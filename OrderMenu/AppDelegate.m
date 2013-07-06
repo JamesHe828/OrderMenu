@@ -9,15 +9,25 @@
 #import "AppDelegate.h"
 
 #import "ViewController.h"
-
+#import "SettingViewController.h"
+#import "MoreFunctionViewController.h"
 @implementation AppDelegate
-
+@synthesize ddmenuControler;
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
     self.viewController = [[ViewController alloc] initWithNibName:@"ViewController" bundle:nil];
-    self.window.rootViewController = self.viewController;
+    UINavigationController *nav=[[UINavigationController alloc] initWithRootViewController:self.viewController];
+    DDMenuController *rootController = [[DDMenuController alloc] initWithRootViewController:nav];
+    ddmenuControler = rootController;
+    SettingViewController *setVC=[[SettingViewController alloc] init];
+    //UINavigationController *nav2=[[UINavigationController alloc] initWithRootViewController:setVC];
+    ddmenuControler.leftViewController=setVC;
+    MoreFunctionViewController *moreFunctionVC=[[MoreFunctionViewController alloc] init];
+    ddmenuControler.rightViewController=moreFunctionVC;
+    self.window.rootViewController = ddmenuControler;
+
     [self.window makeKeyAndVisible];
     return YES;
 }

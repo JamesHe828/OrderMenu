@@ -8,6 +8,17 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ViewController : UIViewController
-
+@interface ViewController : UIViewController<UITableViewDelegate,UITableViewDataSource>
+{
+    UIScrollView  *ascrollview;
+    UIPageControl *pageC;
+    UITableView   *aTableView;
+    NSArray       *ary;
+    NSArray       *nameAry;
+    NSArray       *addressAry;
+    NSString      *numberStr;
+}
+@property(nonatomic,retain)UIPageControl *pageC;
+@property(nonatomic,retain)UITableView   *aTableView;
+@property(nonatomic,retain)NSString      *numberStr;
 @end

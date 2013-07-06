@@ -1,0 +1,16 @@
+//
+//  SettingViewController.h
+//  OrderMenu
+//
+//  Created by tiankong360 on 13-7-3.
+//  Copyright (c) 2013年 tiankong360. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+
+@interface SettingViewController : UIViewController<UITableViewDataSource,UITableViewDelegate>
+{
+    NSArray     *ary;
+    UITableView *aTableView;
+}
+@end
