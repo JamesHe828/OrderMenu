@@ -9,5 +9,9 @@
 #import <UIKit/UIKit.h>
 
 @interface DetailViewController : UIViewController<UITableViewDelegate,UITableViewDataSource>
+{
+     UITableView   *aTableView;
+}
 
+@property(nonatomic,retain)UITableView   *aTableView;
 @end

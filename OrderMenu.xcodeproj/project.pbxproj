@@ -93,6 +93,8 @@
 		4DC782311787C75500212688 /* UIButton+WebCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC782281787C75500212688 /* UIButton+WebCache.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		4DC782321787C75500212688 /* UIImageView+WebCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC7822A1787C75500212688 /* UIImageView+WebCache.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		4DC782341787C81400212688 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DC782331787C81400212688 /* ImageIO.framework */; };
+		4DF3E7CE178AB28900C82B46 /* DishesCustomCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF3E7CD178AB28800C82B46 /* DishesCustomCell.m */; };
+		4DF3E7D0178AB2B600C82B46 /* DishesCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DF3E7CF178AB2B600C82B46 /* DishesCustomCell.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -238,6 +240,9 @@
 		4DC782291787C75500212688 /* UIImageView+WebCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImageView+WebCache.h"; sourceTree = "<group>"; };
 		4DC7822A1787C75500212688 /* UIImageView+WebCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImageView+WebCache.m"; sourceTree = "<group>"; };
 		4DC782331787C81400212688 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
+		4DF3E7CC178AB28800C82B46 /* DishesCustomCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DishesCustomCell.h; sourceTree = "<group>"; };
+		4DF3E7CD178AB28800C82B46 /* DishesCustomCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DishesCustomCell.m; sourceTree = "<group>"; };
+		4DF3E7CF178AB2B600C82B46 /* DishesCustomCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DishesCustomCell.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -314,6 +319,9 @@
 				4D54584217856586006AF288 /* DetailViewController.h */,
 				4D54584317856586006AF288 /* DetailViewController.m */,
 				4D54584417856586006AF288 /* DetailViewController.xib */,
+				4DF3E7CC178AB28800C82B46 /* DishesCustomCell.h */,
+				4DF3E7CD178AB28800C82B46 /* DishesCustomCell.m */,
+				4DF3E7CF178AB2B600C82B46 /* DishesCustomCell.xib */,
 				4D2B2B271787B1F00041D463 /* 第三方 */,
 				4D19CDC6178404ED0018FB37 /* Supporting Files */,
 			);
@@ -637,6 +645,7 @@
 				4D24489A178A65A400AA41DF /* AboutViewController.xib in Resources */,
 				4D24489F178A65B500AA41DF /* HelpViewController.xib in Resources */,
 				4D2448A4178A65C800AA41DF /* FeedbackViewController.xib in Resources */,
+				4DF3E7D0178AB2B600C82B46 /* DishesCustomCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -692,6 +701,7 @@
 				4D244899178A65A400AA41DF /* AboutViewController.m in Sources */,
 				4D24489E178A65B500AA41DF /* HelpViewController.m in Sources */,
 				4D2448A3178A65C800AA41DF /* FeedbackViewController.m in Sources */,
+				4DF3E7CE178AB28900C82B46 /* DishesCustomCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
