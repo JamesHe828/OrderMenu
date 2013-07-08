@@ -8,6 +8,12 @@
 
 #import "SettingViewController.h"
 #import "CustomCell.h"
+#import "CollectViewController.h"
+#import "ShareViewController.h"
+#import "VersionViewController.h"
+#import "AboutViewController.h"
+#import "HelpViewController.h"
+#import "FeedbackViewController.h"
 @interface SettingViewController ()
 
 @end
@@ -19,17 +25,21 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
+
     }
     return self;
 }
 -(void)viewWillAppear:(BOOL)animated
 {
-    NSLog(@"left");
+//    NSLog(@"left");
     [super viewWillAppear:animated];
 }
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    self.navigationItem.title=@"设置";
+    self.navigationController.navigationBar.tintColor=[UIColor orangeColor];
+//    self.navigationController.navigationBar.hidden=YES;
     // Do any additional setup after loading the view from its nib.
     //手势
     UISwipeGestureRecognizer *recognizer;
@@ -52,7 +62,7 @@
     aTableView.delegate=self;
     aTableView.dataSource=self;
     [self.view addSubview:aTableView];
-    ary=[[NSArray alloc] initWithObjects:@"收藏",@"使用版本",@"关于",@"使用帮助",@"使用反馈",@"向好友推荐", nil];
+    ary=[[NSArray alloc] initWithObjects:@"收藏",@"向好友推荐",@"使用版本",@"关于",@"使用帮助",@"用户反馈", nil];
 }
 //手势
 -(void)handleSwipeFrom:(UISwipeGestureRecognizer *)recognizer
@@ -92,6 +102,36 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [aTableView deselectRowAtIndexPath:[aTableView indexPathForSelectedRow] animated:YES];
+    if (indexPath.row==0)
+    {
+        CollectViewController *collectVC=[[CollectViewController alloc] init];
+        [self.navigationController pushViewController:collectVC animated:YES];
+    }
+    if (indexPath.row==1)
+    {
+        ShareViewController *shareVC=[[ShareViewController alloc] init];
+        [self.navigationController pushViewController:shareVC animated:YES];
+    }
+    if (indexPath.row==2)
+    {
+        VersionViewController *versionVC=[[VersionViewController alloc] init];
+        [self.navigationController pushViewController:versionVC animated:YES];
+    }
+    if (indexPath.row==3)
+    {
+        AboutViewController *aboutVC=[[AboutViewController alloc] init];
+        [self.navigationController pushViewController:aboutVC animated:YES];
+    }
+    if (indexPath.row==4)
+    {
+        HelpViewController *helpVC=[[HelpViewController alloc] init];
+        [self.navigationController pushViewController:helpVC animated:YES];
+    }
+    if (indexPath.row==5)
+    {
+        FeedbackViewController *feedbackVC=[[FeedbackViewController alloc] init];
+        [self.navigationController pushViewController:feedbackVC animated:YES];
+    }
 }
 - (void)didReceiveMemoryWarning
 {
