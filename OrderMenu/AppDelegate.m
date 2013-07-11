@@ -24,8 +24,8 @@
     SettingViewController *setVC=[[SettingViewController alloc] init];
     UINavigationController *nav2=[[UINavigationController alloc] initWithRootViewController:setVC];
     ddmenuControler.leftViewController=nav2;
-    MoreFunctionViewController *moreFunctionVC=[[MoreFunctionViewController alloc] init];
-    ddmenuControler.rightViewController=moreFunctionVC;
+//    MoreFunctionViewController *moreFunctionVC=[[MoreFunctionViewController alloc] init];
+//    ddmenuControler.rightViewController=moreFunctionVC;
     self.window.rootViewController = ddmenuControler;
 
     [self.window makeKeyAndVisible];

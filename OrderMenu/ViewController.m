@@ -17,54 +17,92 @@
 @synthesize pageC;
 @synthesize aTableView;
 @synthesize numberStr;
+@synthesize searchVC;
+@synthesize searchAry;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    UIImageView *aImageView=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
+    aImageView.image=[UIImage imageNamed:@"导航"];
+    [self.view addSubview:aImageView];
+    UIButton *aBtn=[UIButton buttonWithType:UIButtonTypeCustom];
+    aBtn.frame=CGRectMake(0, 0, 60, 60);
+    [self.view addSubview:aBtn];
+    [aBtn addTarget:self action:@selector(leftVCClick) forControlEvents:UIControlEventTouchUpInside];
     self.view.backgroundColor=[UIColor whiteColor];
-	ascrollview=[[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, 320, 146)];
+    //搜索栏
+    UISearchBar *searchBar=[[UISearchBar alloc] initWithFrame:CGRectMake(0, 44, 320, 41)];
+    searchBar.delegate=self;
+    [self.view addSubview:searchBar];
+//    searchBar.showsCancelButton=YES;
+    for( id cc in [searchBar subviews]){
+        if([cc isKindOfClass:[UIButton class]]){
+            UIButton *btn = (UIButton *)cc;
+            [btn setTitle:@"取消"  forState:UIControlStateNormal];
+        }
+    }
+//    for (UIButton *cc in [searchBar subviews])
+//    {
+//        [cc setTitle:@"取消" forState:UIControlStateNormal];
+//    }
+    UIView *segment=[searchBar.subviews objectAtIndex:0];
+    [segment removeFromSuperview];
+    searchBar.backgroundColor=[UIColor whiteColor];
+   // 
+    searchBar.tintColor=[UIColor orangeColor];
+//	[searchBar setScopeButtonTitles:[NSArray arrayWithObjects:@"按餐馆查询",@"按菜品查询",nil]];
+    searchBar.placeholder=@"请输入餐馆名或者菜品名";
+    searchAry=[[NSMutableArray alloc] initWithCapacity:0];
+    //养生图片
+	ascrollview=[[UIScrollView alloc] initWithFrame:CGRectMake(0, 44+41, 320, 132)];
     [self.view addSubview:ascrollview];
     ascrollview.pagingEnabled=YES;
     ascrollview.showsHorizontalScrollIndicator=NO;
     ascrollview.delegate=self;
-    ascrollview.contentSize=CGSizeMake(320*5, 146);
+    ascrollview.contentSize=CGSizeMake(320*5, 132);
     for (int i = 0 ; i<5; i++) {
-        UIImageView *aImage = [[UIImageView alloc] initWithFrame:CGRectMake(320*i, 0, 320, 146)];
+        UIImageView *aImage = [[UIImageView alloc] initWithFrame:CGRectMake(320*i, 0, 320, 132)];
         aImage.userInteractionEnabled = YES;
 //         aImage.backgroundColor=[UIColor colorWithRed:211.0/255.0 green:212.0/255.0 blue:217.0/255.0 alpha:1];
-        aImage.image = [UIImage imageNamed:[NSString stringWithFormat:@"%d.jpg",i+1]];
+        aImage.image = [UIImage imageNamed:[NSString stringWithFormat:@"最佳推荐%d",i+1]];
         [ascrollview addSubview:aImage];
         
     }
     for (int j=0; j<5; j++)
     {
         UIButton *btn=[UIButton buttonWithType:UIButtonTypeCustom];
-        btn.frame=CGRectMake(320*j, 0, 320, 146);
+        btn.frame=CGRectMake(320*j, 0, 320, 132);
         [btn addTarget:self action:@selector(detailClick:) forControlEvents:UIControlEventTouchUpInside];
         [ascrollview addSubview:btn];
     }
-    pageC = [[UIPageControl alloc] initWithFrame:CGRectMake(120,126, 100, 10)];
+    pageC = [[UIPageControl alloc] initWithFrame:CGRectMake(120,126+44+41-14+10, 100, 10)];
     pageC.numberOfPages = 5;
     pageC.currentPage=0;
     [self.view addSubview:pageC];
     
     self.navigationItem.title=@"美食推荐";
     self.navigationController.navigationBar.tintColor=[UIColor orangeColor];
-    
-    aTableView=[[UITableView alloc] initWithFrame:CGRectMake(0,146, 320, [UIScreen mainScreen].bounds.size.height - 146-44-20) style:UITableViewStylePlain];
+    self.navigationController.navigationBar.hidden=YES;
+    aTableView=[[UITableView alloc] initWithFrame:CGRectMake(0,146+44+41-14, 320, [UIScreen mainScreen].bounds.size.height - 146-44-41) style:UITableViewStylePlain];
     aTableView.delegate=self;
     aTableView.dataSource=self;
     //[aTableView setSeparatorColor:[UIColor whiteColor]];
     [self.view addSubview:aTableView];
     self.aTableView.backgroundColor=[UIColor clearColor];
-    ary=[[NSArray alloc] initWithObjects:@"a.jpg",@"b.jpg",@"c.jpg",@"d.jpg",@"e.jpg",@"f.jpg", nil];
-    nameAry=[[NSArray alloc] initWithObjects:@"汉丽轩",@"金汉斯",@"徐同泰",@"阳光小餐厅",@"卷凉皮",@"河南天空", nil];
-    addressAry=[[NSArray alloc] initWithObjects:@"花园路国基路向北100米路西",@"花园路国基路向北100米路西",@"花园路国基路向北100米路西",@"花园路国基路向北100米路西",@"花园路国基路向北100米路西",@"花园路国基路向北100米路西", nil];
+    ary=[[NSArray alloc] initWithObjects:@"a.jpg",@"b.jpg",@"c.jpg",@"d.jpg",@"e.jpg",@"f.jpg",@"f.jpg",@"f.jpg",@"f.jpg",@"f.jpg", nil];
+    nameAry=[[NSArray alloc] initWithObjects:@"汉丽轩",@"金汉斯",@"徐同泰",@"阳光小餐厅",@"卷凉皮",@"河南天空",@"aaa",@"bbb",@"111",@"000", nil];
+    addressAry=[[NSArray alloc] initWithObjects:@"花园路国基路向北100米路西",@"花园路国基路向北100米路西",@"花园路国基路向北100米路西",@"花园路国基路向北100米路西",@"花园路国基路向北100米路西",@"花园路国基路向北100米路西",@"花园路国基路向北100米路西",@"花园路国基路向北100米路西",@"花园路国基路向北100米路西",@"花园路国基路向北100米路西", nil];
+}
+-(void)leftVCClick
+{
+    NSLog(@"---------");
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"showLeftVC" object:nil];
 }
 -(void)detailClick:(id)sender
 {
-    DetailViewController *detailVC=[[DetailViewController alloc] init];
-    [self.navigationController pushViewController:detailVC animated:YES];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"pan_NO" object:nil];
+//    DetailViewController *detailVC=[[DetailViewController alloc] init];
+//    [self.navigationController pushViewController:detailVC animated:YES];
+//    [[NSNotificationCenter defaultCenter] postNotificationName:@"pan_NO" object:nil];
    
 }
 -(void)viewWillAppear:(BOOL)animated
@@ -109,33 +147,108 @@
         }
     }
     //右边小箭头
-    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+//    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     cell.imag.image=[UIImage imageNamed:[ary objectAtIndex:indexPath.row]];
     cell.lab.text=[nameAry objectAtIndex:indexPath.row];
+    cell.lab.font = [UIFont fontWithName:@"Arial" size:17.0f];
+    cell.lab.textColor=[UIColor colorWithRed:255.0/255.0 green:137.0/255.0 blue:3.0/255.0 alpha:1.0];
     cell.lab2.textColor=[UIColor grayColor];
     cell.lab2.text=[addressAry objectAtIndex:indexPath.row];
+    cell.renjunLab.text=@"人均 ￥50";
+    cell.renjunLab.textColor=[UIColor grayColor];
     cell.timeLab.textColor=[UIColor grayColor];
     cell.timeLab.text=@"0371-88888815";
     numberStr=cell.timeLab.text;
     [cell.abtn addTarget:self action:@selector(detailClick:) forControlEvents:UIControlEventTouchUpInside];
     [cell.bbtn addTarget:self action:@selector(callNum:) forControlEvents:UIControlEventTouchUpInside];
-   // cell.textLabel.text=[ary objectAtIndex:indexPath.row];
-    //    XmlStriing *xmlStr=[self.array objectAtIndex:indexPath.row];
-    //    cell.lab.text=xmlStr.titleCnString;
-    //    cell.lab2.text=xmlStr.authorString;
-    //    cell.timeLab.text=xmlStr.publishTimeString;
     return cell;
 }
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     
-    return 110;
+    return 66;
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
    // [self detailClick:nil];
   //  [aTableView deselectRowAtIndexPath:[aTableView indexPathForSelectedRow] animated:YES];
+}
+#pragma mark - - searchbar delegate
+//-(void)filterContentForSearchText:(NSString *)searchText scope:(NSString *)scope
+//{
+//   	//清空查询结果表
+//	[searchAry removeAllObjects];
+//    for (NSString *str in nameAry)
+//    {
+//        //截取str字符串[searchText length]长，然后和searchText进行比较，如果相等，就取出来
+//        NSComparisonResult result=[str compare:searchText
+//                                                        options:(NSCaseInsensitiveSearch|NSDiacriticInsensitiveSearch)
+//                                                          range:NSMakeRange(0, [searchText length])];
+//        if (result==NSOrderedSame) 
+//        {
+//            [searchAry addObject:str];
+//        }
+//
+//    }
+//}
+//- (void)searchDisplayController:(UISearchDisplayController *)controller didShowSearchResultsTableView:(UITableView *)tableView
+//{
+//    tableView.frame = CGRectMake(0, 44+41, 320, [UIScreen mainScreen].bounds.size.height-44-41);
+//}
+////输入框中字符串改变
+//- (BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchString:(NSString *)searchString
+//{
+//    NSLog(@"+++++++");
+//	[self filterContentForSearchText:searchString scope:[[self.searchVC.searchBar scopeButtonTitles] objectAtIndex:[self.searchVC.searchBar selectedScopeButtonIndex]]];
+//    return YES;
+//}
+- (BOOL)searchBarShouldBeginEditing:(UISearchBar *)searchBar
+{
+    NSLog(@"searchBarShouldBeginEditing");
+    searchBar.showsCancelButton=YES;
+    return YES;
+}
+- (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar
+{
+    NSLog(@"searchBarTextDidBeginEditing");
+}
+- (BOOL)searchBarShouldEndEditing:(UISearchBar *)searchBar
+{
+    NSLog(@"searchBarShouldEndEditing");
+    return YES;
+}
+- (void)searchBarTextDidEndEditing:(UISearchBar *)searchBar
+{
+    NSLog(@"searchBarTextDidEndEditing");
+    //清空查询结果表
+	[searchAry removeAllObjects];
+    for (NSString *str in nameAry)
+    {
+        //截取str字符串[searchText length]长，然后和searchText进行比较，如果相等，就取出来
+        NSComparisonResult result=[str compare:searchBar.text
+                                       options:(NSCaseInsensitiveSearch|NSDiacriticInsensitiveSearch)
+                                         range:NSMakeRange(0, [searchBar.text length])];
+        if (result==NSOrderedSame)
+        {
+            [searchAry addObject:str];
+            NSLog(@"%@",searchAry);
+        }
+        
+    }
+}
+- (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
+{
+//    NSLog(@"textDidChange");
+}
+- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
+{
+    NSLog(@"searchBarSearchButtonClickedv");
+    [searchBar resignFirstResponder];
+}
+- (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar{
+    [searchBar resignFirstResponder];
+    searchBar.showsCancelButton=NO;
 }
 //打电话
 -(void)callNum:(id)sender

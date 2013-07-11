@@ -97,6 +97,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(BackRootVC) name:@"SwitchGesture" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pan_NO) name:@"pan_NO" object:nil];
      [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pan_YES) name:@"pan_YES" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showLeft:) name:@"showLeftVC" object:nil];
 }
 -(void)pan_NO
 {

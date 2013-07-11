@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ViewController : UIViewController<UITableViewDelegate,UITableViewDataSource>
+@interface ViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,UISearchBarDelegate>
 {
     UIScrollView  *ascrollview;
     UIPageControl *pageC;
@@ -17,8 +17,12 @@
     NSArray       *nameAry;
     NSArray       *addressAry;
     NSString      *numberStr;
+    UISearchDisplayController *searchVC;
+    NSMutableArray*searchAry;
 }
 @property(nonatomic,retain)UIPageControl *pageC;
 @property(nonatomic,retain)UITableView   *aTableView;
 @property(nonatomic,retain)NSString      *numberStr;
+@property(nonatomic,retain)UISearchDisplayController *searchVC;
+@property(nonatomic,retain)NSMutableArray*searchAry;
 @end
