@@ -7,7 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
-
-@interface FeedbackViewController : UIViewController
-
+#import "UIPlaceHolderTextView.h"
+@interface FeedbackViewController : UIViewController<UITextViewDelegate>
+{
+    UIPlaceHolderTextView *aTextView;
+    UITextField           *atextField;
+    UIView                *backView;
+}
+@property(nonatomic,retain)UIPlaceHolderTextView *aTextView;
+@property(nonatomic,retain)UITextField           *atextField;
+@property(nonatomic,retain)UIView                *backView;
 @end

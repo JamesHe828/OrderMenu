@@ -8,6 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface SearchViewController : UIViewController
-
+@interface SearchViewController : UIViewController<UISearchBarDelegate,UITableViewDataSource,UITableViewDelegate>
+{
+    NSArray     *ary;
+}
+@property(nonatomic,retain)NSArray     *ary;
 @end

@@ -11,10 +11,12 @@
 #import "ViewController.h"
 #import "SettingViewController.h"
 #import "MoreFunctionViewController.h"
+#import "MobClick.h"
 @implementation AppDelegate
 @synthesize ddmenuControler;
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    [MobClick checkUpdate];
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
     self.viewController = [[ViewController alloc] initWithNibName:@"ViewController" bundle:nil];

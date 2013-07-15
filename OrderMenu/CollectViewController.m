@@ -7,7 +7,7 @@
 //
 
 #import "CollectViewController.h"
-
+#import <QuartzCore/QuartzCore.h>
 @interface CollectViewController ()
 
 @end
@@ -26,9 +26,23 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
+    UIImageView *aImageView=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
+    aImageView.image=[UIImage imageNamed:@"搜索"];
+    [self.view addSubview:aImageView];
+    UIButton *aBtn=[UIButton buttonWithType:UIButtonTypeCustom];
+    aBtn.frame=CGRectMake(0, 0, 60, 60);
+    [self.view addSubview:aBtn];
+    [aBtn addTarget:self action:@selector(backClick) forControlEvents:UIControlEventTouchUpInside];
 }
-
+-(void)backClick
+{
+    CATransition* transition = [CATransition animation];
+    transition.duration = 0.5;
+    transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    transition.type = kCATransitionMoveIn;
+    [self.navigationController.view.layer addAnimation:transition forKey:nil];
+    [self.navigationController popViewControllerAnimated:NO];
+}
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];

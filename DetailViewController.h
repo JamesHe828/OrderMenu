@@ -11,7 +11,9 @@
 @interface DetailViewController : UIViewController<UITableViewDelegate,UITableViewDataSource>
 {
      UITableView   *aTableView;
+     UILabel       *numLab;
 }
 
 @property(nonatomic,retain)UITableView   *aTableView;
+@property(nonatomic,retain)UILabel       *numLab;
 @end
