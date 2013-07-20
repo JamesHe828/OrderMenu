@@ -232,7 +232,7 @@
     return self;
 }
 - (id)initWithFrame:(CGRect)frame  {
-    return [self initWithFrame:frame arrowImageName:@"blueArrow.png" textColor:TEXT_COLOR];
+    return [self initWithFrame:frame arrowImageName:@"blueArrowDown.png" textColor:TEXT_COLOR];
 }
 -(void)layoutSubviews
 {

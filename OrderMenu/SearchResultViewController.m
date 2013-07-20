@@ -8,13 +8,18 @@
 
 #import "SearchResultViewController.h"
 #import "SearchResultCustomCell.h"
-#import "DetailViewController.h"
+#import "UIImageView+WebCache.h"
+#import "MyActivceView.h"
+#import "ASIHTTPRequest.h"
+#import "NSString+JsonString.h"
 @interface SearchResultViewController ()
 
 @end
 
 @implementation SearchResultViewController
 @synthesize ary;
+@synthesize searchStr;
+@synthesize aTableView;
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -35,12 +40,18 @@
     [self.view addSubview:aBtn];
     [aBtn addTarget:self action:@selector(backClick) forControlEvents:UIControlEventTouchUpInside];
     
-  UITableView  *aTableView=[[UITableView alloc] initWithFrame:CGRectMake(0,44, 320, [UIScreen mainScreen].bounds.size.height -44-20) style:UITableViewStylePlain];
+    aTableView=[[UITableView alloc] initWithFrame:CGRectMake(0,44, 320, [UIScreen mainScreen].bounds.size.height -44-20) style:UITableViewStylePlain];
     aTableView.delegate=self;
     aTableView.dataSource=self;
     //[aTableView setSeparatorColor:[UIColor whiteColor]];
     [self.view addSubview:aTableView];
-    ary=[[NSArray alloc] initWithObjects:@"1",@"2",@"3",@"1",@"2",@"3",@"1",@"2",@"3", nil];
+    detailVC=[[DetailViewController alloc] init];
+    
+}
+-(void)viewWillAppear:(BOOL)animated
+{
+    [aTableView reloadData];
+    [super viewWillAppear:animated];
 }
 #pragma mark - tableview delegate
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -81,18 +92,17 @@
     //右边小箭头
     //    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    cell.textLabel.text=[ary objectAtIndex:indexPath.row];
-//    cell.imag.image=[UIImage imageNamed:[ary objectAtIndex:indexPath.row]];
-//    cell.lab.text=[nameAry objectAtIndex:indexPath.row];
-//    cell.lab.font = [UIFont fontWithName:@"Arial" size:17.0f];
-//    cell.lab.textColor=[UIColor colorWithRed:255.0/255.0 green:137.0/255.0 blue:3.0/255.0 alpha:1.0];
-//    cell.lab2.textColor=[UIColor grayColor];
-//    cell.lab2.text=[addressAry objectAtIndex:indexPath.row];
-//    cell.renjunLab.text=@"人均 ￥50";
-//    cell.renjunLab.textColor=[UIColor grayColor];
-//    cell.timeLab.textColor=[UIColor grayColor];
-//    cell.timeLab.text=@"0371-88888815";
-//    numberStr=cell.timeLab.text;
+    cell.lab.font = [UIFont fontWithName:@"Arial" size:17.0f];
+    cell.lab.textColor=[UIColor colorWithRed:255.0/255.0 green:137.0/255.0 blue:3.0/255.0 alpha:1.0];
+    cell.lab2.textColor=[UIColor grayColor];
+    cell.renjunLab.textColor=[UIColor grayColor];
+    cell.timeLab.textColor=[UIColor grayColor];
+    //numberStr=cell.timeLab.text;
+    cell.lab.text=[[ary objectAtIndex:indexPath.row] valueForKey:@"restname"];
+    [cell.imag setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://interface.hcgjzs.com%@",[[ary objectAtIndex:indexPath.row] valueForKey:@"restimg"]]] placeholderImage:[UIImage imageNamed:@"加载中"]];
+    cell.lab2.text=[[ary objectAtIndex:indexPath.row] valueForKey:@"restaddress"];
+    cell.timeLab.text=[[ary objectAtIndex:indexPath.row] valueForKey:@"restphone"];
+    cell.renjunLab.text=[NSString stringWithFormat:@"人均￥%@",[[ary objectAtIndex:indexPath.row] valueForKey:@"restaverage"]];
     //   [cell.abtn addTarget:self action:@selector(detailClick:) forControlEvents:UIControlEventTouchUpInside];
     //  [cell.bbtn addTarget:self action:@selector(callNum:) forControlEvents:UIControlEventTouchUpInside];
     return cell;
@@ -104,10 +114,52 @@
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    DetailViewController *detailVC=[[DetailViewController alloc] init];
+    [self detailRequest];
     [self.navigationController pushViewController:detailVC animated:YES];
+    p=indexPath.row;
+    NSLog(@"=======  %d",indexPath.row);
     //点击 蓝色慢慢消失
     [tableView deselectRowAtIndexPath:[tableView indexPathForSelectedRow] animated:YES];
+}
+-(void)detailRequest
+{
+    [MyActivceView startAnimatedInView:self.view];
+    ASIHTTPRequest *request=[ASIHTTPRequest requestWithURL:[NSURL URLWithString:@"http://interface.hcgjzs.com/OM_Interface/Restaurant.asmx"]];
+    NSString *postStr=[NSString stringWithFormat:@"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
+                       <soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\
+                       <soap:Body>\
+                       <GetInfo xmlns=\"http://tempuri.org/\">\
+                       <id>%d</id>\
+                       </GetInfo>\
+                       </soap:Body>\
+                       </soap:Envelope>", [[[ary objectAtIndex:p]valueForKey:@"id"] intValue]];
+    NSLog(@"(%d)",p);
+//    request.tag=1111;[[[ary objectAtIndex:p]valueForKey:@"id"] intValue]
+    [request addRequestHeader:@"Host" value:@"interface.hcgjzs.com"];
+    [request addRequestHeader:@"Content-Type" value:@"text/xml; charset=utf-8"];
+    [request addRequestHeader:@"Content-Length" value:[NSString stringWithFormat:@"%d",postStr.length]];
+    [request addRequestHeader:@"SOAPAction" value:@"http://tempuri.org/GetInfo"];
+    [request setPostBody:(NSMutableData *)[postStr dataUsingEncoding:4]];
+    request.delegate=self;
+    [request startAsynchronous];
+}
+#pragma mark - asihttprequest
+- (void)requestStarted:(ASIHTTPRequest *)request
+{
+    NSLog(@"请求开始");
+}
+-(void)requestFinished:(ASIHTTPRequest *)request
+{
+    //       NSLog(@"----->>%@",request.responseString);
+    NSArray *infoAry=[NSString ConverfromData:request.responseData name:@"GetInfo"];
+    //        detailVC.detailAry=infoAry;
+    NSLog(@"______------%@",infoAry);
+    detailVC.addressLab.text=[infoAry  valueForKey:@"restaddress"];
+    detailVC.aLab.text=[infoAry  valueForKey:@"restname"];
+    [detailVC.imageview setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://interface.hcgjzs.com%@",[infoAry valueForKey:@"restimg"]]] placeholderImage:[UIImage imageNamed:@"加载中"]];
+    detailVC.numLab.text=[infoAry valueForKey:@"restphone"];
+    detailVC.aText.text=[infoAry valueForKey:@"restbrief"];
+    [MyActivceView stopAnimatedInView:self.view];
 }
 -(void)backClick
 {

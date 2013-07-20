@@ -12,8 +12,17 @@
 {
      UITableView   *aTableView;
      UILabel       *numLab;
+     NSArray       *detailAry;
+     UIImageView   *imageview;
+     UILabel       *aLab;
+     UITextView    *aText;
+     UILabel       *addressLab;
 }
 
 @property(nonatomic,retain)UITableView   *aTableView;
 @property(nonatomic,retain)UILabel       *numLab;
+@property(nonatomic,retain)NSArray       *detailAry;
+@property(nonatomic,retain)UIImageView   *imageview;
+@property(nonatomic,retain)UILabel       *aLab,*addressLab;
+@property(nonatomic,retain)UITextView    *aText;
 @end

@@ -130,8 +130,10 @@
     }
     if (indexPath.row==3)
     {
-        HelpViewController *helpVC=[[HelpViewController alloc] init];
-        [self.navigationController pushViewController:helpVC animated:YES];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"helpFileView" object:nil];
+        [self performSelector:@selector(helpView) withObject:nil afterDelay:0];
+        
+         
     }
     if (indexPath.row==4)
     {
@@ -151,6 +153,10 @@
         ShareViewController *shareVC=[[ShareViewController alloc] init];
         [self.navigationController pushViewController:shareVC animated:YES];
     }
+}
+-(void)helpView
+{
+   [[NSNotificationCenter defaultCenter] postNotificationName:@"SwitchGesture" object:nil];
 }
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell
 

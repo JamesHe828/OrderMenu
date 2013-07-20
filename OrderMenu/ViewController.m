@@ -8,9 +8,15 @@
 
 #import "ViewController.h"
 #import "CustomCell.h"
-#import "DetailViewController.h"
 #import "SearchViewController.h"
 #import "RefreshHeaderAndFooterView.h"
+#import "ASIHTTPRequest.h"
+#import "SBJSON.h"
+#import "HelpViewController.h"
+#import "NSString+JsonString.h"
+#import "UIImageView+WebCache.h"
+#import "MyActivceView.h"
+#import "Reachability.h"
 @interface ViewController ()<RefreshHeaderAndFooterViewDelegate,UIScrollViewDelegate>
 {
     RefreshHeaderAndFooterView *heardview ;
@@ -45,7 +51,7 @@
     [self.view addSubview:searchBtn];
     [searchBtn addTarget:self action:@selector(searchClick) forControlEvents:UIControlEventTouchUpInside];
     self.view.backgroundColor=[UIColor whiteColor];
-
+    
 //    //搜索栏
 //    UISearchBar *searchBar=[[UISearchBar alloc] initWithFrame:CGRectMake(0, 44, 320, 41)];
 //    searchBar.delegate=self;
@@ -99,15 +105,16 @@
     self.navigationItem.title=@"美食推荐";
     self.navigationController.navigationBar.tintColor=[UIColor orangeColor];
     self.navigationController.navigationBar.hidden=YES;
-    aTableView=[[UITableView alloc] initWithFrame:CGRectMake(0,146+44-14, 320, [UIScreen mainScreen].bounds.size.height - 146-44) style:UITableViewStylePlain];
+    aTableView=[[UITableView alloc] initWithFrame:CGRectMake(0,146+44-14, 320, [UIScreen mainScreen].bounds.size.height - 146-44+14) style:UITableViewStylePlain];
     aTableView.delegate=self;
     aTableView.dataSource=self;
     //[aTableView setSeparatorColor:[UIColor whiteColor]];
     [self.view addSubview:aTableView];
     //self.aTableView.backgroundColor=[UIColor clearColor];
-    ary=[[NSArray alloc] initWithObjects:@"a.jpg",@"b.jpg",@"c.jpg",@"d.jpg",@"e.jpg",@"f.jpg",@"f.jpg",@"f.jpg",@"f.jpg",@"f.jpg", nil];
-    nameAry=[[NSArray alloc] initWithObjects:@"汉丽轩",@"金汉斯",@"徐同泰",@"阳光小餐厅",@"卷凉皮",@"河南天空",@"aaa",@"bbb",@"111",@"000", nil];
-    addressAry=[[NSArray alloc] initWithObjects:@"花园路国基路向北100米路西",@"花园路国基路向北100米路西",@"花园路国基路向北100米路西",@"花园路国基路向北100米路西",@"花园路国基路向北100米路西",@"花园路国基路向北100米路西",@"花园路国基路向北100米路西",@"花园路国基路向北100米路西",@"花园路国基路向北100米路西",@"花园路国基路向北100米路西", nil];
+    ary=[[NSArray alloc] init];
+    nameAry=[[NSArray alloc] init];
+
+    
     //定时滚动
 //    CGPoint bottomOffset = CGPointMake(self.ascrollview.contentOffset.x, self.ascrollview.contentSize.height - self.ascrollview.bounds.size.height);
 //    CGPoint bottomOffset = CGPointMake(self.ascrollview.contentSize.width-self.ascrollview.bounds.size.width,self.ascrollview.contentOffset.y);
@@ -122,6 +129,52 @@
     
     [NSTimer scheduledTimerWithTimeInterval:scrollDurationInSeconds target:self selector:@selector(scrollScrollView:) userInfo:nil repeats:YES];
     [self reloadData2];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(helpFileview) name:@"helpFileView" object:nil];
+    //详情界面
+     detailVC=[[DetailViewController alloc] init];
+    if ([self isconnectok])
+    {
+        [self restaurantListRequest];
+    }
+    else
+    {
+        UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示" message:@"无网络连接" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+        [alert show];
+    }
+
+    
+}
+//网络判断
+-(Boolean)isconnectok{
+    NSURL *url1 = [NSURL URLWithString:@"http://www.tiankong360.com"];
+    NSURLRequest *request = [NSURLRequest requestWithURL:url1 cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval:5];
+    NSHTTPURLResponse *response;
+    [NSURLConnection sendSynchronousRequest:request returningResponse: &response error: nil];
+    if (response == nil) {
+        return false;
+    }
+    else{
+        //通了之后再判断连接类型
+        Reachability *r = [Reachability reachabilityForInternetConnection];
+//        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+        switch ([r currentReachabilityStatus]) {
+            case ReachableViaWWAN:
+//                [userDefaults setObject:@"1" forKey:@"DownLoad"];
+                return true;
+                // break;
+            case ReachableViaWiFi:
+//                [userDefaults setObject:@"0" forKey:@"DownLoad"];
+                return true;
+                // break;
+        }
+        return true;
+    }
+}
+-(void)helpFileview
+{
+//    NSLog(@"()()()()()(()");
+    HelpViewController *helo=[[HelpViewController alloc] init];
+    [self.navigationController pushViewController:helo animated:NO];
 }
 -(void)reloadData2
 {
@@ -155,7 +208,7 @@
         //        }
         
         [self performSelector:@selector(doneLoadingTableViewData) withObject:nil afterDelay:3.0];
-        [self performSelector:@selector(sendRequest)];
+        [self performSelector:@selector(restaurantListRequest)];
         
     }
     else if(view.refreshFooterView.state == PullRefreshLoading){//上拉加载更多动作的内容
@@ -166,7 +219,7 @@
         //            self.page++;
         //        }
         [self performSelector:@selector(doneLoadingTableViewData) withObject:nil afterDelay:3.0];
-        [self performSelector:@selector(sendRequest)];
+       // [self performSelector:@selector(sendRequest)];
     }
     
 }
@@ -208,8 +261,106 @@
 }
 -(void)sendRequest
 {
-    NSLog(@"qweqweqwe");
+//    NSLog(@"qweqweqwe");
     //[self._aTableView reloadData];
+    //请求数据
+    NSString *str=[NSString stringWithFormat:@"http://www.iarchiscape.com/web/newarchilist?before=2013040118000&page=1"];
+    NSString *str2=[str stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    ASIHTTPRequest *request=[[ASIHTTPRequest alloc] initWithURL:[NSURL URLWithString:str2]];
+    [request setDelegate:self];
+    [request startAsynchronous];
+
+    
+}
+-(void)restaurantListRequest
+{
+    [MyActivceView startAnimatedInView:self.view];
+    ASIHTTPRequest *request=[ASIHTTPRequest requestWithURL:[NSURL URLWithString:@"http://interface.hcgjzs.com/OM_Interface/Restaurant.asmx"]];
+    NSString *postStr=[NSString stringWithFormat:@"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
+                       <soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\
+                       <soap:Body>\
+                       <GetRestaurantList xmlns=\"http://tempuri.org/\">\
+                       <filedOrder>%d</filedOrder>\
+                       <typeid>%d</typeid>\
+                       <departid>%d</departid>\
+                       </GetRestaurantList>\
+                       </soap:Body>\
+                       </soap:Envelope>",1,0,1];
+    request.tag=0000;
+    [request addRequestHeader:@"Host" value:@"interface.hcgjzs.com"];
+    [request addRequestHeader:@"Content-Type" value:@"text/xml; charset=utf-8"];
+    [request addRequestHeader:@"Content-Length" value:[NSString stringWithFormat:@"%d",postStr.length]];
+    [request addRequestHeader:@"SOAPAction" value:@"http://tempuri.org/GetRestaurantList"];
+    [request setPostBody:(NSMutableData *)[postStr dataUsingEncoding:4]];
+    request.delegate=self;
+    [request startAsynchronous];
+}
+-(void)detailRequest
+{
+    [MyActivceView startAnimatedInView:self.view];
+    ASIHTTPRequest *request=[ASIHTTPRequest requestWithURL:[NSURL URLWithString:@"http://interface.hcgjzs.com/OM_Interface/Restaurant.asmx"]];
+    NSString *postStr=[NSString stringWithFormat:@"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
+                       <soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\
+                       <soap:Body>\
+                       <GetInfo xmlns=\"http://tempuri.org/\">\
+                       <id>%d</id>\
+                       </GetInfo>\
+                       </soap:Body>\
+                       </soap:Envelope>",[[[ary objectAtIndex:p]valueForKey:@"id"] intValue]];
+    request.tag=1111;
+    [request addRequestHeader:@"Host" value:@"interface.hcgjzs.com"];
+    [request addRequestHeader:@"Content-Type" value:@"text/xml; charset=utf-8"];
+    [request addRequestHeader:@"Content-Length" value:[NSString stringWithFormat:@"%d",postStr.length]];
+    [request addRequestHeader:@"SOAPAction" value:@"http://tempuri.org/GetInfo"];
+    [request setPostBody:(NSMutableData *)[postStr dataUsingEncoding:4]];
+    request.delegate=self;
+    [request startAsynchronous];
+}
+#pragma mark - asihttprequest
+- (void)requestStarted:(ASIHTTPRequest *)request
+{
+    NSLog(@"请求开始");
+}
+-(void)requestFinished:(ASIHTTPRequest *)request
+{
+    [MyActivceView stopAnimatedInView:self.view];
+    if (request.tag==0000)
+    {
+        
+ //       NSLog(@"----->>%@",request.responseString);
+        ary=[NSString ConverfromData:request.responseData name:@"GetRestaurantList"];
+//        NSLog(@"______------%@",ary);
+        [self.aTableView reloadData];
+    }
+    else if (request.tag==1111)
+    {
+ //       NSLog(@"----->>%@",request.responseString);
+        NSArray *infoAry=[NSString ConverfromData:request.responseData name:@"GetInfo"];
+//        detailVC.detailAry=infoAry;
+        NSLog(@"______------%@",infoAry);
+        detailVC.addressLab.text=[infoAry  valueForKey:@"restaddress"];
+        detailVC.aLab.text=[infoAry  valueForKey:@"restname"];
+        [detailVC.imageview setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://interface.hcgjzs.com%@",[infoAry valueForKey:@"restimg"]]] placeholderImage:[UIImage imageNamed:@"加载中"]];
+        detailVC.numLab.text=[infoAry valueForKey:@"restphone"];
+        detailVC.aText.text=[infoAry valueForKey:@"restbrief"];
+    }
+
+    //解析
+    //NSObject *ssss=[ary objectAtIndex:1];
+//    SBJSON  *sbJson=[[SBJSON alloc] init];
+//    NSDictionary *dic=[sbJson objectWithString:ssss error:nil];
+//   // NSDictionary *dicc=[sbJson stringWithObject:ssss error:nil];
+//    NSString *restname=[dicc objectForKey:@"restname"];
+//    NSString *restaddress=[dicc objectForKey:@"restaddress"];
+//    NSString *restaverage=[dicc objectForKey:@"restaverage"];
+//    NSString *restimg=[dicc objectForKey:@"restimg"];
+//    NSString *restphone=[dicc objectForKey:@"restphone"];
+//    NSString *idStr=[dicc objectForKey:@"id"];
+//    NSLog(@"--->>>>%@",restname);
+}
+- (void)requestFailed:(ASIHTTPRequest *)request
+{
+    
 }
 #pragma mark -----------------
 - (void)scrollScrollView:(NSTimer *)timer
@@ -245,7 +396,7 @@
 }
 -(void)detailClick:(id)sender
 {
-    DetailViewController *detailVC=[[DetailViewController alloc] init];
+  //  DetailViewController *detailVC=[[DetailViewController alloc] init];
     [self.navigationController pushViewController:detailVC animated:YES];
   //  [[NSNotificationCenter defaultCenter] postNotificationName:@"pan_NO" object:nil];
    
@@ -264,6 +415,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
+    
 	return [ary count];
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -294,19 +446,21 @@
     //右边小箭头
 //    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    cell.imag.image=[UIImage imageNamed:[ary objectAtIndex:indexPath.row]];
-    cell.lab.text=[nameAry objectAtIndex:indexPath.row];
     cell.lab.font = [UIFont fontWithName:@"Arial" size:17.0f];
     cell.lab.textColor=[UIColor colorWithRed:255.0/255.0 green:137.0/255.0 blue:3.0/255.0 alpha:1.0];
-    cell.lab2.textColor=[UIColor grayColor];
-    cell.lab2.text=[addressAry objectAtIndex:indexPath.row];
-    cell.renjunLab.text=@"人均 ￥50";
+   cell.lab2.textColor=[UIColor grayColor];
     cell.renjunLab.textColor=[UIColor grayColor];
     cell.timeLab.textColor=[UIColor grayColor];
-    cell.timeLab.text=@"0371-88888815";
     numberStr=cell.timeLab.text;
+    cell.lab.text=[[ary objectAtIndex:indexPath.row] valueForKey:@"restname"];
+//    cell.imag.image=[UIImage imageNamed:[NSString stringWithFormat:@"http://interface.hcgjzs.com%@",[[ary objectAtIndex:indexPath.row] valueForKey:@"restimg"]]];
+    [cell.imag setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://interface.hcgjzs.com%@",[[ary objectAtIndex:indexPath.row] valueForKey:@"restimg"]]] placeholderImage:[UIImage imageNamed:@"加载中"]];
+    cell.lab2.text=[[ary objectAtIndex:indexPath.row] valueForKey:@"restaddress"];
+    cell.timeLab.text=[[ary objectAtIndex:indexPath.row] valueForKey:@"restphone"];
+    cell.renjunLab.text=[NSString stringWithFormat:@"人均￥%@",[[ary objectAtIndex:indexPath.row] valueForKey:@"restaverage"]];
  //   [cell.abtn addTarget:self action:@selector(detailClick:) forControlEvents:UIControlEventTouchUpInside];
   //  [cell.bbtn addTarget:self action:@selector(callNum:) forControlEvents:UIControlEventTouchUpInside];
+
     return cell;
 }
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -316,11 +470,15 @@
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    DetailViewController *detailVC=[[DetailViewController alloc] init];
+     p=indexPath.row;
+    [self detailRequest];
+   // DetailViewController *detailVC=[[DetailViewController alloc] init];
     [self.navigationController pushViewController:detailVC animated:YES];
     //点击 蓝色慢慢消失
    [aTableView deselectRowAtIndexPath:[aTableView indexPathForSelectedRow] animated:YES];
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:@"pan_NO" object:nil];
+   
 }
 #pragma mark - - searchbar delegate
 //-(void)filterContentForSearchText:(NSString *)searchText scope:(NSString *)scope

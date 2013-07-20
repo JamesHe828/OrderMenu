@@ -8,6 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
-@interface HelpViewController : UIViewController
-
+@interface HelpViewController : UIViewController<UIScrollViewDelegate>
+{
+    UIPageControl *pageC;
+    int    currentHelppage;
+    
+}
+@property(nonatomic,retain)UIPageControl *pageC;
+@property (nonatomic, retain) NSArray *helpData ;
 @end

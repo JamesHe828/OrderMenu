@@ -7,7 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
-
-@interface ShareViewController : UIViewController
-
+#import "WXApi.h"
+@interface ShareViewController : UIViewController<UITextViewDelegate,WXApiDelegate>
+{
+    UITextView     *aTextView;
+    UIImageView    *shareImage;
+}
+@property(nonatomic,retain)UITextView      *aTextView;
+@property(nonatomic,retain)UIImageView     *shareImage;
 @end

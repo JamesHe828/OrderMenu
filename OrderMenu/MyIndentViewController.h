@@ -8,6 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface MyIndentViewController : UIViewController
-
+@interface MyIndentViewController : UIViewController<UITableViewDelegate,UITableViewDataSource>
+{
+    NSArray *ary;
+}
+@property(nonatomic,retain)NSArray *ary;
 @end

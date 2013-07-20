@@ -9,6 +9,7 @@
 #import "DetailViewController.h"
 #import "DishesCustomCell.h"
 #import <QuartzCore/QuartzCore.h>
+#import "UMSocial.h"
 @interface DetailViewController ()
 
 @end
@@ -16,6 +17,8 @@
 @implementation DetailViewController
 @synthesize aTableView;
 @synthesize numLab;
+@synthesize detailAry;
+@synthesize imageview,aLab,aText,addressLab;
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -36,6 +39,7 @@
 //    //[aTableView setSeparatorColor:[UIColor whiteColor]];
 //    [self.view addSubview:aTableView];
 //    self.aTableView.backgroundColor=[UIColor clearColor];
+   // detailAry=[[NSArray alloc] init];
     UIImageView *aImageView=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
     aImageView.image=[UIImage imageNamed:@"详情导航"];
     [self.view addSubview:aImageView];
@@ -53,11 +57,13 @@
     aView.layer.borderWidth=0.5;
     aView.layer.cornerRadius =5.0;
     
-    UIImageView *imageview=[[UIImageView alloc] initWithFrame:CGRectMake(10, 13, 54, 54)];
-    imageview.image=[UIImage imageNamed:@"a.jpg"];
+    imageview=[[UIImageView alloc] initWithFrame:CGRectMake(10, 13, 54, 54)];
+    //imageview.image=[UIImage imageNamed:@"a.jpg"];
     [aView addSubview:imageview];
-    UILabel *aLab=[[UILabel alloc] initWithFrame:CGRectMake(73, 23, 180, 20)];
-    aLab.text=@"河南天空科技有限公司";
+    aLab=[[UILabel alloc] initWithFrame:CGRectMake(73, 23, 180, 20)];
+    //aLab.text=@"河南天空科技有限公司";
+    //aLab.text=[detailAry valueForKey:@"restname"];
+    //    aLab.text=[[detailAry objectAtIndex:0] valueForKey:@"restname"];
     [aView addSubview:aLab];
     UIImageView *startimageview=[[UIImageView alloc] initWithFrame:CGRectMake(210, 60, 85, 16)];
     startimageview.image=[UIImage imageNamed:@"开始点菜"];
@@ -74,8 +80,8 @@
     yellowImage2.backgroundColor=[UIColor colorWithRed:253.0/255.0 green:226.0/255.0 blue:196.0/255.0 alpha:1.0];
     [self.view addSubview:yellowImage2];
     //餐馆介绍
-    UITextView *aText=[[UITextView alloc] initWithFrame:CGRectMake(8, 150, 320-16, 110)];
-    aText.text=@"河南仲记企业创始于1999年，立足于服务行业，以餐饮为核心产业，传承儒家文化之精髓，倡导仁、义、礼、智、信得儒家理念，是一家集中餐酒楼，公益慈善、绿色食品、文化教育为一体的多元化集团企业，仲记酒楼正光路店2012年盛大开幕，现需诚聘大量英才加入我们的团队。";
+    aText=[[UITextView alloc] initWithFrame:CGRectMake(8, 150, 320-16, 110)];
+    //aText.text=@"河南仲记企业创始于1999年，立足于服务行业，以餐饮为核心产业，传承儒家文化之精髓，倡导仁、义、礼、智、信得儒家理念，是一家集中餐酒楼，公益慈善、绿色食品、文化教育为一体的多元化集团企业，仲记酒楼正光路店2012年盛大开幕，现需诚聘大量英才加入我们的团队。";
     aText.backgroundColor=[UIColor clearColor];
     aText.editable=NO;
     [self.view addSubview:aText];
@@ -105,15 +111,15 @@
     UIImageView *numImage=[[UIImageView alloc] initWithFrame:CGRectMake(15, 40, 20, 20)];
     numImage.image=[UIImage imageNamed:@"电话图标"];
     [addressView addSubview:numImage];
-    UILabel  *addressLab=[[UILabel alloc] initWithFrame:CGRectMake(35, 5, 230, 30)];
+    addressLab=[[UILabel alloc] initWithFrame:CGRectMake(35, 5, 230, 30)];
     addressLab.backgroundColor=[UIColor clearColor];
     addressLab.font=[UIFont fontWithName:@"Arial" size:15.0f];
-    addressLab.text=@"花园路国基路交叉口往北100米路西";
+    //addressLab.text=@"花园路国基路交叉口往北100米路西";
     [addressView addSubview:addressLab];
     numLab=[[UILabel alloc] initWithFrame:CGRectMake(35, 35, 200, 30)];
     numLab.backgroundColor=[UIColor clearColor];
     numLab.font=[UIFont fontWithName:@"Arial" size:15.0f];
-    numLab.text=@"0371-88888815";
+    //numLab.text=@"0371-88888815";
     [addressView addSubview:numLab];
     //餐馆营业时间，氛围，特色
     UILabel  *Lab1=[[UILabel alloc] initWithFrame:CGRectMake(30, 385, 100, 15)];
@@ -155,6 +161,22 @@
     numBtn.frame=CGRectMake(0, 35, 280, 35);
     [numBtn addTarget:self action:@selector(callNum:) forControlEvents:UIControlEventTouchUpInside];
     [addressView addSubview:numBtn];
+    //分享按钮
+    
+    UIButton *commitBtn=[UIButton buttonWithType:UIButtonTypeCustom];
+    commitBtn.frame=CGRectMake(225, 0, 47, 50);
+    [commitBtn addTarget:self action:@selector(commitContent) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:commitBtn];
+    
+}
+-(void)commitContent
+{
+    [UMSocialSnsService presentSnsIconSheetView:self
+                                         appKey:@"51dccb0456240b7f87001d5e"
+                                      shareText:@"我现在在汉丽轩吃饭，在用点美点进行点餐，用起来不错，推荐给大家。@DMD #点美点# ，随意选就餐环境、菜品、预定座位、在线点餐，尽在指尖，点即动美食定！"
+                                     shareImage:[UIImage imageNamed:@"c.jpg"]
+                                shareToSnsNames:[NSArray arrayWithObjects:UMShareToSina,UMShareToTencent,UMShareToRenren,UMShareToWechat,UMShareToDouban,UMShareToQzone,nil]
+                                       delegate:nil];
 }
 //打电话
 -(void)callNum:(id)sender

@@ -9,7 +9,13 @@
 #import "SearchResultCustomCell.h"
 
 @implementation SearchResultCustomCell
-
+@synthesize lab=_lab;
+@synthesize lab2=_lab2;
+@synthesize timeLab=_timeLab;
+@synthesize imag=_imag;
+@synthesize abtn=_abtn;
+@synthesize bbtn=_bbtn;
+@synthesize renjunLab=_renjunLab;
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];

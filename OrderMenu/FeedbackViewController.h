@@ -13,6 +13,7 @@
     UIPlaceHolderTextView *aTextView;
     UITextField           *atextField;
     UIView                *backView;
+    int                   p;
 }
 @property(nonatomic,retain)UIPlaceHolderTextView *aTextView;
 @property(nonatomic,retain)UITextField           *atextField;

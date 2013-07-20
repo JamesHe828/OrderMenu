@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import "DetailViewController.h"
 @interface ViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,UISearchBarDelegate>
 {
     UIScrollView  *ascrollview;
@@ -15,11 +15,12 @@
     UITableView   *aTableView;
     NSArray       *ary;
     NSArray       *nameAry;
-    NSArray       *addressAry;
     NSString      *numberStr;
     UISearchDisplayController *searchVC;
     NSMutableArray*searchAry;
     UITableView   *resultTableView;
+    int           p;
+    DetailViewController *detailVC;
 }
 @property(nonatomic,retain)UIPageControl *pageC;
 @property(nonatomic,retain)UITableView   *aTableView;

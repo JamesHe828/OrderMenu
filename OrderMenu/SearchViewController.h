@@ -7,10 +7,17 @@
 //
 
 #import <UIKit/UIKit.h>
-
+@class SearchResultViewController;
 @interface SearchViewController : UIViewController<UISearchBarDelegate,UITableViewDataSource,UITableViewDelegate>
 {
-    NSArray     *ary;
+    NSMutableArray     *ary;
+    UISearchBar        *aSearchBar;
+    UITableView        *resultTableView;
+    SearchResultViewController *searchReslutVC;
+    NSArray            *searcharry;
+    NSString           *seatchStr;
 }
-@property(nonatomic,retain)NSArray     *ary;
+@property(nonatomic,retain)NSMutableArray     *ary;
+@property(nonatomic,retain)NSArray            *searcharry;
+@property(nonatomic,retain)NSString           *seatchStr;
 @end

@@ -8,6 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface CollectViewController : UIViewController
-
+@interface CollectViewController : UIViewController<UITableViewDataSource,UITableViewDelegate>
+{
+    NSArray  *ary;
+}
+@property(nonatomic,retain) NSArray  *ary;
 @end
