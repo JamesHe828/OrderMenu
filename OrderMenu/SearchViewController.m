@@ -56,46 +56,46 @@
     [self.view addSubview:resultTableView];
  
     self.ary=[[NSMutableArray alloc] init];
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    self.ary = [userDefaults objectForKey:@"historyAry"];
+//    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+//    self.ary = [userDefaults objectForKey:@"historyAry"];
    // [resultTableView reloadData];2
    
     
 }
-//-(void)viewWillAppear:(BOOL)animated
-//{
-//    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-//    self.ary = [userDefaults objectForKey:@"historyAry"];
-////    // 按时间排序
-////    
-////    
-////    NSArray *sortedArray = [self.ary sortedArrayUsingComparator:^(id obj1, id obj2)
-////                            
-////                            
-////                            {
-////                                
-////                                
-////                                NSComparisonResult result = [obj1 compare:obj2];
-////                                
-////                                
-////                                switch(result)
-////                                {
-////                                    case NSOrderedAscending:
-////                                        return NSOrderedDescending;
-////                                    case NSOrderedDescending:
-////                                        return NSOrderedAscending;
-////                                    case NSOrderedSame:
-////                                        return NSOrderedSame;
-////                                    default:
-////                                        return NSOrderedSame;
-////                                } // 时间从近到远（远近相对当前时间而言）
-////                                
-////                                
-////                            }];
-////    NSLog(@"sortedArray  %@",sortedArray);
-////    [resultTableView reloadData];
-//    [super viewWillAppear:animated];
-//}
+-(void)viewWillAppear:(BOOL)animated
+{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    self.ary = [userDefaults objectForKey:@"historyAry"];
+//    // 按时间排序
+//    
+//    
+//    NSArray *sortedArray = [self.ary sortedArrayUsingComparator:^(id obj1, id obj2)
+//                            
+//                            
+//                            {
+//                                
+//                                
+//                                NSComparisonResult result = [obj1 compare:obj2];
+//                                
+//                                
+//                                switch(result)
+//                                {
+//                                    case NSOrderedAscending:
+//                                        return NSOrderedDescending;
+//                                    case NSOrderedDescending:
+//                                        return NSOrderedAscending;
+//                                    case NSOrderedSame:
+//                                        return NSOrderedSame;
+//                                    default:
+//                                        return NSOrderedSame;
+//                                } // 时间从近到远（远近相对当前时间而言）
+//                                
+//                                
+//                            }];
+//    NSLog(@"sortedArray  %@",sortedArray);
+    [resultTableView reloadData];
+    [super viewWillAppear:animated];
+}
 #pragma mark ------ tableview delegate
 #pragma mark - tableview delegate
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
