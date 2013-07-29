@@ -9,7 +9,17 @@
 #import "DetailViewController.h"
 #import "DishesCustomCell.h"
 #import <QuartzCore/QuartzCore.h>
-#import "UMSocial.h"
+#import "DishesListViewController.h"
+#import "NSString+Additions.h"
+#import "ShareContentViewController.h"
+#import "ASIFormDataRequest.h"
+#import "SBJSON.h"
+#import "TKHttpRequest.h"
+#import "WeiBoLoginViewController.h"
+#import "AppDelegate.h"
+
+#define SinaRequest_string @"https://api.weibo.com/oauth2/authorize?client_id=3564417983&redirect_uri=http://www.tiankong360.com&display=mobile"
+#define TencentRequest_string @""
 @interface DetailViewController ()
 
 @end
@@ -18,7 +28,11 @@
 @synthesize aTableView;
 @synthesize numLab;
 @synthesize detailAry;
+@synthesize pID;
+@synthesize IDAry,collectAry;
 @synthesize imageview,aLab,aText,addressLab;
+@synthesize isFromOrder;
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -61,9 +75,6 @@
     //imageview.image=[UIImage imageNamed:@"a.jpg"];
     [aView addSubview:imageview];
     aLab=[[UILabel alloc] initWithFrame:CGRectMake(73, 23, 180, 20)];
-    //aLab.text=@"河南天空科技有限公司";
-    //aLab.text=[detailAry valueForKey:@"restname"];
-    //    aLab.text=[[detailAry objectAtIndex:0] valueForKey:@"restname"];
     [aView addSubview:aLab];
     UIImageView *startimageview=[[UIImageView alloc] initWithFrame:CGRectMake(210, 60, 85, 16)];
     startimageview.image=[UIImage imageNamed:@"开始点菜"];
@@ -162,21 +173,220 @@
     [numBtn addTarget:self action:@selector(callNum:) forControlEvents:UIControlEventTouchUpInside];
     [addressView addSubview:numBtn];
     //分享按钮
-    
     UIButton *commitBtn=[UIButton buttonWithType:UIButtonTypeCustom];
     commitBtn.frame=CGRectMake(225, 0, 47, 50);
     [commitBtn addTarget:self action:@selector(commitContent) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:commitBtn];
-    
+    //收藏按钮
+    UIButton *collectBtn=[UIButton buttonWithType:UIButtonTypeCustom];
+    collectBtn.frame=CGRectMake(270, 0, 52, 50);
+    [collectBtn addTarget:self action:@selector(collectClick) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:collectBtn];
+    IDAry=[[NSMutableArray alloc] init];
+//    collectAry=[[NSMutableArray alloc] init];
+ //   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    self.collectAry = [NSMutableArray arrayWithArray:[[NSUserDefaults standardUserDefaults] objectForKey:@"collectAry"]];
+    [self detailRequest];
 }
+//------分享
 -(void)commitContent
 {
-    [UMSocialSnsService presentSnsIconSheetView:self
-                                         appKey:@"51dccb0456240b7f87001d5e"
-                                      shareText:@"我现在在汉丽轩吃饭，在用点美点进行点餐，用起来不错，推荐给大家。@DMD #点美点# ，随意选就餐环境、菜品、预定座位、在线点餐，尽在指尖，点即动美食定！"
-                                     shareImage:[UIImage imageNamed:@"c.jpg"]
-                                shareToSnsNames:[NSArray arrayWithObjects:UMShareToSina,UMShareToTencent,UMShareToRenren,UMShareToWechat,UMShareToDouban,UMShareToQzone,nil]
-                                       delegate:nil];
+    background=[[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, [UIScreen mainScreen].bounds.size.height)];
+    background.backgroundColor=[[UIColor blackColor] colorWithAlphaComponent:.7];
+    [self.view addSubview:background];
+    backGroundView=[[UIView alloc] initWithFrame:CGRectMake(0, [UIScreen mainScreen].bounds.size.height, 320, 80)];
+    [self.view addSubview:backGroundView];
+    backGroundView.backgroundColor=[UIColor whiteColor];
+    [UIView animateWithDuration:.3 animations:^{
+        backGroundView.frame=CGRectMake(0, [UIScreen mainScreen].bounds.size.height-80, 320, 80);
+    }];
+    UIButton *sinaBtn=[UIButton buttonWithType:UIButtonTypeCustom];
+    sinaBtn.frame=CGRectMake(20, 10, 40, 40);
+    [sinaBtn setImage:[UIImage imageNamed:@"新浪微博1@2x.png"] forState:UIControlStateNormal];
+    [sinaBtn addTarget:self action:@selector(sinaClick) forControlEvents:UIControlEventTouchUpInside];
+    [backGroundView addSubview:sinaBtn];
+    UIButton *tencentBtn=[UIButton buttonWithType:UIButtonTypeCustom];
+    tencentBtn.frame=CGRectMake(80, 10, 40, 40);
+    [tencentBtn setImage:[UIImage imageNamed:@"腾讯微博1@2x.png"] forState:UIControlStateNormal];
+    [tencentBtn addTarget:self action:@selector(tencentClick) forControlEvents:UIControlEventTouchUpInside];
+    [backGroundView addSubview:tencentBtn];
+    // 创建一个手势识别器
+    UITapGestureRecognizer *oneFingerOneTaps =[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(oneFingerOneTaps)];
+    [oneFingerOneTaps setNumberOfTapsRequired:1];
+    [oneFingerOneTaps setNumberOfTouchesRequired:1];
+    [background addGestureRecognizer:oneFingerOneTaps];
+}
+-(void)sinaClick
+{
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"access_token"])
+    {
+        [self sharecontentVC];
+    }
+    else
+    {
+        authorizationView=[[UIView alloc] initWithFrame:CGRectMake(0, [UIScreen mainScreen].bounds.size.height, 320, [UIScreen mainScreen].bounds.size.height)];
+        [self.view addSubview:authorizationView];
+        UIImageView *aImageView=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
+        aImageView.image=[UIImage imageNamed:@"搜索"];
+        [authorizationView addSubview:aImageView];
+        UIButton *aBtn=[UIButton buttonWithType:UIButtonTypeCustom];
+        aBtn.frame=CGRectMake(0, 0, 60, 60);
+        [authorizationView addSubview:aBtn];
+        [aBtn addTarget:self action:@selector(dimissClick) forControlEvents:UIControlEventTouchUpInside];
+        UIWebView *requestWebview=[[UIWebView alloc] initWithFrame:CGRectMake(0, 44, 320, [UIScreen mainScreen].bounds.size.height-44)];
+        [authorizationView addSubview:requestWebview];
+        requestWebview.delegate=self;
+        NSURLRequest *request=[[NSURLRequest alloc] initWithURL:[NSURL URLWithString:SinaRequest_string]];
+        [requestWebview loadRequest:request];
+        [UIView animateWithDuration:.3 animations:^{
+            authorizationView.frame=CGRectMake(0, 0, 320, [UIScreen mainScreen].bounds.size.height);
+        }];
+    }
+    
+}
+-(void)dimissClick
+{
+    [UIView animateWithDuration:.3 animations:^{
+        authorizationView.frame=CGRectMake(0, [UIScreen mainScreen].bounds.size.height, 320, [UIScreen mainScreen].bounds.size.height);
+    } completion:^(BOOL finished) {
+        [authorizationView removeFromSuperview];
+    }];
+}
+#pragma mark - 腾讯微博分享
+-(void)tencentClick
+{
+    NSString * strPath =  [NSString stringWithFormat:@"https://open.t.qq.com/cgi-bin/oauth2/authorize?client_id=%@&response_type=code&redirect_uri=%@&web=2",APP_KEY,APP_REQUEST_URL];
+    WeiBoLoginViewController * login;
+    if (IPhone5)
+    {
+        login = [[WeiBoLoginViewController alloc] initWithNibName:@"WeiBoLoginViewController" bundle:nil];
+    }
+    else
+    {
+        login = [[WeiBoLoginViewController alloc] initWithNibName:@"WeiBoLoginViewController4" bundle:nil];
+    }
+    login.urlStr = strPath;
+    login.resustName = aLab.text;
+    [self presentViewController:login animated:YES completion:^{
+        ;
+    }];
+}
+//手势
+//消息方法oneFingerOneTaps
+- (void)oneFingerOneTaps
+{
+    //    NSLog(@"Action: One finger, one taps");
+    
+    [UIView animateWithDuration:.3 animations:^{
+        backGroundView.frame=CGRectMake(0, [UIScreen mainScreen].bounds.size.height, 320, 80);
+        background.alpha=0;
+    } completion:^(BOOL finished) {
+        [backGroundView removeFromSuperview];
+        [background removeFromSuperview];
+    }];
+    
+}
+
+#pragma mark - webView
+- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
+{
+    // NSLog(@"-=-=-=-=-=>>>  %@",request.URL.absoluteString);
+    NSString *abslutStr=request.URL.absoluteString;
+    if ([abslutStr containString:@"code=" ])
+    {
+        NSString *queryString = request.URL.query;
+        NSString *code = [[queryString componentsSeparatedByString:@"="] objectAtIndex:1];
+        NSLog(@"code= %@",code);
+        ASIFormDataRequest *request = [[ASIFormDataRequest alloc] initWithURL:[NSURL URLWithString:@"https://api.weibo.com/oauth2/access_token"]];
+        [request setPostValue:@"3564417983" forKey:@"client_id"];
+        [request setPostValue:@"636bf0a9d5ad75f116fd9426cd9ecf45" forKey:@"client_secret"];
+        [request setPostValue:@"authorization_code" forKey:@"grant_type"];
+        [request setPostValue:code forKey:@"code"];
+        [request setPostValue:@"http://www.tiankong360.com" forKey:@"redirect_uri"];
+        request.delegate = self;
+        request.tag=360;
+        [request startSynchronous];
+    }
+    return YES;
+}
+- (void)webViewDidStartLoad:(UIWebView *)webView
+{
+    //NSLog(@"已经开始加载网页");
+}
+- (void)webViewDidFinishLoad:(UIWebView *)webView
+{
+    //NSLog(@"加载完毕网页");
+}
+- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
+{
+    //NSLog(@"加载网页错误");
+}
+#pragma mark -- asihttpdelegate
+- (void)requestStarted:(ASIHTTPRequest *)request
+{}
+- (void)requestFinished:(ASIHTTPRequest *)request
+{
+    if (request.tag==360)
+    {
+        // NSLog(@"-=-=>>>  %@",request.responseString);
+        SBJSON *json = [[SBJSON alloc] init];
+        NSDictionary *dic = [json objectWithString:request.responseString error:nil];
+        //    NSLog(@"dic %@",dic);
+        NSString *accessToken = [dic objectForKey:@"access_token"];
+        NSNumber *expiresNum = [dic objectForKey:@"expires_in"];
+        NSString *userID = [dic objectForKey:@"uid"];
+        //放进UserDefaults里面的对象必须实现NSCoding 协议
+        [[NSUserDefaults standardUserDefaults] setObject:accessToken forKey:@"access_token"];
+        [[NSUserDefaults standardUserDefaults] setObject:expiresNum forKey:@"expires_in"];
+        [[NSUserDefaults standardUserDefaults] setObject:userID forKey:@"uid"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        [self sharecontentVC];
+        [self dimissVC];
+    }
+    else if (request.tag==361)
+    {
+        [MyActivceView stopAnimatedInView:self.view];
+        NSArray *infoAry=[NSString ConverfromData:request.responseData name:@"GetInfo"];
+        self.addressLab.text=[infoAry  valueForKey:@"restaddress"];
+        self.aLab.text=[infoAry  valueForKey:@"restname"];
+        [self.imageview setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://interface.hcgjzs.com%@",[infoAry valueForKey:@"restimg"]]] placeholderImage:[UIImage imageNamed:@"加载中"]];
+        self.numLab.text=[infoAry valueForKey:@"restphone"];
+        self.aText.text=[infoAry valueForKey:@"restbrief"];
+        self.detailAry=infoAry;
+    }
+
+    
+}
+- (void)requestFailed:(ASIHTTPRequest *)request
+{}
+-(void)dimissVC
+{
+    
+    [UIView animateWithDuration:.3 animations:^{
+        authorizationView.alpha=0;
+    } completion:^(BOOL finished) {
+        [authorizationView removeFromSuperview];
+    }];
+    [self oneFingerOneTaps];
+}
+-(void)sharecontentVC
+{
+    ShareContentViewController *shareVC=[[ShareContentViewController alloc] init];
+    shareVC.str=[NSString stringWithFormat:@"我现在在%@吃饭，在用点美点进行点餐，用起来不错，推荐给大家。@DMD #点美点# ，随意选就餐环境、菜品、预定座位、在线点餐，尽在指尖，点即动美食定！http://www.tiankong360.com",self.aLab.text];
+    shareVC.picStr=[NSString stringWithFormat:@"http://interface.hcgjzs.com%@",[self.detailAry valueForKey:@"restimg"]];
+    [self presentModalViewController:shareVC animated:YES];  
+    [self oneFingerOneTaps];
+}
+//---------收藏
+-(void)collectClick
+{
+    UIAlertView *collectAlert=[[UIAlertView alloc] initWithTitle:@"温馨提醒" message:@"餐馆收藏成功" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+    [collectAlert show];
+
+    [collectAry addObject:detailAry];
+    [[NSUserDefaults standardUserDefaults] setObject:collectAry forKey:@"collectAry"];
+    [[NSUserDefaults standardUserDefaults] setObject:self.IDAry forKey:@"IDAry"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 //打电话
 -(void)callNum:(id)sender
@@ -184,7 +394,6 @@
     //返回本程序
         UIWebView *callPhoneWebVw = [[UIWebView alloc] init];
         NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"tel://%@",numLab.text]]];
-//        NSLog(@"%@",numLab);
         [callPhoneWebVw loadRequest:request];
         [self.view addSubview:callPhoneWebVw];
     //跳出本程序
@@ -192,11 +401,54 @@
 }
 -(void)startClick
 {
-   
+    DishesListViewController * dishList;
+    if (IPhone5)
+    {
+        dishList = [[DishesListViewController alloc] initWithNibName:@"DishesListViewController" bundle:nil];
+    }
+    else
+    {
+        dishList = [[DishesListViewController alloc] initWithNibName:@"DishesListViewController4" bundle:nil];
+    }
+    dishList.resultID = [self.pID intValue];
+    [self.navigationController pushViewController:dishList animated:YES];
 }
+#pragma mark - back
 -(void)backClick
 {
-    [self.navigationController popViewControllerAnimated:YES];
+    if (self.isFromOrder)
+    {
+        AppDelegate * delegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+        
+        [delegate.AllNav popViewControllerAnimated:YES];
+        [delegate.ddmenuControler showLeftController:YES];
+    }
+    else
+    {
+     [self.navigationController popViewControllerAnimated:YES];
+    }
+}
+#pragma mark --request delegate
+-(void)detailRequest
+{
+    [MyActivceView startAnimatedInView:self.view];
+    ASIHTTPRequest *request=[TKHttpRequest RequestTKUrl:@"http://interface.hcgjzs.com/OM_Interface/Restaurant.asmx"];
+    NSString *postStr=[NSString stringWithFormat:@"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
+                       <soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\
+                       <soap:Body>\
+                       <GetInfo xmlns=\"http://tempuri.org/\">\
+                       <id>%d</id>\
+                       </GetInfo>\
+                       </soap:Body>\
+                       </soap:Envelope>",[self.pID intValue]];
+    [request addRequestHeader:@"Host" value:@"interface.hcgjzs.com"];
+    [request addRequestHeader:@"Content-Type" value:@"text/xml; charset=utf-8"];
+    [request addRequestHeader:@"Content-Length" value:[NSString stringWithFormat:@"%d",postStr.length]];
+    [request addRequestHeader:@"SOAPAction" value:@"http://tempuri.org/GetInfo"];
+    [request setPostBody:(NSMutableData *)[postStr dataUsingEncoding:4]];
+    request.delegate=self;
+    request.tag=361;
+    [request startAsynchronous];
 }
 #pragma mark --- tableview
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -228,15 +480,6 @@
             }
         }
     }
-    //右边小箭头
-//    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-//    cell.selectionStyle = UITableViewCellSelectionStyleNone;
-
-    // cell.textLabel.text=[ary objectAtIndex:indexPath.row];
-    //    XmlStriing *xmlStr=[self.array objectAtIndex:indexPath.row];
-    //    cell.lab.text=xmlStr.titleCnString;
-    //    cell.lab2.text=xmlStr.authorString;
-    //    cell.timeLab.text=xmlStr.publishTimeString;
     return cell;
 }
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath

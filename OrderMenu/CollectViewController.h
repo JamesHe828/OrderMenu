@@ -10,7 +10,11 @@
 
 @interface CollectViewController : UIViewController<UITableViewDataSource,UITableViewDelegate>
 {
-    NSArray  *ary;
+    NSArray        *ary;
+    NSMutableArray *collectAry;
+    UITableView    *aTableView;
+    NSUserDefaults *userDefaults;
 }
 @property(nonatomic,retain) NSArray  *ary;
+@property(nonatomic,retain)NSMutableArray *collectAry;
 @end

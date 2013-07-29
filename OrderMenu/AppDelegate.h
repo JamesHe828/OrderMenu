@@ -15,5 +15,7 @@
 @property (strong, nonatomic) UIWindow *window;
 
 @property (strong, nonatomic) ViewController *viewController;
-@property (nonatomic,retain)DDMenuController *ddmenuControler;
+@property (nonatomic,strong)DDMenuController *ddmenuControler;
+@property (nonatomic,retain)UINavigationController *AllNav;
+
 @end

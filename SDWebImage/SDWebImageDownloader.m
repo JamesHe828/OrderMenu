@@ -159,7 +159,11 @@ NSString *const SDWebImageDownloadStopNotification = @"SDWebImageDownloadStopNot
 
         // Update the data source, we must pass ALL the data, not just the new bytes
         CGImageSourceRef imageSource = CGImageSourceCreateIncremental(NULL);
+      //  CGImageSourceUpdateData(imageSource, (__bridge CFDataRef)imageData, totalSize == expectedSize);
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-bridge-casts-disallowed-in-nonarc"
         CGImageSourceUpdateData(imageSource, (__bridge CFDataRef)imageData, totalSize == expectedSize);
+#pragma clang diagnostic pop
 
         if (width + height == 0)
         {

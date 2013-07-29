@@ -9,7 +9,14 @@
 #import "CollectCustomCell.h"
 
 @implementation CollectCustomCell
-
+@synthesize lab=_lab;
+@synthesize lab2=_lab2;
+@synthesize timeLab=_timeLab;
+@synthesize imag=_imag;
+@synthesize abtn=_abtn;
+@synthesize bbtn=_bbtn;
+@synthesize renjunLab=_renjunLab;
+@synthesize deletaBtn;
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];

@@ -40,9 +40,16 @@
         UIImageView *aImage = [[UIImageView alloc] initWithFrame:CGRectMake(320*i, 0, 320, [UIScreen mainScreen].bounds.size.height)];
         aImage.userInteractionEnabled = YES;
         //         aImage.backgroundColor=[UIColor colorWithRed:211.0/255.0 green:212.0/255.0 blue:217.0/255.0 alpha:1];
-        aImage.image = [UIImage imageNamed:[NSString stringWithFormat:@"help%d",i+1]];
-        [helpScroll addSubview:aImage];
         
+        if ( [UIScreen mainScreen].bounds.size.height==568)
+        {
+            aImage.image = [UIImage imageNamed:[NSString stringWithFormat:@"help%d-568h@2x.png",i+1]];
+        }
+        else
+        {
+            aImage.image = [UIImage imageNamed:[NSString stringWithFormat:@"help%d",i+1]];
+        }
+        [helpScroll addSubview:aImage];
     }
     pageC = [[UIPageControl alloc] initWithFrame:CGRectMake(120,[UIScreen mainScreen].bounds.size.height-70, 100, 10)];
     pageC.numberOfPages = 4;

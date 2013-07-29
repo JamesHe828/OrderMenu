@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DetailViewController : UIViewController<UITableViewDelegate,UITableViewDataSource>
+@interface DetailViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,UIWebViewDelegate>
 {
      UITableView   *aTableView;
      UILabel       *numLab;
@@ -17,6 +17,12 @@
      UILabel       *aLab;
      UITextView    *aText;
      UILabel       *addressLab;
+     NSString      *pID;
+     NSMutableArray *IDAry;
+     NSMutableArray *collectAry;
+     UIView        *background;
+     UIView        *backGroundView;
+     UIView        *authorizationView;
 }
 
 @property(nonatomic,retain)UITableView   *aTableView;
@@ -25,4 +31,8 @@
 @property(nonatomic,retain)UIImageView   *imageview;
 @property(nonatomic,retain)UILabel       *aLab,*addressLab;
 @property(nonatomic,retain)UITextView    *aText;
+@property(nonatomic,retain)NSString      *pID;
+@property(nonatomic,retain)NSMutableArray*IDAry;
+@property(nonatomic,retain)NSMutableArray *collectAry;
+@property (nonatomic) BOOL isFromOrder;
 @end

@@ -15,7 +15,7 @@
 #import "HelpViewController.h"
 #import "FeedbackViewController.h"
 #import "MyIndentViewController.h"
-#import "UMFeedback.h"
+#import "OrderListViewController.h"
 @interface SettingViewController ()
 
 @end
@@ -33,7 +33,6 @@
 }
 -(void)viewWillAppear:(BOOL)animated
 {
-//    NSLog(@"left");
     [super viewWillAppear:animated];
 }
 - (void)viewDidLoad
@@ -45,7 +44,6 @@
     UIImageView *aImageView=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
     aImageView.image=[UIImage imageNamed:@"设置导航"];
     [self.view addSubview:aImageView];
-    // Do any additional setup after loading the view from its nib.
     //手势
     UISwipeGestureRecognizer *recognizer;
     
@@ -101,8 +99,6 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
         //右边小箭头
          cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-		//单元格的选择风格，选择时单元格不出现蓝条
-		//cell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
     cell.textLabel.textColor=[UIColor grayColor];
     cell.textLabel.text=[ary objectAtIndex:indexPath.row];
@@ -118,8 +114,16 @@
     }
     if (indexPath.row==1)
     {
-        MyIndentViewController *myindentVC=[[MyIndentViewController alloc] init];
-        [self.navigationController pushViewController:myindentVC animated:YES];
+        OrderListViewController * orderList;
+        if (IPhone5)
+        {
+            orderList = [[OrderListViewController alloc] initWithNibName:@"OrderListViewController" bundle:nil];
+        }
+        else
+        {
+            orderList = [[OrderListViewController alloc] initWithNibName:@"OrderListViewController4" bundle:nil];
+        }
+        [self.navigationController pushViewController:orderList animated:YES];
 
     }
     if (indexPath.row==2)

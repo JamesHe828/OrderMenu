@@ -16,8 +16,10 @@
     SearchResultViewController *searchReslutVC;
     NSArray            *searcharry;
     NSString           *seatchStr;
+    UILabel            *alab;
 }
 @property(nonatomic,retain)NSMutableArray     *ary;
 @property(nonatomic,retain)NSArray            *searcharry;
 @property(nonatomic,retain)NSString           *seatchStr;
+@property(nonatomic,retain)UILabel            *alab;
 @end

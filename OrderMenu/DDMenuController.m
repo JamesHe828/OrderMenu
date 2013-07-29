@@ -161,13 +161,9 @@
             view.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
 
         } else {
-            
             view.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
-            
         }
-        
     }
-    
 }
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
@@ -483,9 +479,9 @@
     
     [_tap setEnabled:NO];
     _root.view.userInteractionEnabled = YES;
-
     CGRect frame = _root.view.frame;
     frame.origin.x = 0.0f;
+
 
     BOOL _enabled = [UIView areAnimationsEnabled];
     if (!animated) {

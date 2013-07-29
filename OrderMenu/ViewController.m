@@ -17,6 +17,8 @@
 #import "UIImageView+WebCache.h"
 #import "MyActivceView.h"
 #import "Reachability.h"
+#import "DetailViewController.h"
+#import "TKHttpRequest.h"
 @interface ViewController ()<RefreshHeaderAndFooterViewDelegate,UIScrollViewDelegate>
 {
     RefreshHeaderAndFooterView *heardview ;
@@ -31,7 +33,6 @@
 @synthesize pageC;
 @synthesize aTableView;
 @synthesize numberStr;
-@synthesize searchVC;
 @synthesize searchAry;
 @synthesize resultTableView;
 @synthesize ascrollview;
@@ -52,29 +53,6 @@
     [searchBtn addTarget:self action:@selector(searchClick) forControlEvents:UIControlEventTouchUpInside];
     self.view.backgroundColor=[UIColor whiteColor];
     
-//    //搜索栏
-//    UISearchBar *searchBar=[[UISearchBar alloc] initWithFrame:CGRectMake(0, 44, 320, 41)];
-//    searchBar.delegate=self;
-//    [self.view addSubview:searchBar];
-////    searchBar.showsCancelButton=YES;
-//    for( id cc in [searchBar subviews]){
-//        if([cc isKindOfClass:[UIButton class]]){
-//            UIButton *btn = (UIButton *)cc;
-//            [btn setTitle:@"取消"  forState:UIControlStateNormal];
-//        }
-//    }
-//    for (UIButton *cc in [searchBar subviews])
-//    {
-//        [cc setTitle:@"取消" forState:UIControlStateNormal];
-//    }
-//    UIView *segment=[searchBar.subviews objectAtIndex:0];
-//    [segment removeFromSuperview];
-//    searchBar.backgroundColor=[UIColor whiteColor];
-//   // 
-//    searchBar.tintColor=[UIColor orangeColor];
-////	[searchBar setScopeButtonTitles:[NSArray arrayWithObjects:@"按餐馆查询",@"按菜品查询",nil]];
-//    searchBar.placeholder=@"请输入餐馆名或者菜品名";
-//    searchAry=[[NSMutableArray alloc] initWithCapacity:0];
     //养生图片
 	ascrollview=[[UIScrollView alloc] initWithFrame:CGRectMake(0, 44, 320, 132)];
     [self.view addSubview:ascrollview];
@@ -85,7 +63,6 @@
     for (int i = 0 ; i<5; i++) {
         UIImageView *aImage = [[UIImageView alloc] initWithFrame:CGRectMake(320*i, 0, 320, 132)];
         aImage.userInteractionEnabled = YES;
-//         aImage.backgroundColor=[UIColor colorWithRed:211.0/255.0 green:212.0/255.0 blue:217.0/255.0 alpha:1];
         aImage.image = [UIImage imageNamed:[NSString stringWithFormat:@"最佳推荐%d",i+1]];
         [ascrollview addSubview:aImage];
         
@@ -102,10 +79,10 @@
     pageC.currentPage=0;
     [self.view addSubview:pageC];
     
-    self.navigationItem.title=@"美食推荐";
-    self.navigationController.navigationBar.tintColor=[UIColor orangeColor];
-    self.navigationController.navigationBar.hidden=YES;
-    aTableView=[[UITableView alloc] initWithFrame:CGRectMake(0,146+44-14, 320, [UIScreen mainScreen].bounds.size.height - 146-44+14) style:UITableViewStylePlain];
+    self.navigationController.navigationBarHidden = YES;
+    
+    
+    aTableView=[[UITableView alloc] initWithFrame:CGRectMake(0,146+44-14, 320, [UIScreen mainScreen].bounds.size.height - 146-44+14-20) style:UITableViewStylePlain];  
     aTableView.delegate=self;
     aTableView.dataSource=self;
     //[aTableView setSeparatorColor:[UIColor whiteColor]];
@@ -122,17 +99,14 @@
     float scrollDurationInSeconds = 5.0;
     
     //计算timer间隔
-    
-    
-//    float totalScrollAmount = bottomOffset.x;
-//    float timerInterval = scrollDurationInSeconds / totalScrollAmount;
-    
     [NSTimer scheduledTimerWithTimeInterval:scrollDurationInSeconds target:self selector:@selector(scrollScrollView:) userInfo:nil repeats:YES];
+    
     [self reloadData2];
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(helpFileview) name:@"helpFileView" object:nil];
-    //详情界面
-     detailVC=[[DetailViewController alloc] init];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(detailFileview:) name:@"detailViewC" object:nil];
     if ([self isconnectok])
+        
     {
         [self restaurantListRequest];
     }
@@ -141,8 +115,6 @@
         UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示" message:@"无网络连接" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
         [alert show];
     }
-
-    
 }
 //网络判断
 -(Boolean)isconnectok{
@@ -170,9 +142,16 @@
         return true;
     }
 }
+-(void)detailFileview:(NSNotification *)aNotification
+{
+    NSDictionary * dic = aNotification.userInfo;
+    NSString * title = [NSString stringWithFormat:@"%@",[dic objectForKey:@"key"]];
+     DetailViewController *detailVC=[[DetailViewController alloc] init];
+    detailVC.pID=title;
+    [self.navigationController pushViewController:detailVC animated:YES];
+}
 -(void)helpFileview
 {
-//    NSLog(@"()()()()()(()");
     HelpViewController *helo=[[HelpViewController alloc] init];
     [self.navigationController pushViewController:helo animated:NO];
 }
@@ -200,25 +179,13 @@
 	self.reloading = YES;
     if (view.refreshHeaderView.state == PullRefreshLoading)
     {//下拉刷新动作的内容
-        NSLog(@"header");
-        //        if (self.page >0 && self.page <(articleAry.count/2 +articleAry.count%2)) {
-        //            self.page--;
-        //        }else{
-        //            self.page = 0;
-        //        }
         
-        [self performSelector:@selector(doneLoadingTableViewData) withObject:nil afterDelay:3.0];
+        [self performSelector:@selector(doneLoadingTableViewData) withObject:nil afterDelay:1.0];
         [self performSelector:@selector(restaurantListRequest)];
         
     }
     else if(view.refreshFooterView.state == PullRefreshLoading){//上拉加载更多动作的内容
-        NSLog(@"footer");
-        //        if (self.page =(articleAry.count/2 +articleAry.count%2)) {
-        //            self.page = (articleAry.count/2 +articleAry.count%2);
-        //        }else{
-        //            self.page++;
-        //        }
-        [self performSelector:@selector(doneLoadingTableViewData) withObject:nil afterDelay:3.0];
+        [self performSelector:@selector(doneLoadingTableViewData) withObject:nil afterDelay:1.0];
        // [self performSelector:@selector(sendRequest)];
     }
     
@@ -261,7 +228,6 @@
 }
 -(void)sendRequest
 {
-//    NSLog(@"qweqweqwe");
     //[self._aTableView reloadData];
     //请求数据
     NSString *str=[NSString stringWithFormat:@"http://www.iarchiscape.com/web/newarchilist?before=2013040118000&page=1"];
@@ -269,13 +235,11 @@
     ASIHTTPRequest *request=[[ASIHTTPRequest alloc] initWithURL:[NSURL URLWithString:str2]];
     [request setDelegate:self];
     [request startAsynchronous];
-
-    
 }
 -(void)restaurantListRequest
 {
     [MyActivceView startAnimatedInView:self.view];
-    ASIHTTPRequest *request=[ASIHTTPRequest requestWithURL:[NSURL URLWithString:@"http://interface.hcgjzs.com/OM_Interface/Restaurant.asmx"]];
+    ASIHTTPRequest *request=[TKHttpRequest RequestTKUrl:@"http://interface.hcgjzs.com/OM_Interface/Restaurant.asmx"];
     NSString *postStr=[NSString stringWithFormat:@"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
                        <soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\
                        <soap:Body>\
@@ -295,27 +259,6 @@
     request.delegate=self;
     [request startAsynchronous];
 }
--(void)detailRequest
-{
-    [MyActivceView startAnimatedInView:self.view];
-    ASIHTTPRequest *request=[ASIHTTPRequest requestWithURL:[NSURL URLWithString:@"http://interface.hcgjzs.com/OM_Interface/Restaurant.asmx"]];
-    NSString *postStr=[NSString stringWithFormat:@"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
-                       <soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\
-                       <soap:Body>\
-                       <GetInfo xmlns=\"http://tempuri.org/\">\
-                       <id>%d</id>\
-                       </GetInfo>\
-                       </soap:Body>\
-                       </soap:Envelope>",[[[ary objectAtIndex:p]valueForKey:@"id"] intValue]];
-    request.tag=1111;
-    [request addRequestHeader:@"Host" value:@"interface.hcgjzs.com"];
-    [request addRequestHeader:@"Content-Type" value:@"text/xml; charset=utf-8"];
-    [request addRequestHeader:@"Content-Length" value:[NSString stringWithFormat:@"%d",postStr.length]];
-    [request addRequestHeader:@"SOAPAction" value:@"http://tempuri.org/GetInfo"];
-    [request setPostBody:(NSMutableData *)[postStr dataUsingEncoding:4]];
-    request.delegate=self;
-    [request startAsynchronous];
-}
 #pragma mark - asihttprequest
 - (void)requestStarted:(ASIHTTPRequest *)request
 {
@@ -329,34 +272,9 @@
         
  //       NSLog(@"----->>%@",request.responseString);
         ary=[NSString ConverfromData:request.responseData name:@"GetRestaurantList"];
-//        NSLog(@"______------%@",ary);
         [self.aTableView reloadData];
     }
-    else if (request.tag==1111)
-    {
- //       NSLog(@"----->>%@",request.responseString);
-        NSArray *infoAry=[NSString ConverfromData:request.responseData name:@"GetInfo"];
-//        detailVC.detailAry=infoAry;
-        NSLog(@"______------%@",infoAry);
-        detailVC.addressLab.text=[infoAry  valueForKey:@"restaddress"];
-        detailVC.aLab.text=[infoAry  valueForKey:@"restname"];
-        [detailVC.imageview setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://interface.hcgjzs.com%@",[infoAry valueForKey:@"restimg"]]] placeholderImage:[UIImage imageNamed:@"加载中"]];
-        detailVC.numLab.text=[infoAry valueForKey:@"restphone"];
-        detailVC.aText.text=[infoAry valueForKey:@"restbrief"];
-    }
 
-    //解析
-    //NSObject *ssss=[ary objectAtIndex:1];
-//    SBJSON  *sbJson=[[SBJSON alloc] init];
-//    NSDictionary *dic=[sbJson objectWithString:ssss error:nil];
-//   // NSDictionary *dicc=[sbJson stringWithObject:ssss error:nil];
-//    NSString *restname=[dicc objectForKey:@"restname"];
-//    NSString *restaddress=[dicc objectForKey:@"restaddress"];
-//    NSString *restaverage=[dicc objectForKey:@"restaverage"];
-//    NSString *restimg=[dicc objectForKey:@"restimg"];
-//    NSString *restphone=[dicc objectForKey:@"restphone"];
-//    NSString *idStr=[dicc objectForKey:@"id"];
-//    NSLog(@"--->>>>%@",restname);
 }
 - (void)requestFailed:(ASIHTTPRequest *)request
 {
@@ -385,7 +303,6 @@
 }
 -(void)leftVCClick
 {
-//    NSLog(@"---------");
     [[NSNotificationCenter defaultCenter] postNotificationName:@"showLeftVC" object:nil];
 }
 -(void)searchClick
@@ -394,22 +311,14 @@
     [self.navigationController pushViewController:searchVC2 animated:YES];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"pan_NO" object:nil];
 }
--(void)detailClick:(id)sender
-{
-  //  DetailViewController *detailVC=[[DetailViewController alloc] init];
-    [self.navigationController pushViewController:detailVC animated:YES];
-  //  [[NSNotificationCenter defaultCenter] postNotificationName:@"pan_NO" object:nil];
-   
-}
 -(void)viewWillAppear:(BOOL)animated
 {
-     [[NSNotificationCenter defaultCenter] postNotificationName:@"pan_YES" object:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"pan_YES" object:nil];
     [super viewWillAppear:animated];
 }
 #pragma mark - tableview delegate
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-	
     return 1;
 }
 
@@ -471,8 +380,8 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
      p=indexPath.row;
-    [self detailRequest];
-   // DetailViewController *detailVC=[[DetailViewController alloc] init];
+    DetailViewController *detailVC=[[DetailViewController alloc] init];
+    detailVC.pID=[[ary objectAtIndex:p]valueForKey:@"id"];;
     [self.navigationController pushViewController:detailVC animated:YES];
     //点击 蓝色慢慢消失
    [aTableView deselectRowAtIndexPath:[aTableView indexPathForSelectedRow] animated:YES];
@@ -480,104 +389,7 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:@"pan_NO" object:nil];
    
 }
-#pragma mark - - searchbar delegate
-//-(void)filterContentForSearchText:(NSString *)searchText scope:(NSString *)scope
-//{
-//   	//清空查询结果表
-//	[searchAry removeAllObjects];
-//    for (NSString *str in nameAry)
-//    {
-//        //截取str字符串[searchText length]长，然后和searchText进行比较，如果相等，就取出来
-//        NSComparisonResult result=[str compare:searchText
-//                                                        options:(NSCaseInsensitiveSearch|NSDiacriticInsensitiveSearch)
-//                                                          range:NSMakeRange(0, [searchText length])];
-//        if (result==NSOrderedSame) 
-//        {
-//            [searchAry addObject:str];
-//        }
-//
-//    }
-//}
-//- (void)searchDisplayController:(UISearchDisplayController *)controller didShowSearchResultsTableView:(UITableView *)tableView
-//{
-//    tableView.frame = CGRectMake(0, 44+41, 320, [UIScreen mainScreen].bounds.size.height-44-41);
-//}
-////输入框中字符串改变
-//- (BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchString:(NSString *)searchString
-//{
-//    NSLog(@"+++++++");
-//	[self filterContentForSearchText:searchString scope:[[self.searchVC.searchBar scopeButtonTitles] objectAtIndex:[self.searchVC.searchBar selectedScopeButtonIndex]]];
-//    return YES;
-//}
-- (BOOL)searchBarShouldBeginEditing:(UISearchBar *)searchBar
-{
-    NSLog(@"searchBarShouldBeginEditing");
-//    searchBar.showsCancelButton=YES;
-//    
-//    resultTableView=[[UITableView alloc] initWithFrame:CGRectMake(0, [UIScreen mainScreen].bounds.size.height, 320,[UIScreen mainScreen].bounds.size.height-41-44) style:UITableViewStylePlain];
-////    resultTableView.delegate=self;
-////    resultTableView.dataSource=self;
-//    [self.view addSubview:resultTableView];
-//    [UIView animateWithDuration:.3 animations:^{
-//        resultTableView.frame=CGRectMake(0, 44+41, 320,[UIScreen mainScreen].bounds.size.height-41-44);
-//    }];
-    
-    
-    return YES;
-}
-- (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar
-{
-    NSLog(@"searchBarTextDidBeginEditing");
-}
-- (BOOL)searchBarShouldEndEditing:(UISearchBar *)searchBar
-{
-    NSLog(@"searchBarShouldEndEditing");
-    return YES;
-}
-- (void)searchBarTextDidEndEditing:(UISearchBar *)searchBar
-{
-    NSLog(@"searchBarTextDidEndEditing");
-    //清空查询结果表
-	[searchAry removeAllObjects];
-    for (NSString *str in nameAry)
-    {
-        //截取str字符串[searchText length]长，然后和searchText进行比较，如果相等，就取出来
-        NSComparisonResult result=[str compare:searchBar.text
-                                       options:(NSCaseInsensitiveSearch|NSDiacriticInsensitiveSearch)
-                                         range:NSMakeRange(0, [searchBar.text length])];
-        if (result==NSOrderedSame)
-        {
-            [searchAry addObject:str];
-            NSLog(@"%@",searchAry);
-        }
-        
-    }
-}
-- (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
-{
-//    NSLog(@"textDidChange");
-}
-- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
-{
-    NSLog(@"searchBarSearchButtonClickedv");
-    [searchBar resignFirstResponder];
-}
-- (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar{
-    [searchBar resignFirstResponder];
-    searchBar.showsCancelButton=NO;
-}
-//打电话
--(void)callNum:(id)sender
-{
-    //返回本程序
-//    UIWebView *callPhoneWebVw = [[UIWebView alloc] init];
-//    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"tel://%@",numberStr]]];
-//    NSLog(@"%@",numberStr);
-//    [callPhoneWebVw loadRequest:request];
-//    [self.view addSubview:callPhoneWebVw];
-    //跳出本程序
-//    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"tel://%@",numberStr]]];
-}
+
 
 - (void)didReceiveMemoryWarning
 {

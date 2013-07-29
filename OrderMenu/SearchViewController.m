@@ -11,6 +11,8 @@
 #import "NSString+JsonString.h"
 #import "Reachability.h"
 #import "SearchResultViewController.h"
+#import "MyActivceView.h"
+#import "TKHttpRequest.h"
 @interface SearchViewController ()
 
 @end
@@ -18,6 +20,7 @@
 @implementation SearchViewController
 @synthesize ary,searcharry;
 @synthesize seatchStr;
+@synthesize alab;
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -30,6 +33,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    
     UIImageView *aImageView=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
     aImageView.image=[UIImage imageNamed:@"搜索"];
     [self.view addSubview:aImageView];
@@ -49,63 +54,70 @@
     
     
     //表
-    resultTableView=[[UITableView alloc] initWithFrame:CGRectMake(0, 44+41, 320, [UIScreen mainScreen].bounds.size.height-44-41-20) style:UITableViewStylePlain];
+    resultTableView=[[UITableView alloc] initWithFrame:CGRectMake(0, 44+41, 320, [UIScreen mainScreen].bounds.size.height-44-41) style:UITableViewStylePlain];
     resultTableView.delegate=self;
     resultTableView.dataSource=self;
-    //resultTableView.scrollEnabled=NO;
     [self.view addSubview:resultTableView];
- 
-    self.ary=[[NSMutableArray alloc] init];
-//    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-//    self.ary = [userDefaults objectForKey:@"historyAry"];
-   // [resultTableView reloadData];2
-   
+    
+    alab=[[UILabel alloc] initWithFrame:CGRectMake(120, 20, 200, 50)];
+    alab.backgroundColor=[UIColor clearColor];
+    [resultTableView addSubview:alab];
+    
+    self.ary=[NSMutableArray arrayWithCapacity:0];
+    self.searcharry=[[NSArray alloc] init];
     
 }
 -(void)viewWillAppear:(BOOL)animated
 {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    self.ary = [userDefaults objectForKey:@"historyAry"];
-//    // 按时间排序
-//    
-//    
-//    NSArray *sortedArray = [self.ary sortedArrayUsingComparator:^(id obj1, id obj2)
-//                            
-//                            
-//                            {
-//                                
-//                                
-//                                NSComparisonResult result = [obj1 compare:obj2];
-//                                
-//                                
-//                                switch(result)
-//                                {
-//                                    case NSOrderedAscending:
-//                                        return NSOrderedDescending;
-//                                    case NSOrderedDescending:
-//                                        return NSOrderedAscending;
-//                                    case NSOrderedSame:
-//                                        return NSOrderedSame;
-//                                    default:
-//                                        return NSOrderedSame;
-//                                } // 时间从近到远（远近相对当前时间而言）
-//                                
-//                                
-//                            }];
-//    NSLog(@"sortedArray  %@",sortedArray);
-    [resultTableView reloadData];
+    self.ary = [NSMutableArray arrayWithArray:[[NSUserDefaults standardUserDefaults] objectForKey:@"historyAry"]];
+   // NSLog(@"self.array = %@",ary);
+    
+    if ([ary count] != 0)
+    {
+        alab.text=nil;
+    }
+  
+    // 按时间排序
+    self.searcharry = [self.ary sortedArrayUsingComparator:^(id obj1, id obj2)
+                            
+                            
+                            {
+                                
+                                
+                                NSComparisonResult result = [obj1 compare:obj2];
+                                
+                                
+                                switch(result)
+                                {
+                                    case NSOrderedAscending:
+                                        return NSOrderedDescending;
+                                    case NSOrderedDescending:
+                                        return NSOrderedAscending;
+                                    case NSOrderedSame:
+                                        return NSOrderedSame;
+                                    default:
+                                        return NSOrderedSame;
+                                } // 时间从近到远（远近相对当前时间而言）
+                                
+                                
+                            }];
+    NSLog(@"sortedArray  %@",searcharry);
+      [resultTableView reloadData];
     [super viewWillAppear:animated];
 }
 #pragma mark ------ tableview delegate
 #pragma mark - tableview delegate
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-	
+    if ([self.searcharry count]==0)
+    {
+        alab.text=@"无搜索记录";
+    }
     return 1;
 }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [ary count];
+    return [self.searcharry count];
 }
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
@@ -118,18 +130,14 @@
 	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
 	if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
-        //右边小箭头
-       // cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-		//单元格的选择风格，选择时单元格不出现蓝条
-		//cell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
-    cell.textLabel.text=[ary objectAtIndex:indexPath.row];
+    cell.textLabel.text=[self.searcharry objectAtIndex:indexPath.row];
 	return cell;
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [tableView deselectRowAtIndexPath:[tableView indexPathForSelectedRow] animated:YES];
-    self.seatchStr=[ary objectAtIndex:indexPath.row];
+    self.seatchStr=[self.searcharry objectAtIndex:indexPath.row];
     [self resultViewController];
 }
 //- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
@@ -138,41 +146,56 @@
 ////    [aView addSubview:aSearchBar];
 //    return aSearchBar;
 //}
-//-(UIView*)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
-//{
-//    UIView *aView=[[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 60)];
-//    UILabel *aLab=[[UILabel alloc] initWithFrame:CGRectMake(90, 5, 160, 30)];
-//    aLab.textAlignment=NSTextAlignmentCenter;
-//    aLab.text=@"清空历史记录";
-//    aLab.baselineAdjustment=UIBaselineAdjustmentAlignBaselines;
-//    aLab.backgroundColor=[UIColor clearColor];
-//    [aView addSubview:aLab];
-//    UIButton *btn=[UIButton buttonWithType:UIButtonTypeCustom];
-//    btn.frame=CGRectMake(52, 10, 250, 50);
-//    [btn addTarget:self action:@selector(delegateData) forControlEvents:UIControlEventTouchUpInside];
-//    [aView addSubview:btn];
-//    return aView;
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+{
+    return 60;
+}
+-(UIView*)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
+{
+    UIView *aView=[[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 60)];
+    UILabel *aLab2=[[UILabel alloc] initWithFrame:CGRectMake(90, 5, 160, 30)];
+    aLab2.textAlignment=NSTextAlignmentCenter;
+    if ([self.searcharry count]!= 0)
+    {
+        aLab2.text=@"清空历史记录";
+    }
+    else
+    {
+        aLab2.text=@"";
+    }
+    
+    aLab2.baselineAdjustment=UIBaselineAdjustmentAlignBaselines;
+    aLab2.backgroundColor=[UIColor clearColor];
+    [aView addSubview:aLab2];
+    UIButton *btn=[UIButton buttonWithType:UIButtonTypeCustom];
+    btn.frame=CGRectMake(52, 10, 250, 50);
+    [btn addTarget:self action:@selector(delegateData) forControlEvents:UIControlEventTouchUpInside];
+    [aView addSubview:btn];
+    return aView;
+}
+//滑动删除
+////要求委托方的编辑风格在表视图的一个特定的位置。
+//-(UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath{
+//    UITableViewCellEditingStyle result = UITableViewCellEditingStyleNone;//默认没有编辑风格
+//    if ([tableView isEqual:resultTableView]) {
+//        result = UITableViewCellEditingStyleDelete;//设置编辑风格为删除风格
+//    }
+//    return result;
 //}
-//要求委托方的编辑风格在表视图的一个特定的位置。
--(UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath{
-    UITableViewCellEditingStyle result = UITableViewCellEditingStyleNone;//默认没有编辑风格
-    if ([tableView isEqual:resultTableView]) {
-        result = UITableViewCellEditingStyleDelete;//设置编辑风格为删除风格
-    }
-    return result;
-}
--(void)setEditing:(BOOL)editing animated:(BOOL)animated{//设置是否显示一个可编辑视图的视图控制器。
-    [super setEditing:editing animated:animated];
-    [resultTableView setEditing:editing animated:animated];//切换接收者的进入和退出编辑模式。
-}
--(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath{//请求数据源提交的插入或删除指定行接收者。
-    if (editingStyle ==UITableViewCellEditingStyleDelete) {//如果编辑样式为删除样式
-        if (indexPath.row<[self.ary count]) {
-            [self.ary removeObjectAtIndex:indexPath.row];//移除数据源的数据
-            [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationLeft];//移除tableView中的数据
-        }
-    }
-}
+//-(void)setEditing:(BOOL)editing animated:(BOOL)animated{//设置是否显示一个可编辑视图的视图控制器。
+//    [super setEditing:editing animated:animated];
+//    [resultTableView setEditing:editing animated:animated];//切换接收者的进入和退出编辑模式。
+//}
+//-(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath{//请求数据源提交的插入或删除指定行接收者。
+//    if (editingStyle ==UITableViewCellEditingStyleDelete) {//如果编辑样式为删除样式
+//        if (indexPath.row<[self.searcharry count]) {
+//            [self.searcharry removeObjectAtIndex:indexPath.row];//移除数据源的数据
+//            [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationLeft];//移除tableView中的数据
+//            [[NSUserDefaults standardUserDefaults] setObject:self.searcharry forKey:@"historyAry"];
+//            [[NSUserDefaults standardUserDefaults] synchronize];
+//        }
+//    }
+//}
 # pragma mark - --- searchbar delegate
 - (BOOL)searchBarShouldBeginEditing:(UISearchBar *)searchBar
 {
@@ -232,11 +255,10 @@
 {
     [self.ary addObject:searchBar.text];
     self.seatchStr=searchBar.text;
-   // NSLog(@"searchBarSearchButtonClickedv");
     [searchBar resignFirstResponder];
     [self resultViewController];
-   // [self.ary addObject:searchBar.text];
-    [[NSUserDefaults standardUserDefaults] setObject:ary forKey:@"historyAry"];
+    searchBar.text=nil;
+    [[NSUserDefaults standardUserDefaults] setObject:self.ary forKey:@"historyAry"];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 - (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar{
@@ -246,19 +268,20 @@
 #pragma mark ----
 -(void)delegateData
 {
-//    NSLog(@"+++++++++>>>>");
-//    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-//    [userDefaults removeObjectForKey:@"historyAry"];
-//    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-////    self.ary = [userDefaults objectForKey:@"historyAry"];
-//    [[userDefaults objectForKey:@"historyAry"] removeAllObjects];
-//    [resultTableView reloadData];
+    self.ary = [NSMutableArray arrayWithArray:[[NSUserDefaults standardUserDefaults] objectForKey:@"historyAry"]];
+    [self.ary removeAllObjects];
+    [[NSUserDefaults standardUserDefaults] setObject:self.ary forKey:@"historyAry"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    self.searcharry=[[NSArray alloc] init];
+//    self.ary=[NSMutableArray arrayWithCapacity:0];
+    [resultTableView reloadData];
 }
 -(void)resultViewController
 {
     if ([self isconnectok])
     {
         [self searchRequest];
+        [MyActivceView startAnimatedInView:self.view];
     }
     else
     {
@@ -266,11 +289,10 @@
         [alert show];
     }
 
-    
 }
 -(void)searchRequest
 {
-    ASIHTTPRequest *request=[ASIHTTPRequest requestWithURL:[NSURL URLWithString:@"http://interface.hcgjzs.com/OM_Interface/Restaurant.asmx"]];
+    ASIHTTPRequest *request=[TKHttpRequest RequestTKUrl: @"http://interface.hcgjzs.com/OM_Interface/Restaurant.asmx"];
     NSString *postStr=[NSString stringWithFormat:@"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
                        <soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\
                        <soap:Body>\
@@ -279,7 +301,6 @@
                        </ListForSearch>\
                        </soap:Body>\
                        </soap:Envelope>",self.seatchStr];
-   // NSLog(@"------  %@",aSearchBar.text);
     [request addRequestHeader:@"Host" value:@"interface.hcgjzs.com"];
     [request addRequestHeader:@"Content-Type" value:@"text/xml; charset=utf-8"];
     [request addRequestHeader:@"Content-Length" value:[NSString stringWithFormat:@"%d",postStr.length]];
@@ -303,10 +324,9 @@
     //NSArray *ary2=[NSString ConverfromData:request.responseData name:@"ListForSearch"];
    // NSLog(@"______------%@",ary2);
     //searchReslutVC.ary=ary2;
-    //searcharry=ary2;
+    [MyActivceView stopAnimatedInView:self.view];
     searchReslutVC=[[SearchResultViewController alloc] init];
     searchReslutVC.ary=[NSString ConverfromData:request.responseData name:@"ListForSearch"];
-    //NSLog(@"searchReslutVC.ary  %@",searchReslutVC.ary);
     [self.navigationController pushViewController:searchReslutVC animated:YES];
 }
 - (void)requestFailed:(ASIHTTPRequest *)request

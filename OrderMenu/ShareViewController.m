@@ -8,8 +8,14 @@
 
 #import "ShareViewController.h"
 #import <QuartzCore/QuartzCore.h>
-#import "UMSocial.h"
+#import "NSString+Additions.h"
+#import "ASIFormDataRequest.h"
+#import "SBJSON.h"
+#import "ShareContentViewController.h"
+#import "WeiBoLoginViewController.h"
+#define SinaRequest_string @"https://api.weibo.com/oauth2/authorize?client_id=3564417983&redirect_uri=http://www.tiankong360.com&display=mobile"
 
+#define TencentRequest_string @""
 @interface ShareViewController ()
 
 @end
@@ -64,7 +70,7 @@
 //    [tencnetBtn addTarget:self action:@selector(tencentClick) forControlEvents:UIControlEventTouchUpInside];
 //    [nView addSubview:tencnetBtn];
     //白色底
-    UIView *nView=[[UIView alloc] initWithFrame:CGRectMake(10, 60, 280, 160)];
+    UIView *nView=[[UIView alloc] initWithFrame:CGRectMake(10, 60, 280, 165)];
     nView.backgroundColor=[UIColor colorWithRed:255.0/255.0 green:255.0/255.0 blue:255.0/255.0 alpha:1.0];
     //圆角
     nView.layer.borderColor=[UIColor grayColor].CGColor;
@@ -80,38 +86,54 @@
     nView.clipsToBounds = NO;
     [self.view addSubview:nView];
     
-    aTextView=[[UITextView alloc] initWithFrame:CGRectMake(5, 5, 270, 150)];
+    aTextView=[[UITextView alloc] initWithFrame:CGRectMake(5, 5, 270, 155)];
     aTextView.text=@"去那个好呢，东城，西城，城南，城北？哥们，要吃饭啊？@DMD #点美点# ，随意选就餐环境、菜品、预定座位、在线点餐，点美点，美一点，我的美餐！http://www.tiankong360.com";
     aTextView.font=[UIFont fontWithName:@"Arial" size:16.0f];
     aTextView.delegate=self;
     aTextView.returnKeyType=UIReturnKeyDone;
     [nView addSubview:aTextView];
     
-    shareImage=[[UIImageView alloc] initWithFrame:CGRectMake(170, 240, 100, 80)];
-    shareImage.image=[UIImage imageNamed:@"c.jpg"];
+    shareImage=[[UIImageView alloc] initWithFrame:CGRectMake(180, 240, 70, 100)];
+    shareImage.image=[UIImage imageNamed:@"Default@2x.png"];
     [self.view addSubview:shareImage];
 
     UIButton *commitBtn=[UIButton buttonWithType:UIButtonTypeCustom];
     commitBtn.frame=CGRectMake(230, 0, 60, 50);
     [commitBtn addTarget:self action:@selector(commitContent) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:commitBtn];
-    [WXApi registerApp:@"wxbbaa72933f4cc9b7"];
-//    [UMSocialControllerService defaultControllerService].socialData.extConfig.wxMessageType = UMSocialWXMessageTypeApp;   //可以指定音乐类型或者视频类型
-//    [UMSocialData defaultData].extConfig.appUrl = @"http://www.tiankong360.com";
 
     
 }
 -(void)commitContent
 {
+
+
+    background=[[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, [UIScreen mainScreen].bounds.size.height)];
+    background.backgroundColor=[[UIColor blackColor] colorWithAlphaComponent:.7];
+    [self.view addSubview:background];
+    backGroundView=[[UIView alloc] initWithFrame:CGRectMake(0, [UIScreen mainScreen].bounds.size.height, 320, 80)];
+    [self.view addSubview:backGroundView];
+    backGroundView.backgroundColor=[UIColor whiteColor];
+    [UIView animateWithDuration:.3 animations:^{
+        backGroundView.frame=CGRectMake(0, [UIScreen mainScreen].bounds.size.height-80, 320, 80);
+    }];
+    UIButton *sinaBtn=[UIButton buttonWithType:UIButtonTypeCustom];
+    sinaBtn.frame=CGRectMake(20, 10, 40, 40);
+    [sinaBtn setImage:[UIImage imageNamed:@"新浪微博1@2x.png"] forState:UIControlStateNormal];
+    [sinaBtn addTarget:self action:@selector(sinaClick) forControlEvents:UIControlEventTouchUpInside];
+    [backGroundView addSubview:sinaBtn];
+    UIButton *tencentBtn=[UIButton buttonWithType:UIButtonTypeCustom];
+    tencentBtn.frame=CGRectMake(80, 10, 40, 40);
+    [tencentBtn setImage:[UIImage imageNamed:@"腾讯微博1@2x.png"] forState:UIControlStateNormal];
+    [tencentBtn addTarget:self action:@selector(tencentClick) forControlEvents:UIControlEventTouchUpInside];
+    [backGroundView addSubview:tencentBtn];
+    // 创建一个手势识别器
+    UITapGestureRecognizer *oneFingerOneTaps =[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(oneFingerOneTaps)];
+    [oneFingerOneTaps setNumberOfTapsRequired:1];
+    [oneFingerOneTaps setNumberOfTouchesRequired:1];
+    [background addGestureRecognizer:oneFingerOneTaps];
+//    [backGroundView addGestureRecognizer:oneFingerOneTaps];
     
-//    [UMSocialControllerService defaultControllerService].socialData.extConfig.wxMessageType = UMSocialWXMessageTypeApp;   //可以指定音乐类型或者视频类型
-//    [UMSocialData defaultData].extConfig.appUrl = @"http://www.tiankong360.com";
-    [UMSocialSnsService presentSnsIconSheetView:self
-                                         appKey:@"51dccb0456240b7f87001d5e"
-                                      shareText:aTextView.text
-                                     shareImage:shareImage.image
-                                shareToSnsNames:[NSArray arrayWithObjects:UMShareToSina,UMShareToTencent,UMShareToRenren,UMShareToWechat,UMShareToDouban,UMShareToQzone,nil]
-                                       delegate:nil];
 }
 #pragma MARK -textview delegate
 -(BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
@@ -130,11 +152,144 @@
 }
 -(void)sinaClick
 {
-   
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"access_token"])
+    {
+        [self sharecontentVC];
+    }
+    else
+    {
+        authorizationView=[[UIView alloc] initWithFrame:CGRectMake(0, [UIScreen mainScreen].bounds.size.height, 320, [UIScreen mainScreen].bounds.size.height)];
+        [self.view addSubview:authorizationView];
+        UIImageView *aImageView=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
+        aImageView.image=[UIImage imageNamed:@"搜索"];
+        [authorizationView addSubview:aImageView];
+        UIButton *aBtn=[UIButton buttonWithType:UIButtonTypeCustom];
+        aBtn.frame=CGRectMake(0, 0, 60, 60);
+        [authorizationView addSubview:aBtn];
+        [aBtn addTarget:self action:@selector(dimissClick) forControlEvents:UIControlEventTouchUpInside];
+        UIWebView *requestWebview=[[UIWebView alloc] initWithFrame:CGRectMake(0, 44, 320, [UIScreen mainScreen].bounds.size.height-44)];
+        [authorizationView addSubview:requestWebview];
+        requestWebview.delegate=self;
+        NSURLRequest *request=[[NSURLRequest alloc] initWithURL:[NSURL URLWithString:SinaRequest_string]];
+        [requestWebview loadRequest:request];
+        [UIView animateWithDuration:.3 animations:^{
+            authorizationView.frame=CGRectMake(0, 0, 320, [UIScreen mainScreen].bounds.size.height);
+        }];
+    }
+
 }
 -(void)tencentClick
 {
-   
+    NSString * strPath =  [NSString stringWithFormat:@"https://open.t.qq.com/cgi-bin/oauth2/authorize?client_id=%@&response_type=code&redirect_uri=%@",APP_KEY,APP_REQUEST_URL];
+    WeiBoLoginViewController * login;
+    if (IPhone5)
+    {
+        login = [[WeiBoLoginViewController alloc] initWithNibName:@"WeiBoLoginViewController" bundle:nil];
+    }
+    else
+    {
+      login = [[WeiBoLoginViewController alloc] initWithNibName:@"WeiBoLoginViewController4" bundle:nil];
+    }
+    login.urlStr = strPath;
+    [self presentViewController:login animated:YES completion:^{
+        ;
+    }];
+}
+-(void)dimissClick
+{
+    [UIView animateWithDuration:.3 animations:^{
+        authorizationView.frame=CGRectMake(0, [UIScreen mainScreen].bounds.size.height, 320, [UIScreen mainScreen].bounds.size.height);
+    } completion:^(BOOL finished) {
+        [authorizationView removeFromSuperview];
+    }];
+}
+//手势
+//消息方法oneFingerOneTaps
+- (void)oneFingerOneTaps
+{
+//    NSLog(@"Action: One finger, one taps");
+
+        [UIView animateWithDuration:.3 animations:^{
+            backGroundView.frame=CGRectMake(0, [UIScreen mainScreen].bounds.size.height, 320, 80);
+            background.alpha=0;
+        } completion:^(BOOL finished) {
+            [backGroundView removeFromSuperview];
+            [background removeFromSuperview];
+        }];
+    
+}
+
+#pragma mark - webView
+- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
+{
+    NSString *abslutStr=request.URL.absoluteString;
+    if ([abslutStr containString:@"code=" ])
+    {
+       NSString *queryString = request.URL.query;
+        NSString *code = [[queryString componentsSeparatedByString:@"="] objectAtIndex:1];
+        NSLog(@"code= %@",code);
+        ASIFormDataRequest *request = [[ASIFormDataRequest alloc] initWithURL:[NSURL URLWithString:@"https://api.weibo.com/oauth2/access_token"]];
+        [request setPostValue:@"3564417983" forKey:@"client_id"];
+        [request setPostValue:@"636bf0a9d5ad75f116fd9426cd9ecf45" forKey:@"client_secret"];
+        [request setPostValue:@"authorization_code" forKey:@"grant_type"];
+        [request setPostValue:code forKey:@"code"];
+        [request setPostValue:@"http://www.tiankong360.com" forKey:@"redirect_uri"];
+        request.delegate = self;
+        [request startSynchronous];
+    }
+    return YES;
+}
+- (void)webViewDidStartLoad:(UIWebView *)webView
+{
+    //NSLog(@"已经开始加载网页");
+}
+- (void)webViewDidFinishLoad:(UIWebView *)webView
+{
+    //NSLog(@"加载完毕网页");
+}
+- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
+{
+    //NSLog(@"加载网页错误");
+}
+#pragma mark -- asihttpdelegate
+- (void)requestStarted:(ASIHTTPRequest *)request
+{}
+- (void)requestFinished:(ASIHTTPRequest *)request
+{
+   // NSLog(@"-=-=>>>  %@",request.responseString);
+    SBJSON *json = [[SBJSON alloc] init];
+    NSDictionary *dic = [json objectWithString:request.responseString error:nil];
+//    NSLog(@"dic %@",dic);
+    NSString *accessToken = [dic objectForKey:@"access_token"];
+    NSNumber *expiresNum = [dic objectForKey:@"expires_in"];
+    NSString *userID = [dic objectForKey:@"uid"];
+    //放进UserDefaults里面的对象必须实现NSCoding 协议
+    [[NSUserDefaults standardUserDefaults] setObject:accessToken forKey:@"access_token"];
+    [[NSUserDefaults standardUserDefaults] setObject:expiresNum forKey:@"expires_in"];
+    [[NSUserDefaults standardUserDefaults] setObject:userID forKey:@"uid"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self sharecontentVC];
+    [self dimissVC];
+}
+- (void)requestFailed:(ASIHTTPRequest *)request
+{}
+-(void)dimissVC
+{
+
+    [UIView animateWithDuration:.3 animations:^{
+        authorizationView.alpha=0;
+    } completion:^(BOOL finished) {
+        [authorizationView removeFromSuperview];
+    }];
+    [self oneFingerOneTaps];
+}
+-(void)sharecontentVC
+{
+    ShareContentViewController *shareVC=[[ShareContentViewController alloc] init];
+    shareVC.str=@"去那个好呢，东城，西城，城南，城北？哥们，要吃饭啊？@DMD #点美点# ，随意选就餐环境、菜品、预定座位、在线点餐，点美点，美一点，我的美餐！http://www.tiankong360.com";
+    shareVC.picStr=@"http://interface.hcgjzs.com/images/index.jpg";
+    [self presentModalViewController:shareVC animated:YES];
+    [self oneFingerOneTaps];
 }
 -(void)backClick
 {

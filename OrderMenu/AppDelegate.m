@@ -11,55 +11,37 @@
 #import "ViewController.h"
 #import "SettingViewController.h"
 #import "MoreFunctionViewController.h"
-#import "MobClick.h"
-#import "UMSocial.h"
 #import "HelpViewController.h"
 #import "Reachability.h"
+#import "DataBase.h"
+#import "TKHttpRequest.h"
+
 @implementation AppDelegate
 @synthesize ddmenuControler;
+@synthesize AllNav;
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     
-    //版本
-    [MobClick checkUpdate];
-    [UMSocialData setAppKey:@"51dccb0456240b7f87001d5e"];
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
     self.viewController = [[ViewController alloc] initWithNibName:@"ViewController" bundle:nil];
+    
     UINavigationController *nav=[[UINavigationController alloc] initWithRootViewController:self.viewController];
+    self.AllNav = nav;
     DDMenuController *rootController = [[DDMenuController alloc] initWithRootViewController:nav];
     ddmenuControler = rootController;
     SettingViewController *setVC=[[SettingViewController alloc] init];
     UINavigationController *nav2=[[UINavigationController alloc] initWithRootViewController:setVC];
     ddmenuControler.leftViewController=nav2;
-//    MoreFunctionViewController *moreFunctionVC=[[MoreFunctionViewController alloc] init];
-//    ddmenuControler.rightViewController=moreFunctionVC;
+
+//    self.AllNav = [[UINavigationController alloc] initWithRootViewController:ddmenuControler];
+//    self.AllNav.navigationBarHidden=YES;
     self.window.rootViewController = ddmenuControler;
     
-//    //网络判断
-//    Reachability *r= [Reachability reachabilityWithHostName:@"www.apple.com"];
-//    switch([r currentReachabilityStatus])
-//    {
-//        case NotReachable:
-//            // 没有网络连接
-//        {
-//            UIAlertView *alert=[[UIAlertView alloc] initWithTitle:@"提示" message:@"无网络连接" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
-//            [alert show];
-//        }
-//            break;
-//        case ReachableViaWWAN:
-//            // 使用3G网络
-//        {
-//            NSLog(@"使用3G网络");
-//        }
-//            break;
-//        case ReachableViaWiFi:
-//            // 使用WiFi网络
-//        {
-//            NSLog(@"使用WiFi网络");
-//        }
-//            break;
-//    }
+    //jjy
+    [TKHttpRequest ShareCache];
+    [DataBase clearOrderMenu];
+
     
     //判断程序是否是第一次安装运行
     if (![[NSUserDefaults standardUserDefaults] boolForKey:@"everLaunched"]) {
@@ -74,7 +56,6 @@
         // 这里判断是否第一次如果是加载用户帮助文件
        // [[UIApplication sharedApplication]setStatusBarHidden:YES];
         // [[NSNotificationCenter defaultCenter] postNotificationName:@"helpFileView" object:nil];
-        NSLog(@"***********");
         HelpViewController *hel0=[[HelpViewController alloc] init];
         [self.viewController.navigationController pushViewController:hel0 animated:YES];
         

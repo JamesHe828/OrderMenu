@@ -12,6 +12,7 @@
 #import "MyActivceView.h"
 #import "ASIHTTPRequest.h"
 #import "NSString+JsonString.h"
+#import "DetailViewController.h"
 @interface SearchResultViewController ()
 
 @end
@@ -45,7 +46,6 @@
     aTableView.dataSource=self;
     //[aTableView setSeparatorColor:[UIColor whiteColor]];
     [self.view addSubview:aTableView];
-    detailVC=[[DetailViewController alloc] init];
     
 }
 -(void)viewWillAppear:(BOOL)animated
@@ -62,6 +62,13 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
+    if ([ary count]==0)
+    {
+        UILabel *alab=[[UILabel alloc] initWithFrame:CGRectMake(120, 2, 200, 50)];
+        alab.text=@"无搜索结果";
+        alab.backgroundColor=[UIColor clearColor];
+        [aTableView addSubview:alab];
+    }
 	return [ary count];
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -114,53 +121,15 @@
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    [self detailRequest];
-    [self.navigationController pushViewController:detailVC animated:YES];
     p=indexPath.row;
-    NSLog(@"=======  %d",indexPath.row);
+    DetailViewController *detailVC=[[DetailViewController alloc] init];
+    detailVC.pID=[[ary objectAtIndex:p]valueForKey:@"id"];
+    [self.navigationController pushViewController:detailVC animated:YES];
     //点击 蓝色慢慢消失
     [tableView deselectRowAtIndexPath:[tableView indexPathForSelectedRow] animated:YES];
 }
--(void)detailRequest
-{
-    [MyActivceView startAnimatedInView:self.view];
-    ASIHTTPRequest *request=[ASIHTTPRequest requestWithURL:[NSURL URLWithString:@"http://interface.hcgjzs.com/OM_Interface/Restaurant.asmx"]];
-    NSString *postStr=[NSString stringWithFormat:@"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
-                       <soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\
-                       <soap:Body>\
-                       <GetInfo xmlns=\"http://tempuri.org/\">\
-                       <id>%d</id>\
-                       </GetInfo>\
-                       </soap:Body>\
-                       </soap:Envelope>", [[[ary objectAtIndex:p]valueForKey:@"id"] intValue]];
-    NSLog(@"(%d)",p);
-//    request.tag=1111;[[[ary objectAtIndex:p]valueForKey:@"id"] intValue]
-    [request addRequestHeader:@"Host" value:@"interface.hcgjzs.com"];
-    [request addRequestHeader:@"Content-Type" value:@"text/xml; charset=utf-8"];
-    [request addRequestHeader:@"Content-Length" value:[NSString stringWithFormat:@"%d",postStr.length]];
-    [request addRequestHeader:@"SOAPAction" value:@"http://tempuri.org/GetInfo"];
-    [request setPostBody:(NSMutableData *)[postStr dataUsingEncoding:4]];
-    request.delegate=self;
-    [request startAsynchronous];
-}
-#pragma mark - asihttprequest
-- (void)requestStarted:(ASIHTTPRequest *)request
-{
-    NSLog(@"请求开始");
-}
--(void)requestFinished:(ASIHTTPRequest *)request
-{
-    //       NSLog(@"----->>%@",request.responseString);
-    NSArray *infoAry=[NSString ConverfromData:request.responseData name:@"GetInfo"];
-    //        detailVC.detailAry=infoAry;
-    NSLog(@"______------%@",infoAry);
-    detailVC.addressLab.text=[infoAry  valueForKey:@"restaddress"];
-    detailVC.aLab.text=[infoAry  valueForKey:@"restname"];
-    [detailVC.imageview setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://interface.hcgjzs.com%@",[infoAry valueForKey:@"restimg"]]] placeholderImage:[UIImage imageNamed:@"加载中"]];
-    detailVC.numLab.text=[infoAry valueForKey:@"restphone"];
-    detailVC.aText.text=[infoAry valueForKey:@"restbrief"];
-    [MyActivceView stopAnimatedInView:self.view];
-}
+
+
 -(void)backClick
 {
     [self.navigationController popViewControllerAnimated:YES];

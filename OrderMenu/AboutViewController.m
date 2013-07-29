@@ -58,30 +58,40 @@
     lab1.backgroundColor=[UIColor clearColor];
     lab1.textColor=[UIColor grayColor];
     [self.view addSubview:lab1];
-    UILabel *lab2=[[UILabel alloc] initWithFrame:CGRectMake(37, 270, 70, 70)];
+    UILabel *lab2=[[UILabel alloc] initWithFrame:CGRectMake(37, 260, 70, 70)];
     lab2.text=@"官网:";
     lab2.backgroundColor=[UIColor clearColor];
     lab2.textColor=[UIColor grayColor];
     [self.view addSubview:lab2];
-    UILabel *lab22=[[UILabel alloc] initWithFrame:CGRectMake(90, 270, 200, 70)];
+    UILabel *lab22=[[UILabel alloc] initWithFrame:CGRectMake(90, 260, 200, 70)];
     lab22.text=@"www.tiankong360.com";
     lab22.backgroundColor=[UIColor clearColor];
     lab22.textColor=[UIColor grayColor];
     [self.view addSubview:lab22];
-    UILabel *lab3=[[UILabel alloc] initWithFrame:CGRectMake(37, 304, 100, 70)];
+    UILabel *lab3=[[UILabel alloc] initWithFrame:CGRectMake(37, 285, 100, 70)];
     lab3.text=@"客服邮箱:";
     lab3.backgroundColor=[UIColor clearColor];
     lab3.textColor=[UIColor grayColor];
     [self.view addSubview:lab3];
-    UILabel *lab33=[[UILabel alloc] initWithFrame:CGRectMake(110, 304, 200, 70)];
-    lab33.text=@"408303005@qq.com";
+    UILabel *lab33=[[UILabel alloc] initWithFrame:CGRectMake(110, 285, 200, 70)];
+    lab33.text=@"tiankong360@163.com";
     lab33.backgroundColor=[UIColor clearColor];
     lab33.textColor=[UIColor grayColor];
     [self.view addSubview:lab33];
-    UILabel *lab4=[[UILabel alloc] initWithFrame:CGRectMake(66, 430, 200, 30)];
-    lab4.text=@"www.tiankong360.com";
-    lab4.textColor=[UIColor colorWithRed:255.0/255.0 green:142.0/255.0 blue:45/255.0 alpha:1.0];
+    UILabel *lab4=[[UILabel alloc] initWithFrame:CGRectMake(37, 310, 100, 70)];
+    lab4.text=@"联系电话:";
+    lab4.backgroundColor=[UIColor clearColor];
+    lab4.textColor=[UIColor grayColor];
     [self.view addSubview:lab4];
+    UILabel *lab44=[[UILabel alloc] initWithFrame:CGRectMake(110, 310, 200, 70)];
+    lab44.text=@"0371-88888818/5";
+    lab44.backgroundColor=[UIColor clearColor];
+    lab44.textColor=[UIColor grayColor];
+    [self.view addSubview:lab44];
+    UILabel *lab5=[[UILabel alloc] initWithFrame:CGRectMake(66, 430, 200, 30)];
+    lab5.text=@"www.tiankong360.com";
+    lab5.textColor=[UIColor colorWithRed:255.0/255.0 green:142.0/255.0 blue:45/255.0 alpha:1.0];
+    [self.view addSubview:lab5];
 
 }
 -(void)backClick
