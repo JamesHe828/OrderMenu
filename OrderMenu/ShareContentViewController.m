@@ -28,14 +28,16 @@
     [super viewDidLoad];
    // self.view.backgroundColor=[UIColor whiteColor];
     UIImageView *aImageView=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
-    aImageView.image=[UIImage imageNamed:@"分享导航"];
+    aImageView.image=[UIImage imageNamed:@"好友推荐2"];
     [self.view addSubview:aImageView];
     UIButton *aBtn=[UIButton buttonWithType:UIButtonTypeCustom];
-    aBtn.frame=CGRectMake(0, 0, 60, 60);
+    aBtn.showsTouchWhenHighlighted=YES;
+    aBtn.frame=CGRectMake(0, 0, 44, 44);
     [self.view addSubview:aBtn];
     [aBtn addTarget:self action:@selector(backClick) forControlEvents:UIControlEventTouchUpInside];
     UIButton *rightBtn=[UIButton buttonWithType:UIButtonTypeCustom];
-    rightBtn.frame=CGRectMake(270, 0, 60, 60);
+    rightBtn.frame=CGRectMake(320-44, 0, 44, 44);
+    rightBtn.showsTouchWhenHighlighted=YES;
     [self.view addSubview:rightBtn];
     [rightBtn addTarget:self action:@selector(sendWeibo) forControlEvents:UIControlEventTouchUpInside];
     

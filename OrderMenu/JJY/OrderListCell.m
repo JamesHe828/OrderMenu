@@ -42,7 +42,8 @@
         [self addSubview:orderLab];
         
         UIImageView * timeIV = [[UIImageView alloc] initWithFrame:CGRectMake(155, 29, 8, 8)];
-        timeIV.image = [UIImage imageNamed:@"28.png"];
+        self.timeImageView = timeIV;
+        timeIV.image = [UIImage imageNamed:@"时间图标.png"];
         [self addSubview:timeIV];
         
         UILabel * timelab = [[UILabel alloc] initWithFrame:CGRectMake(163, 26, 92, 15)];
@@ -53,10 +54,10 @@
         [self addSubview:timelab];
         
         UIImageView * imageAdress = [[UIImageView alloc] initWithFrame:CGRectMake(70, 44, 8, 8)];
-        imageAdress.image = [UIImage imageNamed:@"27.png"];
+        imageAdress.image = [UIImage imageNamed:@"位置.png"];
         [self addSubview:imageAdress];
         
-        UILabel * adressLab = [[UILabel alloc] initWithFrame:CGRectMake(78, 41, 174, 30)];
+        UILabel * adressLab = [[UILabel alloc] initWithFrame:CGRectMake(78, 41, 240, 30)];
         adressLab.numberOfLines = 2;
         self.resultAdressLab = adressLab;
         adressLab.textColor = [UIColor grayColor];
@@ -64,13 +65,12 @@
         adressLab.backgroundColor = [UIColor clearColor];
         [self addSubview:adressLab];
         
-        DishesSelectedButton * btn = [[DishesSelectedButton alloc] initWithFrame:CGRectMake(250, 30, 40, 20)];
-        self.deleteBtn = btn;
-        [btn setBackgroundImage:[UIImage imageNamed:@"29.png"] forState:UIControlStateNormal];
-        [btn setTitle:@"删除" forState:UIControlStateNormal];
-        btn.titleLabel.font = [UIFont systemFontOfSize:10];
-        btn.titleLabel.textColor = [UIColor whiteColor];
-        [self addSubview:btn];
+//        DishesSelectedButton * btn = [[DishesSelectedButton alloc] initWithFrame:CGRectMake(270, 25, 30, 30)];
+//        self.deleteBtn = btn;
+//      //  [btn setBackgroundImage:[UIImage imageNamed:@"detele.png"] forState:UIControlStateNormal];
+//        btn.titleLabel.font = [UIFont systemFontOfSize:10];
+//        btn.titleLabel.textColor = [UIColor whiteColor];
+//        [self addSubview:btn];
     }
     return self;
 }

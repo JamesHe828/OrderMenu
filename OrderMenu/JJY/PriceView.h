@@ -12,8 +12,8 @@
 
 @interface PriceView : UIView
 @property (nonatomic,strong) UILabel * detailLab;
-@property (nonatomic)double sumprice;
-@property (nonatomic)int sumnumber;
+@property (nonatomic,assign)double sumprice;
+@property (nonatomic,assign)int sumnumber;
 @property (nonatomic)id<PriceViewDelegate> delegate;
 +(PriceView *)ShareView;
 +(void)AnimateCancle;

@@ -39,13 +39,14 @@
     aImageView.image=[UIImage imageNamed:@"意见反馈导航.png"];
     [self.view addSubview:aImageView];
     UIButton *aBtn=[UIButton buttonWithType:UIButtonTypeCustom];
-    aBtn.frame=CGRectMake(0, 0, 60, 60);
+    aBtn.showsTouchWhenHighlighted=YES;
+    aBtn.frame=CGRectMake(0, 0, 44, 44);
     [self.view addSubview:aBtn];
     [aBtn addTarget:self action:@selector(backClick) forControlEvents:UIControlEventTouchUpInside];
     
     
     //白色底
-    UIView *numView=[[UIView alloc] initWithFrame:CGRectMake(12, 100, 277, 40)];
+    UIView *numView=[[UIView alloc] initWithFrame:CGRectMake(22, 100, 277, 40)];
     numView.backgroundColor=[UIColor colorWithRed:255.0/255.0 green:255.0/255.0 blue:255.0/255.0 alpha:1.0];
     //圆角
     numView.layer.borderColor=[UIColor grayColor].CGColor;
@@ -60,7 +61,7 @@
     numView.layer.shadowOffset = CGSizeMake(0, 3);
     numView.clipsToBounds = NO;
     [backView addSubview:numView];
-    UIView *contentView=[[UIView alloc] initWithFrame:CGRectMake(12, 185, 277, 195)];
+    UIView *contentView=[[UIView alloc] initWithFrame:CGRectMake(22, 185, 277, 195)];
     contentView.backgroundColor=[UIColor colorWithRed:255.0/255.0 green:255.0/255.0 blue:255.0/255.0 alpha:1.0];
     //圆角
     contentView.layer.borderColor=[UIColor grayColor].CGColor;
@@ -75,7 +76,7 @@
     contentView.layer.shadowOffset = CGSizeMake(0, 3);
     contentView.clipsToBounds = NO;
     [backView addSubview:contentView];
-    UILabel  *numLab=[[UILabel alloc] initWithFrame:CGRectMake(12, 57, 100, 50)];
+    UILabel  *numLab=[[UILabel alloc] initWithFrame:CGRectMake(22, 57, 100, 50)];
     numLab.text=@"联系方式:";
     numLab.font=[UIFont fontWithName:@"Arial" size:20.0f];
     numLab.backgroundColor=[UIColor clearColor];
@@ -86,7 +87,7 @@
     atextField.placeholder=@"请输入您的邮箱或者手机号码";
     atextField.clearButtonMode=UITextFieldViewModeWhileEditing;
     [numView addSubview:atextField];
-    UILabel  *contentLab=[[UILabel alloc] initWithFrame:CGRectMake(12, 140, 100, 50)];
+    UILabel  *contentLab=[[UILabel alloc] initWithFrame:CGRectMake(22, 140, 100, 50)];
     contentLab.text=@"反馈内容:";
     contentLab.font=[UIFont fontWithName:@"Arial" size:20.0f];
     contentLab.backgroundColor=[UIColor clearColor];
@@ -100,7 +101,8 @@
     [contentView addSubview:aTextView];
     
     UIButton *commitBtn=[UIButton buttonWithType:UIButtonTypeCustom];
-    commitBtn.frame=CGRectMake(230, 0, 60, 50);
+    commitBtn.frame=CGRectMake(320-44, 0, 44, 44);
+    commitBtn.showsTouchWhenHighlighted=YES;
     [commitBtn addTarget:self action:@selector(commitFeedContent) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:commitBtn];
 //    [[NSNotificationCenter defaultCenter] addObserver:self
@@ -113,6 +115,37 @@
 //                                               object:nil];
 
 
+    //手势
+    UISwipeGestureRecognizer *recognizer;
+    
+    recognizer = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(handleSwipeFrom:)];
+    
+    [recognizer setDirection:(UISwipeGestureRecognizerDirectionRight)];
+    [[self view] addGestureRecognizer:recognizer];
+    
+    recognizer = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(handleSwipeFrom:)];
+    
+    [recognizer setDirection:(UISwipeGestureRecognizerDirectionLeft)];
+    [[self view] addGestureRecognizer:recognizer];
+    
+    
+}
+//手势
+-(void)handleSwipeFrom:(UISwipeGestureRecognizer *)recognizer
+{
+    if(recognizer.direction==UISwipeGestureRecognizerDirectionLeft) {
+        
+        //NSLog(@"swipe left");
+        //执行程序
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"SwitchGesture" object:nil];
+    }
+    
+    if(recognizer.direction==UISwipeGestureRecognizerDirectionRight) {
+        
+        //        NSLog(@"swipe right");
+        //执行程序
+    }
+    
 }
 -(void)commitFeedContent
 {
@@ -279,7 +312,7 @@
 #pragma mark - asihttprequest
 //网络判断
 -(Boolean)isconnectok{
-    NSURL *url1 = [NSURL URLWithString:@"http://www.tiankong360.com"];
+    NSURL *url1 = [NSURL URLWithString:@"http://www.baidu.com"];
     NSURLRequest *request = [NSURLRequest requestWithURL:url1 cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval:5];
     NSHTTPURLResponse *response;
     [NSURLConnection sendSynchronousRequest:request returningResponse: &response error: nil];
@@ -373,6 +406,7 @@
             aTextView.text=nil;
             [atextField resignFirstResponder];
             aTextView.placeholder=@"请输入反馈内容(200字以内)";
+            [self backClick];
         }
     }
 
@@ -401,12 +435,12 @@
 }
 -(void)backClick
 {
-    CATransition* transition = [CATransition animation];
-    transition.duration = 0.5;
-    transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-    transition.type = kCATransitionPush;
-    [self.navigationController.view.layer addAnimation:transition forKey:nil];
-    [self.navigationController popViewControllerAnimated:NO];
+//    CATransition* transition = [CATransition animation];
+//    transition.duration = 0.5;
+//    transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+//    transition.type = kCATransitionPush;
+//    [self.navigationController.view.layer addAnimation:transition forKey:nil];
+    [self.navigationController popViewControllerAnimated:YES];
 }
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {

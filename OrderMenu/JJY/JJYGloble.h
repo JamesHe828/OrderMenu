@@ -25,6 +25,8 @@
 #define CLASS_URL @"http://interface.hcgjzs.com/OM_Interface/Cuisines.asmx"
 #define CLASS_NAME @"GetList"  //获取某一餐馆的菜系分类列表
 #define PRODUCT_URL @"http://interface.hcgjzs.com/OM_Interface/Product.asmx"
+
+#define CHANGE_ONE @"ListForNext"
 #define PRODUCT_NAME @"ProductList"  //根据分类id，获取对应id的菜列表
 #define ALL_URL @"http://interface.hcgjzs.com"
 #define AUDO_PRODUCT_NAME @"ListForSearch"

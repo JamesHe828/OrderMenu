@@ -1,0 +1,479 @@
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/IOS/!svn/ver/9/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu
+END
+VersionViewController.m
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/VersionViewController.m
+END
+main.m
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/main.m
+END
+HelpViewController.m
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/HelpViewController.m
+END
+OrderMenu-Info.plist
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/OrderMenu-Info.plist
+END
+DishClickView.m
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/DishClickView.m
+END
+CustomCell.xib
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/CustomCell.xib
+END
+CollectCustomCell.xib
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/CollectCustomCell.xib
+END
+MyindentCustomCell.xib
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/MyindentCustomCell.xib
+END
+OrderMenu-Prefix.pch
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/OrderMenu-Prefix.pch
+END
+MyIndentViewController.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/MyIndentViewController.h
+END
+nav_menu_icon@2x.png
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/nav_menu_icon@2x.png
+END
+MyIndentViewController.m
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/MyIndentViewController.m
+END
+ShareViewController.xib
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/ShareViewController.xib
+END
+ShareViewController.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/ShareViewController.h
+END
+SearchViewController.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/SearchViewController.h
+END
+DishesCustomCell.xib
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/DishesCustomCell.xib
+END
+ShareViewController.m
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/ShareViewController.m
+END
+SettingViewController.xib
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/SettingViewController.xib
+END
+SearchViewController.m
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/SearchViewController.m
+END
+CheckCell.h
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/CheckCell.h
+END
+FeedbackViewController.xib
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/FeedbackViewController.xib
+END
+ViewController.h
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/ViewController.h
+END
+VersionViewController.xib
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/VersionViewController.xib
+END
+MenuCheckViewController4.xib
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/MenuCheckViewController4.xib
+END
+NSString+Additions.h
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/NSString+Additions.h
+END
+CheckCell.m
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/CheckCell.m
+END
+FeedbackViewController.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/FeedbackViewController.h
+END
+ViewController.m
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/ViewController.m
+END
+CollectViewController.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/CollectViewController.h
+END
+腾讯微博1@2x.png
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/%E8%85%BE%E8%AE%AF%E5%BE%AE%E5%8D%9A1@2x.png
+END
+NSString+Additions.m
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/NSString+Additions.m
+END
+FeedbackViewController.m
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/FeedbackViewController.m
+END
+CollectViewController.m
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/CollectViewController.m
+END
+ShakeViewController.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/ShakeViewController.h
+END
+MenuCheckViewController.xib
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/MenuCheckViewController.xib
+END
+ShareContentViewController.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/ShareContentViewController.h
+END
+SearchResultViewController.xib
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/SearchResultViewController.xib
+END
+ShakeViewController.m
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/ShakeViewController.m
+END
+MenuCheckViewController.h
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/MenuCheckViewController.h
+END
+ShareContentViewController.m
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/ShareContentViewController.m
+END
+MoreFunctionViewController.xib
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/MoreFunctionViewController.xib
+END
+SearchResultViewController.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/SearchResultViewController.h
+END
+AboutViewController.xib
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/AboutViewController.xib
+END
+MenuCheckViewController.m
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/MenuCheckViewController.m
+END
+MoreFunctionViewController.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/MoreFunctionViewController.h
+END
+SearchResultViewController.m
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/SearchResultViewController.m
+END
+AboutViewController.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/AboutViewController.h
+END
+CustomCell.h
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/CustomCell.h
+END
+MoreFunctionViewController.m
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/MoreFunctionViewController.m
+END
+AboutViewController.m
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/AboutViewController.m
+END
+CustomCell.m
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/CustomCell.m
+END
+CollectCustomCell.h
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/CollectCustomCell.h
+END
+MyIndentViewController.xib
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/MyIndentViewController.xib
+END
+MyindentCustomCell.h
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/MyindentCustomCell.h
+END
+CollectCustomCell.m
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/CollectCustomCell.m
+END
+新浪微博1@2x.png
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/%E6%96%B0%E6%B5%AA%E5%BE%AE%E5%8D%9A1@2x.png
+END
+MyindentCustomCell.m
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/MyindentCustomCell.m
+END
+SearchResultCustomCell.xib
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/SearchResultCustomCell.xib
+END
+SearchViewController.xib
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/SearchViewController.xib
+END
+SearchResultCustomCell.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/SearchResultCustomCell.h
+END
+SearchResultCustomCell.m
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/SearchResultCustomCell.m
+END
+MyindentDetailViewController.xib
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/MyindentDetailViewController.xib
+END
+MyindentDetailViewController.h
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/MyindentDetailViewController.h
+END
+DishesCustomCell.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/DishesCustomCell.h
+END
+AppDelegate.h
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/AppDelegate.h
+END
+SettingViewController.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/SettingViewController.h
+END
+MyindentDetailViewController.m
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/MyindentDetailViewController.m
+END
+CollectViewController.xib
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/CollectViewController.xib
+END
+DishesCustomCell.m
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/DishesCustomCell.m
+END
+AppDelegate.m
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/AppDelegate.m
+END
+DDMenuController.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/DDMenuController.h
+END
+SettingViewController.m
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/IOS/!svn/ver/9/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/SettingViewController.m
+END
+HelpViewController.xib
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/HelpViewController.xib
+END
+VersionViewController.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/VersionViewController.h
+END
+DDMenuController.m
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/DDMenuController.m
+END
+ShakeViewController.xib
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/ShakeViewController.xib
+END
+HelpViewController.h
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/HelpViewController.h
+END
+ShareContentViewController.xib
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/ShareContentViewController.xib
+END
+DishClickView.h
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/IOS/!svn/ver/8/OrderMenu%E6%9C%80%E6%96%B0/OrderMenu/DishClickView.h
+END

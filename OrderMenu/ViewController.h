@@ -8,22 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ViewController : UIViewController<UITableViewDelegate,UITableViewDataSource>
+@interface ViewController : UIViewController
 {
-    UIScrollView  *ascrollview;
-    UIPageControl *pageC;
-    UITableView   *aTableView;
-    NSArray       *ary;
-    NSArray       *nameAry;
-    NSString      *numberStr;
-    NSMutableArray*searchAry;
-    UITableView   *resultTableView;
-    int           p;
+
 }
-@property(nonatomic,retain)UIPageControl *pageC;
-@property(nonatomic,retain)UITableView   *aTableView;
-@property(nonatomic,retain)NSString      *numberStr;
-@property(nonatomic,retain)NSMutableArray*searchAry;
-@property(nonatomic,retain)UITableView   *resultTableView;
-@property(nonatomic,retain)UIScrollView  *ascrollview;
+
 @end

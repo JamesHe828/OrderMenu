@@ -30,15 +30,15 @@
         lab.textColor = [UIColor greenColor];
         lab.font = [UIFont systemFontOfSize:18];
         lab.backgroundColor = [UIColor clearColor];
-        lab.text = @"￥0(合计：0个菜)";
+        //lab.text = @"￥0(合计：0个菜)";
         self.detailLab = lab;
         [self addSubview:lab];
         
         UIButton * nextBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [nextBtn addTarget:self action:@selector(nextClickEvent) forControlEvents:UIControlEventTouchUpInside];
-        nextBtn.frame = CGRectMake(240, 5, 60, 30);
-        [nextBtn setBackgroundImage:[UIImage imageNamed:@"9.png"] forState:UIControlStateNormal];
-        [nextBtn setTitle:@"下一步" forState:UIControlStateNormal];
+        nextBtn.frame = CGRectMake(10, 0, 300, 40);
+        [nextBtn setBackgroundImage:[UIImage imageNamed:@"结束点菜，核对菜单.png"] forState:UIControlStateNormal];
+        nextBtn.titleLabel.font = [UIFont systemFontOfSize:14];
         [self addSubview:nextBtn];
     }
     return self;
@@ -66,7 +66,7 @@ static AudoPriceView * priceView;
 {
     AudoPriceView * pc = [AudoPriceView ShareView];
     [UIView beginAnimations:nil context:nil];
-    [UIView setAnimationDuration:0.7];
+    [UIView setAnimationDuration:0.1];
     if (IPhone5)
     {
         pc.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height, 320, 40);
@@ -99,7 +99,7 @@ static AudoPriceView * priceView;
 {
     AudoPriceView * pc = [AudoPriceView ShareView];
     [UIView beginAnimations:nil context:nil];
-    [UIView setAnimationDuration:0.7];
+    [UIView setAnimationDuration:0.1];
     pc.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height-20-40, 320, 40);
     [UIView commitAnimations];
 }
@@ -107,7 +107,7 @@ static AudoPriceView * priceView;
 {
     self.sumprice = aSumPrice;
     self.sumnumber = aDishes;
-    self.detailLab.text = [NSString stringWithFormat:@"￥%g(合计：%d个菜)",aSumPrice,aDishes];
+   // self.detailLab.text = [NSString stringWithFormat:@"￥%g(合计：%d个菜)",aSumPrice,aDishes];
 }
 
 -(void)nextClickEvent

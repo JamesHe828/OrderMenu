@@ -9,10 +9,12 @@
 #import "DishesListViewController.h"
 
 @class AudoResultViewController;
+@class OrderDetailViewController;
 
 @interface AudoDishesListViewController : UIViewController
 @property (nonatomic)int resultID;
 @property (nonatomic,strong)IBOutlet UITableView * classTableView;
 @property (nonatomic,strong)IBOutlet UITableView * productTableView;
 @property (nonatomic,strong) AudoResultViewController * myViewController;
+@property (nonatomic,strong) OrderDetailViewController * orderDetail;
 @end

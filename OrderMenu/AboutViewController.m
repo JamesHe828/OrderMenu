@@ -27,23 +27,24 @@
 {
     [super viewDidLoad];
     UIImageView *aImageView=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
-    aImageView.image=[UIImage imageNamed:@"搜索"];
+    aImageView.image=[UIImage imageNamed:@"关于我们"];
     [self.view addSubview:aImageView];
     UIButton *aBtn=[UIButton buttonWithType:UIButtonTypeCustom];
-    aBtn.frame=CGRectMake(0, 0, 60, 60);
+    aBtn.showsTouchWhenHighlighted=YES;
+    aBtn.frame=CGRectMake(0, 0, 44, 44);
     [self.view addSubview:aBtn];
     [aBtn addTarget:self action:@selector(backClick) forControlEvents:UIControlEventTouchUpInside];
     
-    UIImageView *handImage=[[UIImageView alloc] initWithFrame:CGRectMake(0, 155, 320, 249)];
-    handImage.image=[UIImage imageNamed:@"手"];
-    [self.view addSubview:handImage];
-    UIImageView *xiaorenImage=[[UIImageView alloc] initWithFrame:CGRectMake(78, 70, 144, 96)];
-    xiaorenImage.image=[UIImage imageNamed:@"关于我们小人"];
+//    UIImageView *handImage=[[UIImageView alloc] initWithFrame:CGRectMake(0, 155, 320, 249)];
+//    handImage.image=[UIImage imageNamed:@"手"];
+//    [self.view addSubview:handImage];
+    UIImageView *xiaorenImage=[[UIImageView alloc] initWithFrame:CGRectMake(105, 70, 108, 137)];
+    xiaorenImage.image=[UIImage imageNamed:@"关于我们背景"];
     [self.view addSubview:xiaorenImage];
 
-    UIImageView *piontImage=[[UIImageView alloc] initWithFrame:CGRectMake(99, 179, 97, 34)];
-    piontImage.image=[UIImage imageNamed:@"点美点"];
-    [self.view addSubview:piontImage];
+//    UIImageView *piontImage=[[UIImageView alloc] initWithFrame:CGRectMake(99, 179, 97, 34)];
+//    piontImage.image=[UIImage imageNamed:@"点美点"];
+//    [self.view addSubview:piontImage];
     UIImageView *logoImage=[[UIImageView alloc] initWithFrame:CGRectMake(99, 400, 97, 34)];
     logoImage.image=[UIImage imageNamed:@"天空logo"];
     [self.view addSubview:logoImage];
@@ -90,18 +91,49 @@
     [self.view addSubview:lab44];
     UILabel *lab5=[[UILabel alloc] initWithFrame:CGRectMake(66, 430, 200, 30)];
     lab5.text=@"www.tiankong360.com";
-    lab5.textColor=[UIColor colorWithRed:255.0/255.0 green:142.0/255.0 blue:45/255.0 alpha:1.0];
+    lab5.textColor=[UIColor colorWithRed:251.0/255.0 green:33.0/255.0 blue:47.0/255.0 alpha:1.0];
     [self.view addSubview:lab5];
 
+    //手势
+    UISwipeGestureRecognizer *recognizer;
+    
+    recognizer = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(handleSwipeFrom:)];
+    
+    [recognizer setDirection:(UISwipeGestureRecognizerDirectionRight)];
+    [[self view] addGestureRecognizer:recognizer];
+    
+    recognizer = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(handleSwipeFrom:)];
+    
+    [recognizer setDirection:(UISwipeGestureRecognizerDirectionLeft)];
+    [[self view] addGestureRecognizer:recognizer];
+    
+    
+}
+//手势
+-(void)handleSwipeFrom:(UISwipeGestureRecognizer *)recognizer
+{
+    if(recognizer.direction==UISwipeGestureRecognizerDirectionLeft) {
+        
+        //NSLog(@"swipe left");
+        //执行程序
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"SwitchGesture" object:nil];
+    }
+    
+    if(recognizer.direction==UISwipeGestureRecognizerDirectionRight) {
+        
+        //        NSLog(@"swipe right");
+        //执行程序
+    }
+    
 }
 -(void)backClick
 {
-    CATransition* transition = [CATransition animation];
-    transition.duration = 0.5;
-    transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-    transition.type = kCATransitionMoveIn;
-    [self.navigationController.view.layer addAnimation:transition forKey:nil];
-    [self.navigationController popViewControllerAnimated:NO];
+//    CATransition* transition = [CATransition animation];
+//    transition.duration = 0.5;
+//    transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+//    transition.type = kCATransitionMoveIn;
+//    [self.navigationController.view.layer addAnimation:transition forKey:nil];
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (void)didReceiveMemoryWarning

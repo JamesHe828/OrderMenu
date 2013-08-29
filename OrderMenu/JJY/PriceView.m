@@ -22,11 +22,12 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-        sumprice = 0.0;
-        sumnumber = 0;
+        self.sumprice = 0.0;
+        self.sumnumber = 0;
         
         self.backgroundColor = [UIColor whiteColor];
         UILabel * lab = [[UILabel alloc] initWithFrame:CGRectMake(5, 5, 200, 30)];
+        lab.alpha = 0.0;
         lab.textColor = [UIColor greenColor];
         lab.font = [UIFont systemFontOfSize:18];
         lab.backgroundColor = [UIColor clearColor];
@@ -36,30 +37,33 @@
         
         UIButton * nextBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         [nextBtn addTarget:self action:@selector(nextClickEvent) forControlEvents:UIControlEventTouchUpInside];
-        nextBtn.frame = CGRectMake(240, 5, 60, 30);
-        [nextBtn setBackgroundImage:[UIImage imageNamed:@"9.png"] forState:UIControlStateNormal];
-        [nextBtn setTitle:@"下一步" forState:UIControlStateNormal];
+        nextBtn.frame = CGRectMake(10, 0, 300, 40);
+        [nextBtn setBackgroundImage:[UIImage imageNamed:@"结束点菜，核对菜单.png"] forState:UIControlStateNormal];
+        [nextBtn setShowsTouchWhenHighlighted:YES];
+        nextBtn.titleLabel.font = [UIFont systemFontOfSize:14];
         [self addSubview:nextBtn];
     }
     return self;
 }
 
-static PriceView * priceView;
+static PriceView * priceView = nil;
 +(PriceView *)ShareView
 {
-    if (priceView == nil)
+    @synchronized(self)
     {
-        if (IPhone5)
+        if (priceView == nil)
         {
-            priceView = [[PriceView alloc] initWithFrame:CGRectMake(0, [UIScreen mainScreen].bounds.size.height, 320, 40)];
+            if (IPhone5)
+            {
+                priceView = [[PriceView alloc] initWithFrame:CGRectMake(0, [UIScreen mainScreen].bounds.size.height, 320, 40)];
+            }
+            else
+            {
+                priceView = [[PriceView alloc] initWithFrame:CGRectMake(0, [UIScreen mainScreen].bounds.size.height-20, 320, 40)];
+            }
         }
-        else
-        {
-         priceView = [[PriceView alloc] initWithFrame:CGRectMake(0, [UIScreen mainScreen].bounds.size.height-20, 320, 40)];
-        }
-        
+        return priceView;
     }
-    return priceView;
 }
 
 +(void)AnimateCancle
@@ -69,13 +73,13 @@ static PriceView * priceView;
     [UIView setAnimationDuration:0.3];
     if (IPhone5)
     {
-         pc.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height, 320, 40);
+        pc.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height, 320, 40);
     }
     else
     {
-         pc.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height-20, 320, 40);
+        pc.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height-20, 320, 40);
     }
-   
+    
     [UIView commitAnimations];
 }
 +(void)AnimateCancleSpeed
@@ -100,7 +104,7 @@ static PriceView * priceView;
     PriceView * pc = [PriceView ShareView];
     [UIView beginAnimations:nil context:nil];
     [UIView setAnimationDuration:0.3];
-     pc.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height-20-40, 320, 40);
+    pc.frame = CGRectMake(0, [UIScreen mainScreen].bounds.size.height-20-40, 320, 40);
     [UIView commitAnimations];
 }
 -(void)ChangeLabTextSumPrice:(double)aSumPrice sumDishes:(int)aDishes

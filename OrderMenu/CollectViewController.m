@@ -11,6 +11,7 @@
 #import "CollectCustomCell.h"
 #import "DetailViewController.h"
 #import "UIImageView+WebCache.h"
+#import "DataBase.h"
 @interface CollectViewController ()
 
 @end
@@ -18,6 +19,7 @@
 @implementation CollectViewController
 @synthesize ary;
 @synthesize collectAry;
+@synthesize aTableView;
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -31,10 +33,11 @@
 {
     [super viewDidLoad];
     UIImageView *aImageView=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
-    aImageView.image=[UIImage imageNamed:@"搜索"];
+    aImageView.image=[UIImage imageNamed:@"我的收藏导航"];
     [self.view addSubview:aImageView];
     UIButton *aBtn=[UIButton buttonWithType:UIButtonTypeCustom];
-    aBtn.frame=CGRectMake(0, 0, 60, 60);
+    aBtn.showsTouchWhenHighlighted=YES;
+    aBtn.frame=CGRectMake(0, 0, 44, 44);
     [self.view addSubview:aBtn];
     [aBtn addTarget:self action:@selector(backClick) forControlEvents:UIControlEventTouchUpInside];
     aTableView=[[UITableView alloc] initWithFrame:CGRectMake(0,44, 320, [UIScreen mainScreen].bounds.size.height -44-20) style:UITableViewStylePlain];
@@ -44,7 +47,17 @@
     [self.view addSubview:aTableView];
     ary=[[NSArray alloc] init];
     collectAry=[[NSMutableArray alloc] init];
-
+   
+//    editBtn=[UIButton buttonWithType:UIButtonTypeRoundedRect];
+//    editBtn.frame=CGRectMake(320-44, 0, 44, 44);
+//    [self.view addSubview:editBtn];
+//    [editBtn addTarget:self action:@selector(toggleEdit:) forControlEvents:UIControlEventTouchUpInside];
+//    [editBtn setTitle:@"删除" forState:UIControlStateNormal];
+}
+-(void)toggleEdit:(id)sender
+{
+	[self.aTableView setEditing:!self.aTableView.editing animated:YES];
+    [editBtn setTitle:self.aTableView.editing?@"完成":@"删除" forState:UIControlStateNormal];
 }
 -(void)viewWillAppear:(BOOL)animated
 {
@@ -101,7 +114,7 @@
     //    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     cell.lab.font = [UIFont fontWithName:@"Arial" size:17.0f];
-    cell.lab.textColor=[UIColor colorWithRed:255.0/255.0 green:137.0/255.0 blue:3.0/255.0 alpha:1.0];
+    cell.lab.textColor=[UIColor colorWithRed:251.0/255.0 green:33.0/255.0 blue:47.0/255.0 alpha:1.0];
     cell.lab2.textColor=[UIColor grayColor];
     cell.renjunLab.textColor=[UIColor grayColor];
     cell.timeLab.textColor=[UIColor grayColor];
@@ -111,8 +124,6 @@
     cell.lab2.text=[[[userDefaults objectForKey:@"collectAry"] objectAtIndex:indexPath.row] valueForKey:@"restaddress"];
     cell.timeLab.text=[[[userDefaults objectForKey:@"collectAry"] objectAtIndex:indexPath.row] valueForKey:@"restphone"];
     //cell.renjunLab.text=[NSString stringWithFormat:@"人均￥%@",[[ary objectAtIndex:indexPath.row] valueForKey:@"restaverage"]];
-    [cell.deletaBtn addTarget:self action:@selector(deletaData:) forControlEvents:UIControlEventTouchUpInside];
-    cell.deletaBtn.tag=indexPath.row;
     return cell;
 }
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -131,41 +142,53 @@
     [aTableView reloadData];
 }
 //删除
-////要求委托方的编辑风格在表视图的一个特定的位置。
-//-(UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath{
-//    UITableViewCellEditingStyle result = UITableViewCellEditingStyleNone;//默认没有编辑风格
-//    if ([tableView isEqual:aTableView]) {
-//        result = UITableViewCellEditingStyleDelete;//设置编辑风格为删除风格
-//    }
-//    return result;
-//}
-//-(void)setEditing:(BOOL)editing animated:(BOOL)animated{//设置是否显示一个可编辑视图的视图控制器。
-//    [super setEditing:editing animated:animated];
-//    [aTableView setEditing:editing animated:animated];//切换接收者的进入和退出编辑模式。
-//}
-//-(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath{//请求数据源提交的插入或删除指定行接收者。
-//    if (editingStyle ==UITableViewCellEditingStyleDelete) {//如果编辑样式为删除样式
+//要求委托方的编辑风格在表视图的一个特定的位置。
+-(UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath{
+    UITableViewCellEditingStyle result = UITableViewCellEditingStyleNone;//默认没有编辑风格
+    if ([tableView isEqual:aTableView]) {
+        result = UITableViewCellEditingStyleDelete;//设置编辑风格为删除风格
+    }
+    return result;
+}
+-(void)setEditing:(BOOL)editing animated:(BOOL)animated{//设置是否显示一个可编辑视图的视图控制器。
+    [super setEditing:editing animated:animated];
+    [aTableView setEditing:editing animated:animated];//切换接收者的进入和退出编辑模式。
+}
+-(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath{//请求数据源提交的插入或删除指定行接收者。
+    if (editingStyle ==UITableViewCellEditingStyleDelete)
+    {//如果编辑样式为删除样式
 //        if (indexPath.row<[self.ary count]) {
-//            [self.collectAry removeObjectAtIndex:indexPath.row];//移除数据源的数据
-//            [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationLeft];//移除tableView中的数据
+        NSMutableArray *collect=
+        [NSMutableArray arrayWithArray:[userDefaults objectForKey:@"collectAry"]];
+            [collect removeObjectAtIndex:indexPath.row];//移除数据源的数据
+        [[NSUserDefaults standardUserDefaults] setObject:collect forKey:@"collectAry"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+            [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationLeft];//移除tableView中的数据
 //        }
-//    }
-//}
-//- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-//{
-//    DetailViewController *detailVC=[[DetailViewController alloc] init];
-//    [self.navigationController pushViewController:detailVC animated:YES];
-//    //点击 蓝色慢慢消失
-//    [tableView deselectRowAtIndexPath:[tableView indexPathForSelectedRow] animated:YES];
-//}
+    }
+}
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    [DataBase clearOrderMenu];
+    p=indexPath.row;
+    DetailViewController *detailVC=[[DetailViewController alloc] init];
+    detailVC.resInfoArr =[[NSMutableArray arrayWithArray:[userDefaults objectForKey:@"collectAry"]] objectAtIndex:indexPath.row];
+    detailVC.pID=[[[NSMutableArray arrayWithArray:[userDefaults objectForKey:@"collectAry"]] objectAtIndex:p]valueForKey:@"restid"];;
+    [self.navigationController pushViewController:detailVC animated:YES];
+    //点击 蓝色慢慢消失
+    [tableView deselectRowAtIndexPath:[tableView indexPathForSelectedRow] animated:YES];
+}
+- (NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath{
+    return @"删除";
+}
 -(void)backClick
 {
-    CATransition* transition = [CATransition animation];
-    transition.duration = 0.5;
-    transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-    transition.type = kCATransitionMoveIn;
-    [self.navigationController.view.layer addAnimation:transition forKey:nil];
-    [self.navigationController popViewControllerAnimated:NO];
+//    CATransition* transition = [CATransition animation];
+//    transition.duration = 0.5;
+//    transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+//    transition.type = kCATransitionMoveIn;
+//    [self.navigationController.view.layer addAnimation:transition forKey:nil];
+    [self.navigationController popViewControllerAnimated:YES];
 }
 - (void)didReceiveMemoryWarning
 {

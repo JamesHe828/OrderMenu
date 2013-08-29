@@ -40,7 +40,8 @@
     aImageView.image=[UIImage imageNamed:@"好友推荐导航"];
     [self.view addSubview:aImageView];
     UIButton *aBtn=[UIButton buttonWithType:UIButtonTypeCustom];
-    aBtn.frame=CGRectMake(0, 0, 60, 60);
+    aBtn.showsTouchWhenHighlighted=YES;
+    aBtn.frame=CGRectMake(0, 0, 44, 44);
     [self.view addSubview:aBtn];
     [aBtn addTarget:self action:@selector(backClick) forControlEvents:UIControlEventTouchUpInside];
 //    //白色底
@@ -70,7 +71,7 @@
 //    [tencnetBtn addTarget:self action:@selector(tencentClick) forControlEvents:UIControlEventTouchUpInside];
 //    [nView addSubview:tencnetBtn];
     //白色底
-    UIView *nView=[[UIView alloc] initWithFrame:CGRectMake(10, 60, 280, 165)];
+    UIView *nView=[[UIView alloc] initWithFrame:CGRectMake(20, 60, 280, 165)];
     nView.backgroundColor=[UIColor colorWithRed:255.0/255.0 green:255.0/255.0 blue:255.0/255.0 alpha:1.0];
     //圆角
     nView.layer.borderColor=[UIColor grayColor].CGColor;
@@ -98,10 +99,40 @@
     [self.view addSubview:shareImage];
 
     UIButton *commitBtn=[UIButton buttonWithType:UIButtonTypeCustom];
-    commitBtn.frame=CGRectMake(230, 0, 60, 50);
+    commitBtn.frame=CGRectMake(320-44, 0, 44, 44);
+    commitBtn.showsTouchWhenHighlighted=YES;
     [commitBtn addTarget:self action:@selector(commitContent) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:commitBtn];
+    //手势
+    UISwipeGestureRecognizer *recognizer;
+    
+    recognizer = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(handleSwipeFrom:)];
+    
+    [recognizer setDirection:(UISwipeGestureRecognizerDirectionRight)];
+    [[self view] addGestureRecognizer:recognizer];
+    
+    recognizer = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(handleSwipeFrom:)];
+    
+    [recognizer setDirection:(UISwipeGestureRecognizerDirectionLeft)];
+    [[self view] addGestureRecognizer:recognizer];
 
+    
+}
+//手势
+-(void)handleSwipeFrom:(UISwipeGestureRecognizer *)recognizer
+{
+    if(recognizer.direction==UISwipeGestureRecognizerDirectionLeft) {
+        
+        //NSLog(@"swipe left");
+        //执行程序
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"SwitchGesture" object:nil];
+    }
+    
+    if(recognizer.direction==UISwipeGestureRecognizerDirectionRight) {
+        
+        //        NSLog(@"swipe right");
+        //执行程序
+    }
     
 }
 -(void)commitContent
@@ -161,10 +192,11 @@
         authorizationView=[[UIView alloc] initWithFrame:CGRectMake(0, [UIScreen mainScreen].bounds.size.height, 320, [UIScreen mainScreen].bounds.size.height)];
         [self.view addSubview:authorizationView];
         UIImageView *aImageView=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
-        aImageView.image=[UIImage imageNamed:@"搜索"];
+        aImageView.image=[UIImage imageNamed:@"登陆界面"];
         [authorizationView addSubview:aImageView];
         UIButton *aBtn=[UIButton buttonWithType:UIButtonTypeCustom];
-        aBtn.frame=CGRectMake(0, 0, 60, 60);
+        aBtn.frame=CGRectMake(0, 0, 44, 44);
+        aBtn.showsTouchWhenHighlighted=YES;
         [authorizationView addSubview:aBtn];
         [aBtn addTarget:self action:@selector(dimissClick) forControlEvents:UIControlEventTouchUpInside];
         UIWebView *requestWebview=[[UIWebView alloc] initWithFrame:CGRectMake(0, 44, 320, [UIScreen mainScreen].bounds.size.height-44)];
@@ -287,18 +319,18 @@
 {
     ShareContentViewController *shareVC=[[ShareContentViewController alloc] init];
     shareVC.str=@"去那个好呢，东城，西城，城南，城北？哥们，要吃饭啊？@DMD #点美点# ，随意选就餐环境、菜品、预定座位、在线点餐，点美点，美一点，我的美餐！http://www.tiankong360.com";
-    shareVC.picStr=@"http://interface.hcgjzs.com/images/index.jpg";
+    shareVC.picStr=@"http://interface.hcgjzs.com/images/index.png";
     [self presentModalViewController:shareVC animated:YES];
     [self oneFingerOneTaps];
 }
 -(void)backClick
 {
-    CATransition* transition = [CATransition animation];
-    transition.duration = 0.5;
-    transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-    transition.type = kCATransitionMoveIn;
-    [self.navigationController.view.layer addAnimation:transition forKey:nil];
-    [self.navigationController popViewControllerAnimated:NO];
+//    CATransition* transition = [CATransition animation];
+//    transition.duration = 0.5;
+//    transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+//    transition.type = kCATransitionMoveIn;
+//    [self.navigationController.view.layer addAnimation:transition forKey:nil];
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (void)didReceiveMemoryWarning

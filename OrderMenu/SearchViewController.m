@@ -39,7 +39,8 @@
     aImageView.image=[UIImage imageNamed:@"搜索"];
     [self.view addSubview:aImageView];
     UIButton *aBtn=[UIButton buttonWithType:UIButtonTypeCustom];
-    aBtn.frame=CGRectMake(0, 0, 60, 60);
+    aBtn.frame=CGRectMake(0, 0, 44, 44);
+    aBtn.showsTouchWhenHighlighted=YES;
     [self.view addSubview:aBtn];
     [aBtn addTarget:self action:@selector(backClick) forControlEvents:UIControlEventTouchUpInside];
     //搜索栏
@@ -50,7 +51,7 @@
     UIView *segment=[aSearchBar.subviews objectAtIndex:0];
     [segment removeFromSuperview];
     aSearchBar.backgroundColor=[UIColor whiteColor];
-    aSearchBar.tintColor=[UIColor orangeColor];
+    aSearchBar.tintColor=[UIColor colorWithRed:251.0/255.0 green:33.0/255.0 blue:47.0/255.0 alpha:1.0];
     
     
     //表
@@ -339,7 +340,7 @@
 }
 //网络判断
 -(Boolean)isconnectok{
-    NSURL *url1 = [NSURL URLWithString:@"http://www.tiankong360.com"];
+    NSURL *url1 = [NSURL URLWithString:@"http://www.baidu.com"];
     NSURLRequest *request = [NSURLRequest requestWithURL:url1 cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval:5];
     NSHTTPURLResponse *response;
     [NSURLConnection sendSynchronousRequest:request returningResponse: &response error: nil];

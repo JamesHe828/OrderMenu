@@ -378,6 +378,7 @@
     
     [gesture setEnabled:NO];
     [self showRootController:YES];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"tapGesture" object:nil];
 }
 
 
@@ -713,9 +714,8 @@
         
     } 
     
-    if (navController == nil) {
-       
-        NSLog(@"root controller is not a navigation controller.");
+    if (navController == nil)
+    {
         return;
     }
     

@@ -25,6 +25,7 @@
 @synthesize peopleNumPK;
 @synthesize datasourseArr;
 @synthesize resultID;
+@synthesize resInfoArr;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -36,18 +37,20 @@
 
 -(IBAction)backClick:(id)sender
 {
+    
     [self.navigationController popViewControllerAnimated:YES];
 }
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    peoNum = @"2人";
+    peoNum = @"3人";
     self.datasourseArr = [NSMutableArray arrayWithCapacity:0];
-    for (int i = 1; i<20; i++)
+    for (int i = 1; i<30; i++)
     {
         NSString * str = [NSString stringWithFormat:@"%d人",i+1];
         [self.datasourseArr addObject:str];
     }
+    [self.peopleNumPK selectRow:1 inComponent:0 animated:YES];
 }
 
 - (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView
@@ -88,6 +91,7 @@
     }
     result.peopleNum = peoNum;
     result.resultID = self.resultID;
+    result.resInfoArr = self.resInfoArr;
     [self.navigationController pushViewController:result animated:YES];
 }
 

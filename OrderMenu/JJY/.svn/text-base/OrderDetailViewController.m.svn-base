@@ -1,0 +1,273 @@
+//
+//  OrderDetailViewController.m
+//  OrderMenu
+//
+//  Created by tiankong360 on 13-7-19.
+//  Copyright (c) 2013年 tiankong360. All rights reserved.
+//
+
+#import "OrderDetailViewController.h"
+#import "PriceView.h"
+#import "CheckCell.h"
+#import <QuartzCore/QuartzCore.h>
+#import "AppDelegate.h"
+#import "DetailViewController.h"
+#import "DataBase.h"
+#import "SumbitViewController.h"
+
+
+@interface OrderDetailViewController ()
+@property (nonatomic,strong)IBOutlet UITableView * proTableView;
+@property (nonatomic,strong)NSMutableArray * dataArr;
+@property (nonatomic,strong)IBOutlet UILabel * bottomLab;
+@property (nonatomic,strong)IBOutlet UIButton * sumbitBtn;
+-(IBAction)backClick:(id)sender;
+-(void)getData;
+-(void)getSaveData;
+-(void)leftButtonClickEvent:(UIButton *)aButton;
+-(void)rightButtonClickEvent:(UIButton *)aButton;
+-(void)refePriceView;
+-(IBAction)sumbitClick:(id)sender;
+@end
+
+@implementation OrderDetailViewController
+@synthesize proTableView;
+@synthesize restDic;
+@synthesize dataArr;
+@synthesize bottomLab;
+@synthesize segmentIndex;
+@synthesize saveOrderId;
+@synthesize sumbitBtn;
+@synthesize resultID;
+@synthesize numberStrs;
+
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+
+    }
+    return self;
+}
+
+#pragma mark - change　price
+-(void)refePriceView
+{
+    NSMutableArray * mutableArr = [DataBase SelectAllSaveProId:[self.saveOrderId intValue]];
+    __block NSDictionary * dic;
+    __block double sum = 0;
+    __block double addNum = 0;
+    __block int num = 0;
+    [mutableArr enumerateObjectsUsingBlock:^(NSDictionary * obj, NSUInteger idx, BOOL *stop) {
+        dic = [DataBase SelectNumberAndPriceByProID:[[obj valueForKey:@"proID"] intValue]];
+        num += [[dic valueForKey:@"number"] intValue];
+        addNum = [[dic valueForKey:@"number"] doubleValue]*[[dic valueForKey:@"price"] doubleValue];
+        sum += addNum;
+    }];
+    self.bottomLab.text = [NSString stringWithFormat:@"%g元（共%d个菜）",sum,num];
+}
+
+-(IBAction)sumbitClick:(id)sender
+{
+    SumbitViewController * sumbit;
+    if (IPhone5)
+    {
+        sumbit = [[SumbitViewController alloc] initWithNibName:@"SumbitViewController" bundle:nil];
+    }
+    else
+    {
+        sumbit = [[SumbitViewController alloc] initWithNibName:@"SumbitViewController4" bundle:nil];
+    }
+    sumbit.restId = self.resultID;
+    //id
+    NSMutableArray * arr = [DataBase SelectAllSaveProId:[self.saveOrderId intValue]];
+    __block NSMutableString * idMutableStr = [NSMutableString stringWithCapacity:0];
+    [arr enumerateObjectsUsingBlock:^(NSDictionary * obj, NSUInteger idx, BOOL *stop) {
+        [idMutableStr appendFormat:@"%@,",[obj valueForKey:@"proID"]];
+    }];
+    NSString * str = [idMutableStr substringToIndex:idMutableStr.length-1];
+    sumbit.idStr = str;
+    //number
+    NSArray * arrID = [str componentsSeparatedByString:@","];
+    __block NSMutableArray * array = [NSMutableArray arrayWithCapacity:0];
+    [arrID enumerateObjectsUsingBlock:^(NSString * obj, NSUInteger idx, BOOL *stop) {
+        [array addObject:[DataBase SelectNumberAndPriceByProID:[obj intValue] andOrderId:[self.saveOrderId intValue]]];
+    }];
+ 
+    __block NSMutableString * strMutable = [NSMutableString stringWithCapacity:0];
+    [array enumerateObjectsUsingBlock:^(NSDictionary * obj, NSUInteger idx, BOOL *stop) {
+        [strMutable appendFormat:@"%@,",[obj valueForKey:@"number"]];
+    }];
+    NSString * str1 = [strMutable substringToIndex:strMutable.length-1];
+    sumbit.numberStrs = str1;
+    sumbit.isFromOrder = YES;
+    sumbit.saveOrderId = self.saveOrderId;
+    [self.navigationController pushViewController:sumbit animated:YES];
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+ 
+    self.proTableView.layer.borderColor = [UIColor grayColor].CGColor;
+    self.proTableView.layer.borderWidth = 1;
+    
+    self.proTableView.bounces = NO;
+    
+    if (self.segmentIndex == 1)
+    {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            [self getData];
+        });
+    }
+    else
+    {
+        [self getSaveData];
+
+    }
+}
+-(void)getSaveData
+{
+    if (self.dataArr.count > 0)
+    {
+        [self.dataArr removeAllObjects];
+    }
+    self.dataArr = [DataBase selecetAllNoSaveProduct:self.saveOrderId];
+    [self refePriceView];
+    [self.proTableView reloadData];
+}
+
+-(void)getData
+{
+    int orderId = [[self.restDic valueForKey:@"id"] intValue];
+    ASIHTTPRequest * request = [WebService GetProductList:orderId];
+    [request startAsynchronous];
+    [request setStartedBlock:^{
+        [MyActivceView startAnimatedInView:self.view];
+    }];
+    __block NSMutableData * reciveData = [NSMutableData dataWithCapacity:0];
+    [request setDataReceivedBlock:^(NSData *data) {
+        [reciveData appendData:data];
+    }];
+    [request setCompletionBlock:^{
+        [MyActivceView stopAnimatedInView:self.view];
+        self.dataArr = (NSMutableArray *)[NSString ConverfromData:reciveData name:ORDER_GETPRODUCT];
+        __block double sum = 0.0;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.proTableView reloadData];
+            [self.dataArr enumerateObjectsUsingBlock:^(NSDictionary * obj, NSUInteger idx, BOOL *stop) {
+                sum += [[obj valueForKey:@"prices"] doubleValue]*[[obj valueForKey:@"copies"] intValue];
+            }];
+            self.bottomLab.text = [NSString stringWithFormat:@"￥%g（合计%d个菜)",sum,self.dataArr.count];
+        });
+    }];
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 45;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return self.dataArr.count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString * strMark1 = @"markcell"; 
+    CheckCell * cell1 = [tableView dequeueReusableCellWithIdentifier:strMark1];
+    int dotNumber = 0;
+    if (self.segmentIndex == 0)
+    {
+        dotNumber = [[[self.dataArr objectAtIndex:indexPath.row] valueForKey:@"number"] intValue];
+    }
+    else
+    {
+        dotNumber = [[[self.dataArr objectAtIndex:indexPath.row] valueForKey:@"copies"] intValue];
+    }
+    if (cell1 == nil)
+    {
+        cell1 = [[CheckCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:strMark1 andDotNumber:dotNumber];
+    }
+    if (dotNumber > 0)
+    {
+        [cell1.ClickView initView:dotNumber];
+    }
+    else
+    {
+        [cell1.ClickView zeroState];
+    }
+
+    if (self.segmentIndex == 1)
+    {
+        cell1.labName.text = [[self.dataArr objectAtIndex:indexPath.row] valueForKey:@"title"];
+        NSString * str = @"￥";
+        NSString * priceStr = [[self.dataArr objectAtIndex:indexPath.row] valueForKey:@"prices"];
+        cell1.labPrice.text = [str stringByAppendingFormat:@"%@",priceStr];
+        cell1.ClickView.leftButton.alpha = 0.0;
+        cell1.ClickView.rightButton.alpha = 0.0;
+        self.sumbitBtn.alpha = 0.0;
+    }
+    else
+    {
+        cell1.labName.text = [[self.dataArr objectAtIndex:indexPath.row] valueForKey:@"proName"];
+        NSString * str = @"￥";
+        NSString * priceStr = [[self.dataArr objectAtIndex:indexPath.row] valueForKey:@"price"];
+        cell1.labPrice.text = [str stringByAppendingFormat:@"%@",priceStr];
+        cell1.ClickView.price = [priceStr doubleValue];
+        cell1.ClickView.index = indexPath.row;
+        [cell1.ClickView.rightButton addTarget:self action:@selector(rightButtonClickEvent:) forControlEvents:UIControlEventTouchUpInside];
+        [cell1.ClickView.leftButton addTarget:self action:@selector(leftButtonClickEvent:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return cell1;
+}
+
+#pragma mark - 点菜触发事件
+-(void)leftButtonClickEvent:(UIButton *)aButton
+{
+    CheckCell * cell = (CheckCell *)[[[aButton superview] superview] superview];
+    NSDictionary * obj = [self.dataArr objectAtIndex:cell.ClickView.index];
+    if (cell.ClickView.dotNumber == 0)
+    {
+        [DataBase deleteSaveProID:[[obj valueForKey:@"proID"] intValue] andOrderId:[self.saveOrderId intValue]];
+        [self refePriceView];
+        NSMutableArray * arr = [DataBase SelectAllSaveProId:[self.saveOrderId intValue]];
+        if (arr.count == 0)
+        {
+            [DataBase deleteResultSave:self.saveOrderId];
+            [self.navigationController popViewControllerAnimated:YES];
+        }
+    }
+    else
+    {
+        [DataBase UpdateDotNumber:cell.ClickView.dotNumber andPriId:[[obj valueForKey:@"proID"] intValue] andOrderId:[self.saveOrderId intValue]];
+        [self refePriceView];
+    }
+    if (self.segmentIndex == 0)
+    {
+        [self getSaveData];
+    }
+}
+-(void)rightButtonClickEvent:(UIButton *)aButton
+{
+    CheckCell * cell = (CheckCell *)[[[aButton superview] superview] superview];
+    NSDictionary * obj = [self.dataArr objectAtIndex:cell.ClickView.index];
+    [DataBase UpdateDotNumber:cell.ClickView.dotNumber andPriId:[[obj valueForKey:@"proID"] intValue] andOrderId:[self.saveOrderId intValue]];
+    [self refePriceView];
+}
+
+-(void)detailView
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"SwitchGesture" object:nil];
+}
+-(IBAction)backClick:(id)sender
+{
+    [self.navigationController popViewControllerAnimated:YES];
+}
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+
+}
+
+@end

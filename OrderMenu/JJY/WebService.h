@@ -14,8 +14,10 @@
 +(ASIHTTPRequest *)classInterfaceConfig:(int)aResultID;
 +(ASIHTTPRequest *)ProductListConfig:(NSString *)aClassId;
 +(ASIHTTPRequest *)AudoProductListConfigResultId:(int)aResultID peopleNumber:(int)aPeopleNum;
-+(ASIHTTPRequest *)sumbitOrderAllId:(NSString *)aAllId restId:(NSString *)aResultID contactNumber:(NSString *)aContactNum eatTime:(NSString *)aEatTime mark:(NSString *)aMark;
++(ASIHTTPRequest *)sumbitOrderAllId:(NSString *)aAllId restId:(NSString *)aResultID contactNumber:(NSString *)aContactNum eatTime:(NSString *)aEatTime mark:(NSString *)aMark andNumberS:(NSString *)aNumbers;
 +(ASIHTTPRequest *)GetOrderList:(NSString *)aTellNumber;
 +(ASIHTTPRequest *)DeleteOrderId:(int)orderId;
 +(ASIHTTPRequest *)GetProductList:(int)orderId;
++(ASIHTTPRequest *)AddDisesToOrderId:(int)aOrderId idList:(NSString *)aIdList copies:(NSString *)aCopies;
++(ASIHTTPRequest *)AudoProductListConfigResultId:(int)aResultID peopleNumber:(int)aPeopleNum andMenuId:(int)aMenuId;
 @end

@@ -68,8 +68,28 @@
     [request setPostBody:(NSMutableData *)[postStr dataUsingEncoding:4]];
     return request;
 }
++(ASIHTTPRequest *)AudoProductListConfigResultId:(int)aResultID peopleNumber:(int)aPeopleNum andMenuId:(int)aMenuId
+{
+    ASIHTTPRequest *request=[TKHttpRequest RequestTKUrl:PRODUCT_URL];
+    NSString *postStr=[NSString stringWithFormat:@"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
+                       <soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\
+                       <soap:Body>\
+                       <ListForNext xmlns=\"http://tempuri.org/\">\
+                       <restid>%d</restid>\
+                       <peopleNum>%d</peopleNum>\
+                       <menutid>%d</menutid>\
+                       </ListForNext>\
+                       </soap:Body>\
+                       </soap:Envelope>",aResultID,aPeopleNum,aMenuId];
+    [request addRequestHeader:@"Host" value:@"interface.hcgjzs.com"];
+    [request addRequestHeader:@"Content-Type" value:@"text/xml; charset=utf-8"];
+    [request addRequestHeader:@"Content-Length" value:[NSString stringWithFormat:@"%d",postStr.length]];
+    [request addRequestHeader:@"SOAPAction" value:@"http://tempuri.org/ListForNext"];
+    [request setPostBody:(NSMutableData *)[postStr dataUsingEncoding:4]];
+    return request;
+}
 #pragma mark - 提交订单
-+(ASIHTTPRequest *)sumbitOrderAllId:(NSString *)aAllId restId:(NSString *)aResultID contactNumber:(NSString *)aContactNum eatTime:(NSString *)aEatTime mark:(NSString *)aMark
++(ASIHTTPRequest *)sumbitOrderAllId:(NSString *)aAllId restId:(NSString *)aResultID contactNumber:(NSString *)aContactNum eatTime:(NSString *)aEatTime mark:(NSString *)aMark andNumberS:(NSString *)aNumbers
 {
     ASIHTTPRequest *request=[TKHttpRequest RequestTKUrl:ORDER_URL];
     NSString *postStr=[NSString stringWithFormat:@"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
@@ -81,9 +101,10 @@
                        <contactNum>%@</contactNum>\
                        <eatTime>%@</eatTime>\
                        <mark>%@</mark>\
+                       <copies>%@</copies>\
                        </Add>\
                        </soap:Body>\
-                       </soap:Envelope>",aAllId,[aResultID intValue],aContactNum,aEatTime,aMark];
+                       </soap:Envelope>",aAllId,[aResultID intValue],aContactNum,aEatTime,aMark,aNumbers];
     [request addRequestHeader:@"Host" value:@"interface.hcgjzs.com"];
     [request addRequestHeader:@"Content-Type" value:@"text/xml; charset=utf-8"];
     [request addRequestHeader:@"Content-Length" value:[NSString stringWithFormat:@"%d",postStr.length]];
@@ -117,7 +138,7 @@
                        <soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\
                        <soap:Body>\
                        <Del xmlns=\"http://tempuri.org/\">\
-                        <id>%d</id>\
+                       <id>%d</id>\
                        </Del>\
                        </soap:Body>\
                        </soap:Envelope>",orderId];
@@ -143,6 +164,26 @@
     [request addRequestHeader:@"Content-Type" value:@"text/xml; charset=utf-8"];
     [request addRequestHeader:@"Content-Length" value:[NSString stringWithFormat:@"%d",postStr.length]];
     [request addRequestHeader:@"SOAPAction" value:@"http://tempuri.org/GetProductList"];
+    [request setPostBody:(NSMutableData *)[postStr dataUsingEncoding:4]];
+    return request;
+}
++(ASIHTTPRequest *)AddDisesToOrderId:(int)aOrderId idList:(NSString *)aIdList copies:(NSString *)aCopies
+{
+    ASIHTTPRequest *request=[TKHttpRequest RequestTKUrl:ORDER_URL];
+    NSString *postStr=[NSString stringWithFormat:@"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
+                       <soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\
+                       <soap:Body>\
+                       <AddToOrderInfo xmlns=\"http://tempuri.org/\">\
+                       <orderid>%d</orderid>\
+                       <idlist>%@</idlist>\
+                       <copies>%@</copies>\
+                       </AddToOrderInfo>\
+                       </soap:Body>\
+                       </soap:Envelope>",aOrderId,aIdList,aCopies];
+    [request addRequestHeader:@"Host" value:@"interface.hcgjzs.com"];
+    [request addRequestHeader:@"Content-Type" value:@"text/xml; charset=utf-8"];
+    [request addRequestHeader:@"Content-Length" value:[NSString stringWithFormat:@"%d",postStr.length]];
+    [request addRequestHeader:@"SOAPAction" value:@"http://tempuri.org/AddToOrderInfo"];
     [request setPostBody:(NSMutableData *)[postStr dataUsingEncoding:4]];
     return request;
 }

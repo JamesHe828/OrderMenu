@@ -20,6 +20,8 @@
 @property (nonatomic,strong) IBOutlet UIWebView * myWebView;
 @property (nonatomic,strong) NSURLRequest * request;
 @property (nonatomic,strong) IBOutlet UIButton * sendBtn;
+@property (nonatomic,strong) IBOutlet UIImageView * lineImageView;
+@property (nonatomic,strong) IBOutlet UILabel * lab_title;
 @property (nonatomic,strong) NSMutableArray * dataArr;
 -(IBAction)backClick:(id)sender;
 -(IBAction)sendClick:(id)sender;
@@ -34,6 +36,8 @@
 @synthesize sendBtn;
 @synthesize dataArr;
 @synthesize resustName;
+@synthesize lineImageView;
+@synthesize lab_title;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -56,6 +60,8 @@
     else
     {
         self.sendBtn.alpha = 0.0;
+        self.lab_title.alpha = 1.0;
+        self.lineImageView.alpha = 0.0;
         self.request = [NSURLRequest requestWithURL:[NSURL URLWithString:self.urlStr]];
         [self.myWebView loadRequest:request];
     }
@@ -69,7 +75,6 @@
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
 {
     NSString *str=[[self.myWebView.request URL] absoluteString];
-    NSLog(@"str = %@",str);
     NSRange range = [str rangeOfString:@"code="];
     if (range.length>0)
     {
@@ -82,14 +87,13 @@
         [request1 startAsynchronous];
         NSMutableData * reciveData = [NSMutableData dataWithCapacity:0];
         [request1 setStartedBlock:^{
-            [MyActivceView startAnimatedInView:self.view];
+            [MyActivceView startAnimatedInView:self.myWebView];
         }];
         [request1 setDataReceivedBlock:^(NSData *data) {
             [reciveData appendData:data];
         }];
         [request1 setCompletionBlock:^{
-            
-            [MyActivceView stopAnimatedInView:self.view];
+            [MyActivceView stopAnimatedInView:self.myWebView];
             NSArray * resultArr = [[[NSString alloc] initWithData:reciveData encoding:4] componentsSeparatedByString:@"&"];
             NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
             [defaults setValue:[self parseIndex:3 parStr:@"openid"] forKey:@"T_opeid"];
@@ -101,16 +105,24 @@
     }
     return YES;
 }
+- (void)webViewDidStartLoad:(UIWebView *)webView
+{
+    [MyActivceView startAnimatedInView:self.view];
+}
 
+- (void)webViewDidFinishLoad:(UIWebView *)webView
+{
+    [MyActivceView stopAnimatedInView:self.view];
+}
+
+- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
+{
+ 
+}
 -(void)changeUI
 {
     allView = [[UIView alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height+20, 320, self.view.frame.size.height)];
     allView.backgroundColor = [UIColor colorWithRed:225.0/255.0 green:226.0/255.0 blue:228.0/255.0 alpha:1.0];
-    
-    if (self.resustName.length>0)
-    {
-        self.sendBtn.frame = CGRectMake(250, 2, 64, 33);
-    }
     
     UIView *nView;
     if (self.resustName.length>0)
@@ -119,7 +131,7 @@
     }
     else
     {
-      nView=[[UIView alloc] initWithFrame:CGRectMake(10, 20, 280, 165)];
+      nView=[[UIView alloc] initWithFrame:CGRectMake(20, 20, 280, 165)];
     }
     
     nView.backgroundColor=[UIColor colorWithRed:255.0/255.0 green:255.0/255.0 blue:255.0/255.0 alpha:1.0];
@@ -139,6 +151,7 @@
     
     allTextView = [[UITextView alloc] initWithFrame:CGRectMake(5, 5, 270, 155)];
     allTextView.layer.borderColor = [UIColor grayColor].CGColor;
+    allTextView.font=[UIFont systemFontOfSize:16.0f];
     if (self.resustName.length>0)
     {
          allTextView.text = [NSString stringWithFormat:@"我现在在%@吃饭，在用点美点进行点餐，用起来不错，推荐给大家。@DMD #点美点# ，随意选就餐环境、菜品、预定座位、在线点餐，尽在指尖，点即动美食定！http://www.tiankong360.com",self.resustName];
@@ -148,16 +161,15 @@
        allTextView.text = @"去那个好呢，东城，西城，城南，城北？哥们，要吃饭啊？@DMD #点美点# ，随意选就餐环境、菜品、预定座位、在线点餐，点美点，美一点，我的美餐！http://www.tiankong360.com";
     }
     [nView addSubview:allTextView];
-    
     [self.view addSubview:allView];
-
     [self.myWebView removeFromSuperview];
     [allTextView becomeFirstResponder];
     [UIView animateWithDuration:0.3 animations:^{
         allView.frame = CGRectMake(0, 43, 320, self.view.frame.size.height);
         self.sendBtn.alpha = 1.0;
+        self.lineImageView.alpha =  1.0;
+         self.lab_title.text=@"好友推荐";
     } completion:^(BOOL finished) {
-        
     }];
 }
 -(IBAction)sendClick:(id)sender
@@ -204,21 +216,6 @@
         return result;
     }
     return nil;
-}
-- (void)webViewDidStartLoad:(UIWebView *)webView
-{
-    //[MyActivceView startAnimatedInView:self.view];
-}
-
-- (void)webViewDidFinishLoad:(UIWebView *)webView
-{
-   // [MyActivceView stopAnimatedInView:self.view];
-}
-
-- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
-{
-    //[MyActivceView stopAnimatedInView:self.view];
-   // [MyAlert ShowAlertMessage:@"加载失败" title:@""];
 }
 
 - (void)didReceiveMemoryWarning

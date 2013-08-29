@@ -40,7 +40,7 @@
 					<object class="IBUIImageView" id="372095500">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">310</int>
-						<string key="NSFrameSize">{320, 43}</string>
+						<string key="NSFrameSize">{320, 44}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSNextKeyView" ref="360057720"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
@@ -48,14 +48,14 @@
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 						<object class="NSCustomResource" key="IBUIImage">
 							<string key="NSClassName">NSImage</string>
-							<string key="NSResourceName">26.png</string>
+							<string key="NSResourceName">智能点菜2-确定导航.png</string>
 						</object>
 					</object>
 					<object class="IBUITableView" id="865752675">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">274</int>
 						<array class="NSMutableArray" key="NSSubviews"/>
-						<string key="NSFrame">{{84, 41}, {236, 506}}</string>
+						<string key="NSFrame">{{84, 44}, {236, 506}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<object class="NSColor" key="IBUIBackgroundColor" id="910549833">
@@ -76,7 +76,7 @@
 					<object class="IBUITableView" id="801500656">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">274</int>
-						<string key="NSFrame">{{0, 42}, {84, 506}}</string>
+						<string key="NSFrame">{{0, 44}, {84, 506}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSNextKeyView" ref="865752675"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
@@ -95,7 +95,7 @@
 					<object class="IBUIButton" id="360057720">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrameSize">{44, 35}</string>
+						<string key="NSFrameSize">{44, 38}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSNextKeyView" ref="917631589"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
@@ -103,6 +103,7 @@
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 						<int key="IBUIContentHorizontalAlignment">0</int>
 						<int key="IBUIContentVerticalAlignment">0</int>
+						<bool key="IBUIShowsTouchWhenHighlighted">YES</bool>
 						<reference key="IBUIHighlightedTitleColor" ref="910549833"/>
 						<object class="NSColor" key="IBUINormalTitleColor">
 							<int key="NSColorSpace">1</int>
@@ -125,7 +126,7 @@
 					<object class="IBUIButton" id="917631589">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{266, -3}, {54, 40}}</string>
+						<string key="NSFrame">{{266, -3}, {54, 41}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSNextKeyView" ref="801500656"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
@@ -133,6 +134,7 @@
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 						<int key="IBUIContentHorizontalAlignment">0</int>
 						<int key="IBUIContentVerticalAlignment">0</int>
+						<bool key="IBUIShowsTouchWhenHighlighted">YES</bool>
 						<reference key="IBUIHighlightedTitleColor" ref="910549833"/>
 						<object class="NSColor" key="IBUINormalTitleColor">
 							<int key="NSColorSpace">1</int>
@@ -266,8 +268,8 @@
 							<reference ref="372095500"/>
 							<reference ref="865752675"/>
 							<reference ref="801500656"/>
-							<reference ref="360057720"/>
 							<reference ref="917631589"/>
+							<reference ref="360057720"/>
 						</array>
 						<reference key="parent" ref="0"/>
 					</object>
@@ -333,8 +335,8 @@
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
 		<object class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
-			<string key="NS.key.0">26.png</string>
-			<string key="NS.object.0">{320, 43}</string>
+			<string key="NS.key.0">智能点菜2-确定导航.png</string>
+			<string key="NS.object.0">{320, 44}</string>
 		</object>
 		<string key="IBCocoaTouchPluginVersion">2083</string>
 	</data>

@@ -11,13 +11,16 @@
 @implementation DishesClassCell
 @synthesize backgroundImageView;
 @synthesize textContentLab;
+@synthesize isClick;
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
+        self.isClick = NO;
+        
         UIImageView * imageview = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 84, 44)];
-        imageview.image = [UIImage imageNamed:@"4.png"];
+        imageview.image = [UIImage imageNamed:@"DishClass05.png"];
         self.backgroundImageView = imageview;
         [self addSubview:imageview];
         

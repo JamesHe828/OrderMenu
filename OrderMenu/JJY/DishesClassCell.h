@@ -11,4 +11,5 @@
 @interface DishesClassCell : UITableViewCell
 @property (nonatomic,strong) UIImageView * backgroundImageView;
 @property (nonatomic,strong) UILabel * textContentLab;
+@property (nonatomic) BOOL isClick;
 @end

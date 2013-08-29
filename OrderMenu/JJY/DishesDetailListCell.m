@@ -9,8 +9,11 @@
 #import "DishesDetailListCell.h"
 #import <QuartzCore/QuartzCore.h>
 
+
 @interface DishesDetailListCell()
--(void)btnClickEvent:(DishesSelectedButton *)aBtn;
+-(void)leftClick:(UIButton *)aLeft;
+-(void)rightClick:(UIButton *)aRight;
+-(void)bigClick:(UIButton *)aBig;
 @end
 
 @implementation DishesDetailListCell
@@ -19,6 +22,8 @@
 @synthesize titleLab;
 @synthesize priceLab;
 @synthesize dishesButton;
+@synthesize dishView;
+@synthesize delegate;
 
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
@@ -42,42 +47,71 @@
         self.titleLab = title;
         [bgView addSubview:title];
         
-        UILabel * price = [[UILabel alloc] initWithFrame:CGRectMake(90, 50, 100, 20)];
-        price.font = [UIFont systemFontOfSize:15];
+        UILabel * price = [[UILabel alloc] initWithFrame:CGRectMake(90, 50, 70, 20)];
+        price.font = [UIFont systemFontOfSize:12];
         price.textColor = [UIColor redColor];
         price.backgroundColor = [UIColor clearColor];
         self.priceLab = price;
         [bgView addSubview:price];
         
-        DishesSelectedButton * btn = [[DishesSelectedButton alloc] initWithFrame:CGRectMake(190, 25, 30, 30)];
-        self.dishesButton = btn;
-        [btn setBackgroundImage:[UIImage imageNamed:@"8.png"] forState:UIControlStateNormal];
-        [btn addTarget:self action:@selector(btnClickEvent:) forControlEvents:UIControlEventTouchUpInside];
-        btn.backgroundColor = [UIColor whiteColor];
-        btn.layer.borderColor = [UIColor grayColor].CGColor;
-        btn.layer.borderWidth = 1;
-        btn.layer.cornerRadius = 3;
-        [bgView addSubview:btn];
+
+        DishClickView * clickView = [[DishClickView alloc] initWithFrame:CGRectMake(140, 0, 90, 40) andNumber:0];
+        self.dishView = clickView;
+        [bgView addSubview:clickView];
+        
     }
     return self;
 }
--(void)btnClickEvent:(DishesSelectedButton *)aBtn
+
+- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier andDotNumber:(int)aDotNumber
 {
-    if (aBtn.isSelect)
-    {
-        aBtn.isSelect = NO;
-        [aBtn setBackgroundImage:[UIImage imageNamed:@"8.png"] forState:UIControlStateNormal];
+    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+    if (self) {
+        
+        UIImageView * bgView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, 80)];
+        bgView.userInteractionEnabled = YES;
+        self.backgroundImageView = bgView;
+        [self addSubview:bgView];
+        
+        UIImageView * leftView = [[UIImageView alloc] initWithFrame:CGRectMake(5, 10, 80, 60)];
+        self.leftImageView = leftView;
+        [bgView addSubview:leftView];
+        
+        UILabel * title = [[UILabel alloc] initWithFrame:CGRectMake(90, 15, 100, 35)];
+        title.numberOfLines = 2;
+        title.backgroundColor = [UIColor clearColor];
+        title.font = [UIFont systemFontOfSize:16];
+        self.titleLab = title;
+        [bgView addSubview:title];
+        
+        UILabel * price = [[UILabel alloc] initWithFrame:CGRectMake(90, 50, 60, 20)];
+        price.font = [UIFont systemFontOfSize:12];
+        price.textColor = [UIColor redColor];
+        price.backgroundColor = [UIColor clearColor];
+        self.priceLab = price;
+        [bgView addSubview:price];
+        
+        DishClickView * clickView = [[DishClickView alloc] initWithFrame:CGRectMake(140, 35, 90, 40) andNumber:aDotNumber];
+        self.dishView = clickView;
+        [bgView addSubview:clickView];
+        
     }
-    else
-    {
-        aBtn.isSelect = YES;
-        [aBtn setBackgroundImage:[UIImage imageNamed:@"7.png"] forState:UIControlStateNormal];
-    }
+    return self;
 }
 
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated
+
+-(void)leftClick:(UIButton *)aLeft
 {
-    [super setSelected:selected animated:animated];
+    [self.delegate leftButtonClickEvent:aLeft];
 }
 
+-(void)rightClick:(UIButton *)aRight
+{
+    [self.delegate rightButtonClickEvent:aRight];
+}
+
+-(void)bigClick:(UIButton *)aBig
+{
+    [self.delegate bigButtonClickEvent:aBig];
+}
 @end

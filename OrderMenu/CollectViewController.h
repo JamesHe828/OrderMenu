@@ -14,7 +14,10 @@
     NSMutableArray *collectAry;
     UITableView    *aTableView;
     NSUserDefaults *userDefaults;
+    int            p;
+    UIButton       *editBtn;
 }
 @property(nonatomic,retain) NSArray  *ary;
 @property(nonatomic,retain)NSMutableArray *collectAry;
+@property(nonatomic,retain)UITableView    *aTableView;
 @end

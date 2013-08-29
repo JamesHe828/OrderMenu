@@ -14,8 +14,12 @@
 #import "SumbitViewController.h"
 #import <QuartzCore/QuartzCore.h>
 #import "DataBase.h"
+#import "MenuCheckViewController.h"
 
 @interface AudoResultViewController ()<AudoPriceViewDelegate>
+{
+    int menuId;
+}
 @property (nonatomic,strong)UIButton * backButton;
 @property (nonatomic,strong)UIButton * changeButton;
 @property (nonatomic,strong)NSMutableArray * datasourseArr;
@@ -23,9 +27,11 @@
 -(IBAction)backClick:(id)sender;
 -(IBAction)changeBtnClick:(id)sender;
 -(void)tapClick:(UITapGestureRecognizer *)aTap;
--(void)deleteBtnClick:(DishesSelectedButton *)aButton;
 -(void)getData;
 -(void)refePriceView;
+-(void)rightButtonClickEvent:(UIButton *)aButton;
+-(void)leftButtonClickEvent:(UIButton *)aButton;
+-(void)changeOneGetData;
 @end
 
 @implementation AudoResultViewController
@@ -39,6 +45,7 @@
 @synthesize peopleNum;
 @synthesize resultID;
 @synthesize audoPrice;
+@synthesize resInfoArr;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -64,11 +71,12 @@
     changeBtn.frame = CGRectMake(320-60, 0, 60, 37);
     [changeBtn setImage:[UIImage imageNamed:@"13.png"] forState:UIControlStateNormal];
     [self.navigationController.navigationBar addSubview:changeBtn];
+    
+    [self refeTable];
 }
 #pragma  mark - 刷新表
 -(void)refeTable
 {
-    [self.audoPrice ChangeLabTextSumPrice:0 sumDishes:0];
     if (self.datasourseArr.count>0)
     {
         [self.datasourseArr removeAllObjects];
@@ -80,11 +88,18 @@
 #pragma mark - change　price
 -(void)refePriceView
 {
-    __block double sumPrice = 0;
-    [self.datasourseArr enumerateObjectsUsingBlock:^(NSDictionary * obj, NSUInteger idx, BOOL *stop) {
-        sumPrice += [[obj valueForKey:@"prices"] doubleValue];
+    NSMutableArray * mutableArr = [DataBase selectAllArrayProId];
+    __block NSMutableArray * arr;
+    __block double sum = 0;
+    __block double addNum = 0;
+    __block int num = 0;
+    [mutableArr enumerateObjectsUsingBlock:^(NSString * obj, NSUInteger idx, BOOL *stop) {
+        arr = [DataBase selectNumberFromProId:[obj intValue]];
+        num += [[[arr objectAtIndex:0] valueForKey:@"number"] intValue];
+        addNum = [[[arr objectAtIndex:0] valueForKey:@"number"] doubleValue]*[[[arr objectAtIndex:0] valueForKey:@"price"] doubleValue];
+        sum += addNum;
     }];
-    [self.audoPrice ChangeLabTextSumPrice:sumPrice sumDishes:self.datasourseArr.count];
+    [self.audoPrice ChangeLabTextSumPrice:sum sumDishes:num];
 }
 -(void)viewWillDisappear:(BOOL)animated
 {
@@ -100,12 +115,86 @@
 -(IBAction)changeBtnClick:(id)sender
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [self getData];
+        [self changeOneGetData];
     });
+}
+-(void)changeOneGetData
+{
+    [DataBase clearOrderMenu];
+    NSString * str = [self.peopleNum substringToIndex:self.peopleNum.length-1];
+    NSLog(@"resultid = %d,number = %d,id = %d",self.resultID,[str intValue],menuId);
+    ASIHTTPRequest * request = [WebService AudoProductListConfigResultId:self.resultID peopleNumber:[str intValue]andMenuId:menuId];
+    [request startAsynchronous];
+    NSMutableData * reciveData = [NSMutableData dataWithCapacity:0];
+    [request setStartedBlock:^{
+        [MyActivceView startAnimatedInView:self.view];
+    }];
+    [request setDataReceivedBlock:^(NSData *data) {
+        [reciveData appendData:data];
+    }];
+    [request setCompletionBlock:^{
+        NSArray * arr = [NSString ConverfromData:reciveData name:CHANGE_ONE];
+        NSLog(@"arr = %@",arr);
+        if (arr.count > 0)
+        {
+            menuId = [[[arr objectAtIndex:0] valueForKey:@"Menuid"] intValue];
+            if (self.datasourseArr.count>0)
+            {
+                [self.datasourseArr removeAllObjects];
+            }
+            self.datasourseArr = [NSMutableArray arrayWithArray:[NSString ConverfromData:reciveData name:CHANGE_ONE]];
+            if (self.datasourseArr.count>0)
+            {
+                [self.datasourseArr enumerateObjectsUsingBlock:^(NSDictionary * obj, NSUInteger idx, BOOL *stop) {
+                    [DataBase insertProID:[[obj valueForKey:@"ProID"] intValue] menuid:[[obj valueForKey:@"Menuid"] intValue] proName:[obj valueForKey:@"ProName"] price:[[obj valueForKey:@"prices"] doubleValue] image:[obj valueForKey:@"ProductImg"] andNumber:1];
+                }];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [MyActivceView stopAnimatedInView:self.view];
+                    [self.dishTableView reloadData];
+                    [self refePriceView];
+                });
+            }
+            else
+            {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (self.datasourseArr.count>0)
+                    {
+                        [self.datasourseArr removeAllObjects];
+                    }
+                    [self refeTable];
+                    [self refePriceView];
+                    [MyActivceView stopAnimatedInView:self.view];
+                });
+            }
+        }
+        else
+        {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (self.datasourseArr.count>0)
+                {
+                    [self.datasourseArr removeAllObjects];
+                }
+                [self refeTable];
+                [self refePriceView];
+                [MyActivceView stopAnimatedInView:self.view];
+            });
+        }
+    }];
+    [request setFailedBlock:^{
+        [MyActivceView stopAnimatedInView:self.view];
+        [MyAlert ShowAlertMessage:@"网速不给力！" title:@"请求超时"];
+    }];
 }
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    //加载底部价格view
+    AudoPriceView * price = [AudoPriceView ShareView];
+    self.audoPrice = price;
+    price.delegate = self;
+    [AudoPriceView AnimateCome];
+    [self.view addSubview:price];
     
     self.view.backgroundColor = [UIColor colorWithRed:217 green:217 blue:217 alpha:0.9];
     self.dishTableView.bounces = NO;
@@ -113,14 +202,6 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         [self getData];
     });
-    
-    //加载底部价格view
-    AudoPriceView * price = [AudoPriceView ShareView];
-    self.audoPrice = price;
-    price.delegate = self;
-    [AudoPriceView AnimateCome];
-    [price ChangeLabTextSumPrice:0 sumDishes:0];
-    [self.view addSubview:price];
 }
 
 #pragma mark - get data
@@ -141,49 +222,75 @@
         NSArray * arr = [NSString ConverfromData:reciveData name:AUDO_PRODUCT_NAME];
         if (arr.count > 0)
         {
+            menuId = [[[arr objectAtIndex:0] valueForKey:@"Menuid"] intValue];
+            
+            if (self.datasourseArr.count>0)
+            {
+                [self.datasourseArr removeAllObjects];
+            }
             self.datasourseArr = [NSMutableArray arrayWithArray:[NSString ConverfromData:reciveData name:AUDO_PRODUCT_NAME]];
-            NSLog(@"self.data = %@",self.datasourseArr);
             if (self.datasourseArr.count>0)
             {
                 [self.datasourseArr enumerateObjectsUsingBlock:^(NSDictionary * obj, NSUInteger idx, BOOL *stop) {
-                    [DataBase insertProID:[[obj valueForKey:@"ProID"] intValue] menuid:[[obj valueForKey:@"Menuid"] intValue] proName:[obj valueForKey:@"ProName"] price:[[obj valueForKey:@"prices"] doubleValue] image:[obj valueForKey:@"ProductImg"]];
+                    [DataBase insertProID:[[obj valueForKey:@"ProID"] intValue] menuid:[[obj valueForKey:@"Menuid"] intValue] proName:[obj valueForKey:@"ProName"] price:[[obj valueForKey:@"prices"] doubleValue] image:[obj valueForKey:@"ProductImg"] andNumber:1];
                 }];
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [MyActivceView stopAnimatedInView:self.view];
-                    [self refePriceView];
                     [self.dishTableView reloadData];
+                    [self refePriceView];
                 });
             }
             else
             {
-                [MyActivceView stopAnimatedInView:self.view];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (self.datasourseArr.count>0)
+                    {
+                        [self.datasourseArr removeAllObjects];
+                    }
+                    [self refeTable];
+                    [self refePriceView];
+                    [MyActivceView stopAnimatedInView:self.view];
+                });
             }
         }
         else
         {
-            [MyActivceView stopAnimatedInView:self.view];
-            [MyAlert ShowAlertMessage:@"由于系统出错，无法进行智能点菜！" title:@"抱歉"];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (self.datasourseArr.count>0)
+                {
+                    [self.datasourseArr removeAllObjects];
+                }
+                [self refeTable];
+                [self refePriceView];
+                [MyActivceView stopAnimatedInView:self.view];
+            });
         }
-    }];}
+    }];
+    [request setFailedBlock:^{
+        [MyActivceView stopAnimatedInView:self.view];
+        [MyAlert ShowAlertMessage:@"网速不给力！" title:@"请求超时"];
+    }];
+}
+
 
 #pragma mark - audo price view delegate
 -(void)nextClick
 {
-    SumbitViewController * sumbit;
+    MenuCheckViewController * menu;
     if (IPhone5)
     {
-        sumbit = [[SumbitViewController alloc] initWithNibName:@"SumbitViewController" bundle:nil];
+        menu = [[MenuCheckViewController alloc] initWithNibName:@"MenuCheckViewController" bundle:nil];
     }
     else
     {
-        sumbit = [[SumbitViewController alloc] initWithNibName:@"SumbitViewController4" bundle:nil];
+        menu = [[MenuCheckViewController alloc] initWithNibName:@"MenuCheckViewController4" bundle:nil];
     }
-    sumbit.restId = [NSString stringWithFormat:@"%d",self.resultID];
+    menu.resultID = [NSString stringWithFormat:@"%d",self.resultID];
+    menu.resInfoArr = self.resInfoArr;
     NSString * idStr = [DataBase selectAllProId];
     if (idStr.length>0)
     {
-        sumbit.idStr = idStr;
-        [self.navigationController pushViewController:sumbit animated:YES];
+        [self.navigationController pushViewController:menu animated:YES];
     }
     else
     {
@@ -207,22 +314,33 @@
     }
     else
     {
-       cell = [tableView dequeueReusableCellWithIdentifier:mark_str];
+        cell = [tableView dequeueReusableCellWithIdentifier:mark_str];
+    }
+    int dotNumber = 1;
+    if (indexPath.row<self.datasourseArr.count)
+    {
+        NSMutableArray * arr1 =[DataBase selectNumberFromProId:[[[self.datasourseArr objectAtIndex:indexPath.row] valueForKey:@"ProID"] intValue]];
+        if (arr1.count>0)
+        {
+            dotNumber = [[[arr1 objectAtIndex:0] valueForKey:@"number"] intValue];
+            cell.dishView.dotNumber = dotNumber;
+        }
     }
     if (cell == nil)
     {
         if (indexPath.row == self.datasourseArr.count)
         {
-        cell = [[AudoDishesCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:mark_str1];
+            cell = [[AudoDishesCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:mark_str1];
         }
         else
         {
-         cell = [[AudoDishesCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:mark_str];
-        }
-        
+            cell = [[AudoDishesCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:mark_str andDotNumber:dotNumber];
+        } 
     }
     if (indexPath.row<self.datasourseArr.count)
     {
+        [cell.dishView initView:dotNumber];
+        cell.dishView.myLab.text = [NSString stringWithFormat:@"点%d份",dotNumber];  
         NSString * str1 = ALL_URL;
         NSURL * url = [NSURL URLWithString:[str1 stringByAppendingFormat:@"%@",[[self.datasourseArr objectAtIndex:indexPath.row] valueForKey:@"ProductImg"]]];
         [cell.leftImageView setImageWithURL:url placeholderImage:[UIImage imageNamed:ALL_NO_IMAGE]];
@@ -233,31 +351,78 @@
         
         cell.selectedBackgroundView = [[UIView alloc] initWithFrame:cell.frame];
         cell.dishesButton.rowNum = [[[self.datasourseArr objectAtIndex:indexPath.row] valueForKey:@"ProID"] intValue];
-        [cell.dishesButton addTarget:self action:@selector(deleteBtnClick:) forControlEvents:UIControlEventTouchUpInside];
-        [cell.dishesButton setBackgroundImage:[UIImage imageNamed:@"25.png"] forState:UIControlStateNormal];
+        
+        cell.selectionStyle=UITableViewCellSelectionStyleNone;
+        cell.dishView.price = [priceStr doubleValue];
+        cell.dishView.index = indexPath.row;
+        
+        [cell.dishView.rightButton addTarget:self action:@selector(rightButtonClickEvent:) forControlEvents:UIControlEventTouchUpInside];
+        [cell.dishView.leftButton addTarget:self action:@selector(leftButtonClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     }
     else
     {
+        cell.selectedBackgroundView = [[UIView alloc] initWithFrame:cell.frame];
         cell.leftImageView.image = [UIImage imageNamed:@"16.png"];
         cell.leftImageView.userInteractionEnabled = YES;
         UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapClick:)];
         [cell.leftImageView addGestureRecognizer:tap];
+        cell.dishView.alpha = 0.0;
         cell.titleLab.text = @"加个菜";
         [cell.dishesButton removeFromSuperview];
     }
     return cell;
 }
-#pragma mark - 删除操作
--(void)deleteBtnClick:(DishesSelectedButton *)aButton
+#pragma mark - 点菜触发事件
+-(void)leftButtonClickEvent:(UIButton *)aButton
 {
-    if (self.datasourseArr.count>0)
+    AudoDishesCell * cell = (AudoDishesCell *)[[[aButton superview] superview] superview];
+    NSDictionary * obj = [self.datasourseArr objectAtIndex:cell.dishView.index];
+    if (cell.dishView.dotNumber == 0)
     {
-        [DataBase deleteProID:aButton.rowNum];
-        [self.datasourseArr removeAllObjects];
-        self.datasourseArr = [DataBase selectAllProduct];
+        [DataBase deleteProID:[[obj valueForKey:@"ProID"] intValue]];
+        [self refeTable];
+    }
+    else
+    {
+        [DataBase UpdateDotNumber:[[obj valueForKey:@"ProID"] intValue] currDotNumber:cell.dishView.dotNumber];
+    }
+    
+    if ([PriceView ShareView].sumnumber == 0)
+    {
+        [PriceView AnimateCome];
+        [[PriceView ShareView] ChangeLabTextSumPrice:cell.dishView.price sumDishes:1];
+    }
+    else
+    {
+        [self refePriceView];
+        int numberSum = [PriceView ShareView].sumnumber;
+        if (numberSum-1 == 0)
+        {
+            [UIView beginAnimations:nil context:nil];
+            [UIView setAnimationDuration:0.7];
+            [UIView commitAnimations];
+            [PriceView AnimateCancle];
+        }
+    }
+}
+-(void)rightButtonClickEvent:(UIButton *)aButton
+{
+    DishesDetailListCell * cell = (DishesDetailListCell *)[[[aButton superview] superview] superview];
+    NSDictionary * obj = [self.datasourseArr objectAtIndex:cell.dishView.index];
+    [DataBase UpdateDotNumber:[[obj valueForKey:@"ProID"] intValue] currDotNumber:cell.dishView.dotNumber];
+    
+    if ([PriceView ShareView].sumnumber == 0)
+    {
+        [UIView beginAnimations:nil context:nil];
+        [UIView setAnimationDuration:0.7];
+        [UIView commitAnimations];
+        [PriceView AnimateCome];
         [self refePriceView];
     }
-    [self.dishTableView reloadData];
+    else
+    {
+        [self refePriceView];
+    }
 }
 
 #pragma mark - 加个菜--触发事件

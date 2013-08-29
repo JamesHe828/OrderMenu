@@ -8,6 +8,9 @@
 
 #import "TKHttpRequest.h"
 
+@interface TKHttpRequest()
+@end
+
 @implementation TKHttpRequest
 /*
    设置缓存策略，并返回设置好的request
@@ -16,6 +19,7 @@
 {
     NSURL *url = [NSURL URLWithString:aUrl];
     ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
+    [request setTimeOutSeconds:5.0];
     //获取全局变量
     ASIDownloadCache * cacheData = [self ShareCache];
     //设置缓存方式
