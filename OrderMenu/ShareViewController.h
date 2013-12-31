@@ -7,7 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
-@interface ShareViewController : UIViewController<UITextViewDelegate,UIWebViewDelegate>
+#import "ShareContentViewController.h"
+#import "WXApi.h"
+#import "WXApiObject.h"
+@protocol sendMsgToWeChatViewDelegate <NSObject>
+- (void) sendAppExtendContent;
+- (void) changeScene:(NSInteger)scene;
+@end
+@interface ShareViewController : UIViewController<UITextViewDelegate,UIWebViewDelegate,WXApiDelegate,sendMsgToWeChatViewDelegate>
 {
     UITextView     *aTextView;
     UIImageView    *shareImage;
@@ -15,7 +22,10 @@
     int            p;
     UIView         *background;
     UIView         *backGroundView;
+    ShareContentViewController *shareVC;
+    enum WXScene _scene;
 }
 @property(nonatomic,retain)UITextView      *aTextView;
 @property(nonatomic,retain)UIImageView     *shareImage;
+@property (nonatomic, assign) id<sendMsgToWeChatViewDelegate> delegate;
 @end

@@ -13,6 +13,7 @@
 #import "ASIHTTPRequest.h"
 #import "NSString+JsonString.h"
 #import "DetailViewController.h"
+#import "AppDelegate.h"
 @interface SearchResultViewController ()
 
 @end
@@ -75,7 +76,7 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     
-    static NSString *CellIdentifier = @"CellIdentifier";
+    static NSString *CellIdentifier;
     
     SearchResultCustomCell *cell = (SearchResultCustomCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     
@@ -101,24 +102,291 @@
     //    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     cell.lab.font = [UIFont fontWithName:@"Arial" size:17.0f];
-    cell.lab.textColor=[UIColor colorWithRed:251.0/255.0 green:33.0/255.0 blue:47.0/255.0 alpha:1.0];
+    //cell.lab.textColor=[UIColor colorWithRed:251.0/255.0 green:33.0/255.0 blue:47.0/255.0 alpha:1.0];
     cell.lab2.textColor=[UIColor grayColor];
     cell.renjunLab.textColor=[UIColor grayColor];
     cell.timeLab.textColor=[UIColor grayColor];
     //numberStr=cell.timeLab.text;
     cell.lab.text=[[ary objectAtIndex:indexPath.row] valueForKey:@"restname"];
-    [cell.imag setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://interface.hcgjzs.com%@",[[ary objectAtIndex:indexPath.row] valueForKey:@"restimg"]]] placeholderImage:[UIImage imageNamed:@"加载中"]];
+    [cell.imag setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@%@",Domain_Name,[[ary objectAtIndex:indexPath.row] valueForKey:@"restimg"]]] placeholderImage:[UIImage imageNamed:@"加载中"]];
     cell.lab2.text=[[ary objectAtIndex:indexPath.row] valueForKey:@"restaddress"];
     cell.timeLab.text=[[ary objectAtIndex:indexPath.row] valueForKey:@"restphone"];
     cell.renjunLab.text=[NSString stringWithFormat:@"人均￥%@",[[ary objectAtIndex:indexPath.row] valueForKey:@"restaverage"]];
-    //   [cell.abtn addTarget:self action:@selector(detailClick:) forControlEvents:UIControlEventTouchUpInside];
-    //  [cell.bbtn addTarget:self action:@selector(callNum:) forControlEvents:UIControlEventTouchUpInside];
+    cell.jiamengLab.backgroundColor=[UIColor colorWithRed:251.0/255.0 green:199.0/255.0 blue:188.0/255.0 alpha:1.0];
+    cell.dazheLab.backgroundColor=[UIColor colorWithRed:230.0/255.0 green:233.0/255.0 blue:214.0/255.0 alpha:1.0];
+    cell.waimaiLab.backgroundColor=[UIColor colorWithRed:220.0/255.0 green:241.0/255.0 blue:255.0/255.0 alpha:1.0];
+    cell.huodongLab.backgroundColor=[UIColor colorWithRed:255.0/255.0 green:249.0/255.0 blue:205.0/255.0 alpha:1.0];
+    cell.liansuoLab.backgroundColor=[UIColor colorWithRed:233.0/255.0 green:216.0/255.0 blue:252.0/255.0 alpha:1.0];
+    cell.jiamengLab.textColor=[UIColor grayColor];
+    cell.jiamengLab.textAlignment=NSTextAlignmentCenter;
+    cell.dazheLab.textColor=[UIColor grayColor];
+    cell.dazheLab.textAlignment=NSTextAlignmentCenter;
+    cell.waimaiLab.textColor=[UIColor grayColor];
+    cell.waimaiLab.textAlignment=NSTextAlignmentCenter;
+    cell.huodongLab.textColor=[UIColor grayColor];
+    cell.huodongLab.textAlignment=NSTextAlignmentCenter;
+    cell.liansuoLab.text=@"连锁";
+    cell.liansuoLab.textColor=[UIColor grayColor];
+    cell.liansuoLab.textAlignment=NSTextAlignmentCenter;
+    //标签
+    if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"status"]intValue]==1)
+    {
+        cell.jiamengLab.text=@"加盟";
+        if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"DiscountMark"] isEqualToString:@""])
+        {
+            cell.dazheLab.hidden=YES;
+            if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"CarryoutTime"] isEqualToString:@""])
+            {
+                cell.waimaiLab.hidden=YES;
+                
+                if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"Active"] isEqualToString:@""])
+                {
+                    cell.huodongLab.hidden=YES;
+                    if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"LinkID"]intValue]==-1)
+                    {
+                        cell.liansuoLab.hidden=YES;
+                    }
+                    else
+                    {
+                        cell.liansuoLab.frame=CGRectMake(113, 61, 45, 21);
+                    }
+                }
+                else
+                {
+                    cell.huodongLab.frame=CGRectMake(113, 61, 45, 21);
+                    cell.huodongLab.text=[[ary objectAtIndex:indexPath.row] valueForKey:@"Active"];
+                    if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"LinkID"]intValue]==-1)
+                    {
+                        cell.liansuoLab.hidden=YES;
+                    }
+                    else
+                    {
+                        cell.liansuoLab.frame=CGRectMake(165, 61, 45, 21);
+                    }
+                }
+            }
+            else
+            {
+                cell.waimaiLab.frame=CGRectMake(113, 61, 45, 21);
+                cell.waimaiLab.text=[[ary objectAtIndex:indexPath.row] valueForKey:@"CarryoutTime"];
+                if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"Active"] isEqualToString:@""]) {
+                    cell.huodongLab.hidden=YES;
+                    if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"LinkID"]intValue]==-1)
+                    {
+                        cell.liansuoLab.hidden=YES;
+                    }
+                    else
+                    {
+                        cell.liansuoLab.frame=CGRectMake(165, 61, 45, 21);
+                    }
+                }
+                else
+                {
+                    cell.huodongLab.frame=CGRectMake(165, 61, 45, 21);
+                    cell.huodongLab.text=[[ary objectAtIndex:indexPath.row] valueForKey:@"Active"];
+                    if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"LinkID"]intValue]==-1)
+                    {
+                        cell.liansuoLab.hidden=YES;
+                    }
+                    else
+                    {
+                        cell.liansuoLab.frame=CGRectMake(217, 61, 45, 21);
+                    }
+                }
+            }
+        }
+        else
+        {
+            cell.dazheLab.text=[[ary objectAtIndex:indexPath.row] valueForKey:@"DiscountMark"];
+            if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"CarryoutTime"] isEqualToString:@""])
+            {
+                cell.waimaiLab.hidden=YES;
+                if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"Active"] isEqualToString:@""]) {
+                    cell.huodongLab.hidden=YES;
+                    if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"LinkID"]intValue]==-1)
+                    {
+                        cell.liansuoLab.hidden=YES;
+                    }
+                    else
+                    {
+                        cell.liansuoLab.frame=CGRectMake(165, 61, 45, 21);
+                    }
+                }
+                else
+                {
+                    cell.huodongLab.frame=CGRectMake(165, 61, 45, 21);
+                    cell.huodongLab.text=[[ary objectAtIndex:indexPath.row] valueForKey:@"Active"];
+                    if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"LinkID"]intValue]==-1)
+                    {
+                        cell.liansuoLab.hidden=YES;
+                    }
+                    else
+                    {
+                        cell.liansuoLab.frame=CGRectMake(217, 61, 45, 21);
+                    }
+                }
+            }
+            else
+            {
+                cell.waimaiLab.text=[[ary objectAtIndex:indexPath.row] valueForKey:@"CarryoutTime"];
+                if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"Active"] isEqualToString:@""]) {
+                    cell.huodongLab.hidden=YES;
+                    if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"LinkID"]intValue]==-1)
+                    {
+                        cell.liansuoLab.hidden=YES;
+                    }
+                    else
+                    {
+                        cell.liansuoLab.frame=CGRectMake(217, 61, 45, 21);
+                    }
+                }
+                else
+                {
+                    cell.huodongLab.frame=CGRectMake(217, 61, 45, 21);
+                    cell.huodongLab.text=[[ary objectAtIndex:indexPath.row] valueForKey:@"Active"];
+                    if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"LinkID"]intValue]==-1)
+                    {
+                        cell.liansuoLab.hidden=YES;
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        cell.jiamengLab.hidden=YES;
+        if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"DiscountMark"] isEqualToString:@""])
+        {
+            cell.dazheLab.hidden=YES;
+            if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"CarryoutTime"] isEqualToString:@""])
+            {
+                cell.waimaiLab.hidden=YES;
+                if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"Active"] isEqualToString:@""]) {
+                    cell.huodongLab.hidden=YES;
+                    if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"LinkID"]intValue]==-1)
+                    {
+                        cell.liansuoLab.hidden=YES;
+                    }
+                    else
+                    {
+                        cell.liansuoLab.frame=CGRectMake(66, 61, 45, 21);
+                    }
+                }
+                else
+                {
+                    cell.huodongLab.frame=CGRectMake(66, 61, 45, 21);
+                    cell.huodongLab.text=[[ary objectAtIndex:indexPath.row] valueForKey:@"Active"];
+                    if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"LinkID"]intValue]==-1)
+                    {
+                        cell.liansuoLab.hidden=YES;
+                    }
+                    else
+                    {
+                        cell.liansuoLab.frame=CGRectMake(113, 61, 45, 21);
+                    }
+                }
+            }
+            else
+            {
+                cell.waimaiLab.frame=CGRectMake(66, 61, 45, 21);
+                cell.waimaiLab.text=[[ary objectAtIndex:indexPath.row] valueForKey:@"CarryoutTime"];
+                if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"Active"] isEqualToString:@""]) {
+                    cell.huodongLab.hidden=YES;
+                    if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"LinkID"]intValue]==-1)
+                    {
+                        cell.liansuoLab.hidden=YES;
+                    }
+                    else
+                    {
+                        cell.liansuoLab.frame=CGRectMake(113, 61, 45, 21);
+                    }
+                }
+                else
+                {
+                    cell.huodongLab.frame=CGRectMake(113, 61, 45, 21);
+                    cell.huodongLab.text=[[ary objectAtIndex:indexPath.row] valueForKey:@"Active"];
+                    if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"LinkID"]intValue]==-1)
+                    {
+                        cell.liansuoLab.hidden=YES;
+                    }
+                    else
+                    {
+                        cell.liansuoLab.frame=CGRectMake(165, 61, 45, 21);
+                    }
+                }
+            }
+        }
+        else
+        {
+            cell.dazheLab.frame=CGRectMake(66, 61, 45, 21);
+            cell.dazheLab.text=[[ary objectAtIndex:indexPath.row] valueForKey:@"DiscountMark"];
+            if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"CarryoutTime"] isEqualToString:@""])
+            {
+                cell.waimaiLab.hidden=YES;
+                if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"Active"] isEqualToString:@""])
+                {
+                    cell.huodongLab.hidden=YES;
+                    if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"LinkID"]intValue]==-1)
+                    {
+                        cell.liansuoLab.hidden=YES;
+                    }
+                    else
+                    {
+                        cell.liansuoLab.frame=CGRectMake(113, 61, 45, 21);
+                    }
+                }
+                else
+                {
+                    cell.huodongLab.frame=CGRectMake(113, 61, 45, 21);
+                    cell.huodongLab.text=[[ary objectAtIndex:indexPath.row] valueForKey:@"Active"];
+                    if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"LinkID"]intValue]==-1)
+                    {
+                        cell.liansuoLab.hidden=YES;
+                    }
+                    else
+                    {
+                        cell.liansuoLab.frame=CGRectMake(165, 61, 45, 21);
+                    }
+                }
+            }
+            else
+            {
+                cell.waimaiLab.frame=CGRectMake(113, 61, 45, 21);
+                cell.waimaiLab.text=[[ary objectAtIndex:indexPath.row] valueForKey:@"CarryoutTime"];
+                if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"Active"] isEqualToString:@""]) {
+                    cell.huodongLab.hidden=YES;
+                    if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"LinkID"]intValue]==-1)
+                    {
+                        cell.liansuoLab.hidden=YES;
+                    }
+                    else
+                    {
+                        cell.liansuoLab.frame=CGRectMake(165, 61, 45, 21);
+                    }
+                }
+                else
+                {
+                    cell.huodongLab.frame=CGRectMake(165, 61, 45, 21);
+                    cell.huodongLab.text=[[ary objectAtIndex:indexPath.row] valueForKey:@"Active"];
+                    if ([[[ary objectAtIndex:indexPath.row] valueForKey:@"LinkID"]intValue]==-1)
+                    {
+                        cell.liansuoLab.hidden=YES;
+                    }
+                    else
+                    {
+                        cell.liansuoLab.frame=CGRectMake(217, 61, 45, 21);
+                    }
+                }
+            }
+        }
+        
+    }
     return cell;
 }
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     
-    return 66;
+    return 83;
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -133,6 +401,8 @@
 
 -(void)backClick
 {
+//    AppDelegate *app=(AppDelegate *)[[UIApplication sharedApplication] delegate];
+//    [app showBotomBar];
     [self.navigationController popViewControllerAnimated:YES];
 }
 - (void)didReceiveMemoryWarning

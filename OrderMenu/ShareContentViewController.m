@@ -127,7 +127,8 @@
 }
 -(void)backClick
 {
-    [self dismissModalViewControllerAnimated:YES];
+    [aTextView resignFirstResponder];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"dismissShareVC" object:nil];
 }
 - (void)didReceiveMemoryWarning
 {

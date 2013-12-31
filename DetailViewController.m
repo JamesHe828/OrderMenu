@@ -11,7 +11,6 @@
 #import <QuartzCore/QuartzCore.h>
 #import "DishesListViewController.h"
 #import "NSString+Additions.h"
-#import "ShareContentViewController.h"
 #import "ASIFormDataRequest.h"
 #import "SBJSON.h"
 #import "TKHttpRequest.h"
@@ -20,12 +19,14 @@
 #import "UIImageView+WebCache.h"
 #import "DishClickView.h"
 #import "DataBase.h"
+#import "DrawLineViewController.h"
 
 #define SinaRequest_string @"https://api.weibo.com/oauth2/authorize?client_id=3564417983&redirect_uri=http://www.tiankong360.com&display=mobile"
 #define TencentRequest_string @""
 @interface DetailViewController ()
 {
     BOOL isClick;
+    WeiBoLoginViewController * login;
 }
 @property (nonatomic,strong) NSMutableArray * dataArr;
 @property (nonatomic,strong) ASIHTTPRequest * request1;
@@ -47,6 +48,10 @@
 @synthesize dataArr;
 @synthesize request1;
 @synthesize Lab11,Lab22,Lab33;
+@synthesize delegate = _delegate;
+@synthesize hideStr;
+@synthesize isFromMap;
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -54,10 +59,12 @@
         // Custom initialization
     }
     return self;
+    
 }
 
 -(void)viewWillAppear:(BOOL)animated
 {
+
      //jjy
     if (!isClick)
     {
@@ -71,6 +78,8 @@
 {
     [super viewDidLoad];
     
+    NSLog(@"====%@",self.resInfoArr);
+    
 //    self.navigationItem.title=@"菜单";
     //下个版本
 //    aTableView=[[UITableView alloc] initWithFrame:CGRectMake(0,44, 320, [UIScreen mainScreen].bounds.size.height-44-20) style:UITableViewStylePlain];
@@ -79,7 +88,7 @@
 //    //[aTableView setSeparatorColor:[UIColor whiteColor]];
 //    [self.view addSubview:aTableView];
 //    self.aTableView.backgroundColor=[UIColor clearColor];
-   // detailAry=[[NSArray alloc] init];
+    detailAry=[[NSArray alloc] init];
     UIImageView *aImageView=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
     aImageView.image=[UIImage imageNamed:@"详情导航"];
     [self.view addSubview:aImageView];
@@ -100,6 +109,8 @@
     
     imageview=[[UIImageView alloc] initWithFrame:CGRectMake(10, 8, 54, 54)];
     //imageview.image=[UIImage imageNamed:@"a.jpg"];
+    imageview.layer.borderColor=[[UIColor grayColor] CGColor];
+    imageview.layer.borderWidth=1;
     [aView addSubview:imageview];
     aLab=[[UILabel alloc] initWithFrame:CGRectMake(73, 18, 180, 20)];
     [aView addSubview:aLab];
@@ -212,6 +223,7 @@
     //点击 位置 定位  点击电话打电话
     UIButton *addressBtn=[UIButton buttonWithType:UIButtonTypeCustom];
     addressBtn.frame=CGRectMake(0, 0, 280, 35);
+    [addressBtn addTarget:self action:@selector(tapclick) forControlEvents:UIControlEventTouchUpInside];
 //    [addressBtn addTarget:self action:@selector(<#selector#>) forControlEvents:UIControlEventTouchUpInside];
     [addressView addSubview:addressBtn];
     UIButton *numBtn=[UIButton buttonWithType:UIButtonTypeCustom];
@@ -231,12 +243,53 @@
     [collectBtn addTarget:self action:@selector(collectClick) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:collectBtn];
     IDAry=[[NSMutableArray alloc] init];
-//    collectAry=[[NSMutableArray alloc] init];
- //   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    self.collectAry = [NSMutableArray arrayWithArray:[[NSUserDefaults standardUserDefaults] objectForKey:@"collectAry"]];
+    self.collectAry=[[NSMutableArray alloc] init];
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    self.collectAry = [NSMutableArray arrayWithArray:[userDefaults objectForKey:@"collectAry"]];
+    NSLog(@"collectAry=%@",collectAry);
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dismissShareVC2) name:@"dismissShareVC" object:nil];
+
     [self detailRequest];
     [self recommendRequest];
 }
+
+#pragma mark - tap click draw line
+-(void)tapclick
+{
+     NSDictionary * dicTemp = (NSDictionary *)self.resInfoArr;
+    NSArray * tempArr = [dicTemp allKeys];
+    __block BOOL isHave = NO;
+    [tempArr enumerateObjectsUsingBlock:^(NSString * obj, NSUInteger idx, BOOL *stop) {
+        if ([obj isEqualToString:@"Longitude"] || [obj isEqualToString:@"Latitude"])
+        {
+            isHave = YES;
+            *stop = YES;
+        }
+    }];
+    if (self.isFromMap)
+    {
+        isHave = YES;
+    }
+    if (isHave)
+    {
+        DrawLineViewController * drawline;
+        if (IPhone5)
+        {
+            drawline = [[DrawLineViewController alloc] initWithNibName:@"DrawLineViewController" bundle:Nil];
+        }
+        else
+        {
+            drawline = [[DrawLineViewController alloc] initWithNibName:@"DrawLineViewController4" bundle:nil];
+        }
+        
+        drawline.restName = [dicTemp valueForKey:@"restname"];
+        drawline.lat = [[dicTemp valueForKey:@"Latitude"] doubleValue];
+        drawline.longit = [[dicTemp valueForKey:@"Longitude"] doubleValue];
+        [self.navigationController pushViewController:drawline animated:YES];
+    }
+   
+}
+
 //------分享
 -(void)commitContent
 {
@@ -259,11 +312,24 @@
     [tencentBtn setImage:[UIImage imageNamed:@"腾讯微博1@2x.png"] forState:UIControlStateNormal];
     [tencentBtn addTarget:self action:@selector(tencentClick) forControlEvents:UIControlEventTouchUpInside];
     [backGroundView addSubview:tencentBtn];
+    UIButton *weixinBtn=[UIButton buttonWithType:UIButtonTypeCustom];
+    weixinBtn.frame=CGRectMake(140, 10, 40, 40);
+    [weixinBtn setImage:[UIImage imageNamed:@"weixin.png"] forState:UIControlStateNormal];
+    [weixinBtn addTarget:self action:@selector(weixinClick) forControlEvents:UIControlEventTouchUpInside];
+    [backGroundView addSubview:weixinBtn];
+    
+    UIButton *friendBtn=[UIButton buttonWithType:UIButtonTypeCustom];
+    friendBtn.frame=CGRectMake(200, 10, 40, 40);
+    [friendBtn setImage:[UIImage imageNamed:@"friend.png"] forState:UIControlStateNormal];
+    [friendBtn addTarget:self action:@selector(friendClick) forControlEvents:UIControlEventTouchUpInside];
+    [backGroundView addSubview:friendBtn];
     // 创建一个手势识别器
     UITapGestureRecognizer *oneFingerOneTaps =[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(oneFingerOneTaps)];
     [oneFingerOneTaps setNumberOfTapsRequired:1];
     [oneFingerOneTaps setNumberOfTouchesRequired:1];
     [background addGestureRecognizer:oneFingerOneTaps];
+
+
 }
 -(void)sinaClick
 {
@@ -304,9 +370,11 @@
 #pragma mark - 腾讯微博分享
 -(void)tencentClick
 {
-    isClick = YES;
-    NSString * strPath =  [NSString stringWithFormat:@"https://open.t.qq.com/cgi-bin/oauth2/authorize?client_id=%@&response_type=code&redirect_uri=%@&web=2",APP_KEY,APP_REQUEST_URL];
-    WeiBoLoginViewController * login;
+    if (login)
+    {
+        login = Nil;
+    }
+    NSString * strPath =  [NSString stringWithFormat:@"https://open.t.qq.com/cgi-bin/oauth2/authorize?client_id=%@&response_type=code&redirect_uri=%@",APP_KEY,APP_REQUEST_URL];
     if (IPhone5)
     {
         login = [[WeiBoLoginViewController alloc] initWithNibName:@"WeiBoLoginViewController" bundle:nil];
@@ -316,10 +384,84 @@
         login = [[WeiBoLoginViewController alloc] initWithNibName:@"WeiBoLoginViewController4" bundle:nil];
     }
     login.urlStr = strPath;
-    login.resustName = aLab.text;
-    [self presentViewController:login animated:YES completion:^{
-        ;
+    login.view.frame = CGRectMake(0, login.view.frame.size.height+100, 320, login.view.frame.size.height);
+    [self.view addSubview:login.view];
+    
+    [UIView animateWithDuration:0.3 animations:^{
+        login.view.frame = CGRectMake(0, -20, 320, login.view.frame.size.height);
+    } completion:^(BOOL finished) {
     }];
+}
+
+-(void)weixinClick
+{
+    _scene = WXSceneSession;
+    [self sendAppExtendContent];
+    [_delegate changeScene:WXSceneSession];
+}
+- (void)sendAppExtendContent
+{
+    if ([WXApi isWXAppInstalled] && [WXApi isWXAppSupportApi])
+    {
+        WXMediaMessage *message = [WXMediaMessage message];
+        message.title = @"点美点";
+        message.description = [NSString stringWithFormat:@"我现在在%@吃饭，在用点美点进行点餐，用起来不错，推荐给大家。@DMD #点美点# ，随意选就餐环境、菜品、预定座位、在线点餐，尽在指尖，点即动美食定！http://www.tiankong360.com",self.aLab.text];
+        [message setThumbImage:[UIImage imageNamed:@"Default@2x.png"]];
+        
+        WXAppExtendObject *ext =[WXAppExtendObject object];
+        ext.url=@"https://itunes.apple.com/us/app/dian-mei-dian/id678946071?ls=1&mt=8";
+        message.mediaObject=ext;
+        
+        SendMessageToWXReq* req = [[SendMessageToWXReq alloc] init];
+        req.bText = NO;
+        req.message = message;
+        req.scene = _scene;
+        
+        [WXApi sendReq:req];
+    }
+    else
+    {
+        UIAlertView *alView = [[UIAlertView alloc]initWithTitle:@"" message:@"你的iPhone上还没有安装微信,无法使用此功能，使用微信可以方便的把你喜欢的作品分享给好友。" delegate:nil cancelButtonTitle:@"取消" otherButtonTitles:nil, nil];
+        [alView show];
+        
+    }
+}
+-(void)friendClick
+{
+    _scene=WXSceneTimeline;
+    [self sendAppExtendContent_friend];
+    [_delegate changeScene:WXSceneTimeline];
+}
+- (void)sendAppExtendContent_friend
+{
+    if ([WXApi isWXAppInstalled] && [WXApi isWXAppSupportApi])
+    {
+        WXMediaMessage *message = [WXMediaMessage message];
+        message.title = @"点美点";
+        message.description = [NSString stringWithFormat:@"我现在在%@吃饭，在用点美点进行点餐，用起来不错，推荐给大家。@DMD #点美点# ，随意选就餐环境、菜品、预定座位、在线点餐，尽在指尖，点即动美食定！http://www.tiankong360.com",self.aLab.text];
+        [message setThumbImage:[UIImage imageNamed:@"Default@2x.png"]];
+        
+        WXAppExtendObject *ext =[WXAppExtendObject object];
+        ext.url=@"https://itunes.apple.com/us/app/dian-mei-dian/id678946071?ls=1&mt=8";
+        message.mediaObject=ext;
+        
+        SendMessageToWXReq* req = [[SendMessageToWXReq alloc] init];
+        req.bText = NO;
+        req.message = message;
+        req.scene = _scene;
+        
+        [WXApi sendReq:req];
+    }
+    else
+    {
+        UIAlertView *alView = [[UIAlertView alloc]initWithTitle:@"" message:@"你的iPhone上还没有安装微信,无法使用此功能，使用微信可以方便的把你喜欢的作品分享给好友。" delegate:nil cancelButtonTitle:@"取消" otherButtonTitles:nil, nil];
+        [alView show];
+        
+    }
+}
+-(void) changeScene:(NSInteger)scene
+{
+    _scene = scene;
 }
 //手势
 //消息方法oneFingerOneTaps
@@ -399,11 +541,11 @@
     else if (request.tag==361)
     {
         [MyActivceView stopAnimatedInView:self.view];
+        NSLog(@"--- %@",request.responseString);
         NSArray *infoAry=[NSString ConverfromData:request.responseData name:@"GetInfo"];
-        NSLog(@"info %@",infoAry);
         self.addressLab.text=[infoAry  valueForKey:@"restaddress"];
         self.aLab.text=[infoAry  valueForKey:@"restname"];
-        [self.imageview setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://interface.hcgjzs.com%@",[infoAry valueForKey:@"restimg"]]] placeholderImage:[UIImage imageNamed:@"加载中"]];
+        [self.imageview setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@%@",Domain_Name,[infoAry valueForKey:@"restimg"]]] placeholderImage:[UIImage imageNamed:@"加载中"]];
         self.numLab.text=[infoAry valueForKey:@"restphone"];
        // self.aText.text=[infoAry valueForKey:@"restbrief"];
         self.Lab11.text=[infoAry valueForKey:@"worktime"];
@@ -419,13 +561,13 @@
        NSArray *infoAry=[NSString ConverfromData:request.responseData name:@"ProductRedList"];
         self.recommendAry=infoAry;
         aScrollView.contentSize=CGSizeMake(320, [UIScreen mainScreen].bounds.size.height-161-44-20+70*[self.recommendAry count]);
-        UITableView *recommendTable=[[UITableView alloc] initWithFrame:CGRectMake(12, 193, 296, 70*[self.recommendAry count]+15)style:UITableViewStyleGrouped];
+        UITableView *recommendTable=[[UITableView alloc] initWithFrame:CGRectMake(20, 205, 280, 70*[self.recommendAry count])style:UITableViewStylePlain];
         [aScrollView addSubview:recommendTable];
         recommendTable.scrollEnabled=NO;
         recommendTable.delegate=self;
         recommendTable.dataSource=self;
         recommendTable.backgroundView=nil;
-        recommendTable.backgroundColor=[UIColor clearColor];
+       // recommendTable.backgroundColor=[UIColor clearColor];
     }
 }
 - (void)requestFailed:(ASIHTTPRequest *)request
@@ -445,19 +587,52 @@
 }
 -(void)sharecontentVC
 {
-    ShareContentViewController *shareVC=[[ShareContentViewController alloc] init];
+    shareVC=[[ShareContentViewController alloc] init];
     shareVC.str=[NSString stringWithFormat:@"我现在在%@吃饭，在用点美点进行点餐，用起来不错，推荐给大家。@DMD #点美点# ，随意选就餐环境、菜品、预定座位、在线点餐，尽在指尖，点即动美食定！http://www.tiankong360.com",self.aLab.text];
-    shareVC.picStr=[NSString stringWithFormat:@"http://interface.hcgjzs.com%@",[self.detailAry valueForKey:@"restimg"]];
-    [self presentModalViewController:shareVC animated:YES];  
+    shareVC.picStr=[NSString stringWithFormat:@"http://%@%@",Domain_Name,[self.detailAry valueForKey:@"restimg"]];
+    NSLog(@"shar %@",shareVC.picStr);
+    shareVC.view.frame=CGRectMake(0, [UIScreen mainScreen].bounds.size.height, 320, [UIScreen mainScreen].bounds.size.height);
+    [self.view addSubview:shareVC.view];
+    [UIView animateWithDuration:.3 animations:^{
+        shareVC.view.frame=CGRectMake(0, 0, 320, [UIScreen mainScreen].bounds.size.height);
+    } completion:^(BOOL finished) {
+        
+    }];
+   // [self presentModalViewController:shareVC animated:YES];
     [self oneFingerOneTaps];
 }
 //---------收藏
 -(void)collectClick
 {
-    UIAlertView *collectAlert=[[UIAlertView alloc] initWithTitle:@"温馨提醒" message:@"餐馆收藏成功" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
-    [collectAlert show];
-
-    [collectAry addObject:detailAry];
+    int p=0;
+    if ([self.collectAry count]==0)
+    {
+        
+    }
+    else
+    {
+        for (NSObject *ary in collectAry)
+        {
+            if (ary==self.detailAry)
+            {
+                p=1;
+            }
+            else
+            {
+                
+            }
+        }
+    }
+    if (p==1)
+    {
+        [MyAlert ShowAlertMessage:@"已收藏,请勿重复收藏。" title:@"温馨提醒"];
+    }
+    else
+    {
+        [MyAlert ShowAlertMessage:@"餐馆收藏成功" title:@"温馨提醒"];
+        [collectAry addObject:detailAry];
+    }
+    
     [[NSUserDefaults standardUserDefaults] setObject:collectAry forKey:@"collectAry"];
     [[NSUserDefaults standardUserDefaults] setObject:self.IDAry forKey:@"IDAry"];
     [[NSUserDefaults standardUserDefaults] synchronize];
@@ -492,8 +667,21 @@
 #pragma mark - back
 -(void)backClick
 {
+    if ([self.hideStr isEqualToString:@"hide"])
+    {
+        
+    }
+    else if ([self.hideStr isEqualToString:@"show"])
+    {
+        AppDelegate *app=(AppDelegate *)[[UIApplication sharedApplication] delegate];
+        [app showBotomBar];
+    }
+
+
+  
     [DataBase clearOrderMenu];
     [self.request1 cancel];
+    
     [self.navigationController popViewControllerAnimated:YES];
 
 }
@@ -501,7 +689,7 @@
 -(void)detailRequest
 {
     [MyActivceView startAnimatedInView:self.view];
-    ASIHTTPRequest *request=[TKHttpRequest RequestTKUrl:@"http://interface.hcgjzs.com/OM_Interface/Restaurant.asmx"];
+    ASIHTTPRequest *request=[TKHttpRequest RequestTKUrl:[NSString stringWithFormat:@"http://%@/OM_Interface/Restaurant.asmx?op=GetInfo",Domain_Name]];
     NSString *postStr=[NSString stringWithFormat:@"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
                        <soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\
                        <soap:Body>\
@@ -510,7 +698,7 @@
                        </GetInfo>\
                        </soap:Body>\
                        </soap:Envelope>",[self.pID intValue]];
-    [request addRequestHeader:@"Host" value:@"interface.hcgjzs.com"];
+    [request addRequestHeader:@"Host" value:Domain_Name];
     [request addRequestHeader:@"Content-Type" value:@"text/xml; charset=utf-8"];
     [request addRequestHeader:@"Content-Length" value:[NSString stringWithFormat:@"%d",postStr.length]];
     [request addRequestHeader:@"SOAPAction" value:@"http://tempuri.org/GetInfo"];
@@ -521,7 +709,7 @@
 }
 -(void)recommendRequest
 {
-    ASIHTTPRequest *request=[TKHttpRequest RequestTKUrl:@"http://interface.hcgjzs.com/OM_Interface/Product.asmx?op=ProductRedList"];
+    ASIHTTPRequest *request=[TKHttpRequest RequestTKUrl:[NSString stringWithFormat:@"http://%@/OM_Interface/Product.asmx?op=ProductRedList",Domain_Name]];
     NSString *postStr=[NSString stringWithFormat:@"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
                        <soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\
                        <soap:Body>\
@@ -530,7 +718,7 @@
                        </ProductRedList>\
                        </soap:Body>\
                        </soap:Envelope>",[self.pID intValue]];
-    [request addRequestHeader:@"Host" value:@"interface.hcgjzs.com"];
+    [request addRequestHeader:@"Host" value:Domain_Name];
     [request addRequestHeader:@"Content-Type" value:@"text/xml; charset=utf-8"];
     [request addRequestHeader:@"Content-Length" value:[NSString stringWithFormat:@"%d",postStr.length]];
     [request addRequestHeader:@"SOAPAction" value:@"http://tempuri.org/ProductRedList"];
@@ -578,8 +766,10 @@
     cell.nameLab.text=[[self.recommendAry objectAtIndex:indexPath.row] valueForKey:@"ProName"];
     cell.priceLab.textColor=[UIColor colorWithRed:251.0/255.0 green:33.0/255.0 blue:47.0/255.0 alpha:1.0];
     cell.priceLab.text=[NSString stringWithFormat:@"￥%@",[[self.recommendAry objectAtIndex:indexPath.row] valueForKey:@"prices"]];
-    [cell.image setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://interface.hcgjzs.com%@",[[self.recommendAry objectAtIndex:indexPath.row] valueForKey:@"ProductImg"]]] placeholderImage:[UIImage imageNamed:@"加载中"]];
-    
+    [cell.image setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@%@",Domain_Name,[[self.recommendAry objectAtIndex:indexPath.row] valueForKey:@"ProductImg"]]] placeholderImage:[UIImage imageNamed:@"加载中"]];
+    cell.image.layer.borderColor=[[UIColor grayColor] CGColor];
+    cell.image.layer.borderWidth=1;
+    cell.image.layer.cornerRadius=5.0;
     DishClickView *dishView=[[DishClickView alloc] initWithFrame:CGRectMake(180, 28, 90, 40) andNumber:0];
     [cell addSubview:dishView];
     
@@ -674,6 +864,14 @@
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     return 70;//此处返回cell的高度
+}
+-(void)dismissShareVC2
+{
+    [UIView animateWithDuration:.3 animations:^{
+        shareVC.view.frame=CGRectMake(0, [UIScreen mainScreen].bounds.size.height, 320, [UIScreen mainScreen].bounds.size.height);
+    } completion:^(BOOL finished) {
+        [shareVC.view removeFromSuperview];
+    }];
 }
 - (void)didReceiveMemoryWarning
 {

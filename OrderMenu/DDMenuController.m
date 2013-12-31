@@ -27,7 +27,7 @@
 #import "DDMenuController.h"
 #import <QuartzCore/QuartzCore.h>
 #define kMenuFullWidth 320.0f
-#define kMenuDisplayedWidth 296.0f
+#define kMenuDisplayedWidth 320.0f
 #define kMenuOverlayWidth (self.view.bounds.size.width - kMenuDisplayedWidth)
 #define kMenuBounceOffset 20.0f
 #define kMenuBounceDuration .3f
@@ -98,6 +98,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pan_NO) name:@"pan_NO" object:nil];
      [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pan_YES) name:@"pan_YES" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showLeft:) name:@"showLeftVC" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showRight:) name:@"showRightVC" object:nil];
 }
 -(void)pan_NO
 {

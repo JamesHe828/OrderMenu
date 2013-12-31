@@ -12,7 +12,6 @@
 #import "SettingViewController.h"
 #import "CollectViewController.h"
 #import "OrderListViewController.h"
-
 @interface ViewController ()
 @end
 

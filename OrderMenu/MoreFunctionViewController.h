@@ -10,7 +10,12 @@
 
 @interface MoreFunctionViewController : UIViewController<UITableViewDataSource,UITableViewDelegate>
 {
-    UITableView *aTableView;
-    NSArray     *ary;
+    UITableView       *aTableView;
+    NSArray           *ary;
+    NSMutableArray    *_array;
+    BOOL              flag[26];//里面默认值为no
+   
 }
+@property(nonatomic,retain)NSMutableArray     *_array;
+
 @end

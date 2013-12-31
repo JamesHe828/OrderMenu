@@ -14,11 +14,13 @@
 #import "DataBase.h"
 #import "AudoResultViewController.h"
 #import "OrderDetailViewController.h"
+#import <QuartzCore/QuartzCore.h>
 
 @interface AudoDishesListViewController ()
 {
     int selectRow;
     BOOL isFirst;
+    BOOL isTest;
 }
 @property (nonatomic,strong) NSArray * myClassArr;
 @property (nonatomic,strong) NSMutableArray * myProArr;
@@ -27,6 +29,13 @@
 @property (nonatomic,strong) NSMutableDictionary * tempClassDic;
 @property (nonatomic,strong) NSMutableDictionary * tempDotNumberDic;
 
+@property (nonatomic,strong) NSMutableDictionary * priceAndNumberDic;
+@property (nonatomic,strong) NSMutableDictionary * indexDic;
+@property (nonatomic,strong) NSMutableDictionary * dotNumberDic;
+@property (nonatomic,strong) IBOutlet UIImageView * nav_imageview;;
+
+@property (nonatomic,strong) IBOutlet UIButton * btn_back;
+@property (nonatomic,strong) IBOutlet UIButton * btn_yes;
 
 
 -(IBAction)backClick:(id)sender;
@@ -48,6 +57,10 @@
 @synthesize tempClassDic;
 @synthesize tempDotNumberDic;
 
+@synthesize priceAndNumberDic;
+@synthesize indexDic;
+@synthesize dotNumberDic;
+@synthesize nav_imageview;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -57,14 +70,86 @@
     return self;
 }
 
+-(void)viewWillAppear:(BOOL)animated
+{
+//    if ([NSString IOS_7])
+//    {
+//        UIWindow * window1 = [UIApplication sharedApplication].delegate.window;
+//        window1.frame = [[UIScreen mainScreen] applicationFrame];
+//        window1.clipsToBounds =YES;
+//        
+//        if (IPhone5)
+//        {
+//            window1.frame =  CGRectMake(0,20,320,568);
+//            window1.bounds = CGRectMake(0, 0, 320, 568);
+//            if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"ios7"] isEqualToString:@"1"])
+//            {
+//                window1.bounds = CGRectMake(0, -20, 320, 568);
+//            }
+//        }
+//        else
+//        {
+//            window1.frame =  CGRectMake(0,30,320,460);
+//            window1.bounds = CGRectMake(0, 0, 320, 480);
+//            if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"ios7"] isEqualToString:@"1"])
+//            {
+//                window1.bounds = CGRectMake(0, -20, 320, 480);
+//            }
+//        }
+    
+        
+//        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+//        self.nav_imageview.frame = CGRectMake(0, 20, 320, 44);
+//        if (IPhone5)
+//        {
+//            self.classTableView.frame = CGRectMake(0, 64, 84, 505);
+//            self.productTableView.frame = CGRectMake(84, 64, 237, 505);
+//            self.btn_back.frame = CGRectMake(0, 20, 44, 44);
+//            self.btn_yes.frame = CGRectMake(266, 20, 54, 41);
+//        }
+//        else
+//        {
+//            self.classTableView.frame = CGRectMake(0, 64, 84, 427);
+//            self.productTableView.frame = CGRectMake(84, 64, 237, 417);
+//            self.btn_back.frame = CGRectMake(0, 20, 44, 44);
+//            self.btn_yes.frame = CGRectMake(266, 20, 54, 41);
+//        }
+//    }
+}
+-(void)viewWillDisappear:(BOOL)animated
+{
+//    if ([NSString IOS_7])
+//    {
+//        if (IPhone5)
+//        {
+//            UIWindow * window1 = [UIApplication sharedApplication].delegate.window;
+//            window1.frame = [[UIScreen mainScreen] applicationFrame];
+//            window1.bounds = CGRectMake(0,-20,320, window1.frame.size.height);
+//            [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+//        }
+//        else
+//        {
+//            UIWindow * window1 = [UIApplication sharedApplication].delegate.window;
+//            window1.frame = [[UIScreen mainScreen] applicationFrame];
+//            window1.bounds = CGRectMake(0,-20,320, window1.frame.size.height);
+//            [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+//        }
+//       
+//    }
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     
-    isFirst = YES;
     
     self.tempClassDic = [NSMutableDictionary dictionaryWithCapacity:0];
     self.tempDotNumberDic = [NSMutableDictionary dictionaryWithCapacity:0];
+    
+    self.priceAndNumberDic = [NSMutableDictionary dictionaryWithCapacity:0];
+    self.indexDic = [NSMutableDictionary dictionaryWithCapacity:0];
+    self.dotNumberDic = [NSMutableDictionary dictionaryWithCapacity:0];
+    
     //点菜的数目 初始化
     self.id_arr = [NSMutableArray arrayWithCapacity:0];
     selectRow = 0;
@@ -77,6 +162,7 @@
 #pragma mark - get data
 -(void)getClassData
 {
+    NSLog(@"self.resultid = %d",self.resultID);
     ASIHTTPRequest * request = [WebService classInterfaceConfig:self.resultID];
     [request startAsynchronous];
     NSMutableData * reciveData = [NSMutableData dataWithCapacity:0];
@@ -132,6 +218,8 @@
             [self.tempDotNumberDic setValue:[obj valueForKey:@"number"] forKey:[obj valueForKey:@"ProID"]];
         }];
         [self.productTableView reloadData];
+        
+        isTest = YES;
     }];
     [request setFailedBlock:^{
         [MyActivceView stopAnimatedInView:self.view];
@@ -187,7 +275,7 @@
     NSString *str1 = [NSString stringWithFormat:@"cellmark%d",selectRow];
     NSString * strMark1 = str1; //不停类别用不同的重用标示符，目的是为了不同分类同一位置的重用现象。
     DishesDetailListCell * cell1 = [tableView dequeueReusableCellWithIdentifier:strMark1];
-   __block int dotNumber = 0;
+    __block int dotNumber = 0;
     if (indexPath.row < self.myProArr.count)
     {
         __block NSString * proID;
@@ -216,7 +304,7 @@
     }
     
     NSLog(@"result = %d,proid = %@",resylt,[[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"ProID"]);
-  //  cell1.dishView.myLab.text = [NSString stringWithFormat:@"点%d份",dotNumber];
+    //  cell1.dishView.myLab.text = [NSString stringWithFormat:@"点%d份",dotNumber];
     
     if (indexPath.row%2 == 0)
     {
@@ -229,64 +317,125 @@
     cell1.selectionStyle=UITableViewCellSelectionStyleNone;
     
     //判断是否有已经推荐过的菜系
-   
-    cell1.titleLab.text = [[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"ProName"];
-    NSString * str = @"￥";
-    NSString * priceStr = [[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"prices"];
-    cell1.priceLab.text = [str stringByAppendingFormat:@"%@",priceStr];
     
-    cell1.dishView.price = [priceStr doubleValue];
+    cell1.titleLab.text = [[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"ProName"];
+    //    NSString * str = @"折扣价:￥";
+    //    NSString * priceStr = [[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"prices"];
+    //    cell1.priceLab.text = [str stringByAppendingFormat:@"%@",priceStr];
+    //
+    //    cell1.historypriceLab.text = @"原价:￥12.3";
+    //
+    //    cell1.dishView.price = [priceStr doubleValue];
+    
+    
+    
+    NSString * disprice = [NSString stringWithFormat:@"%@",[[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"DiscountPrice"]];
+    NSLog(@"disprice = %@",disprice);
+    if (disprice.length>0)
+    {
+        NSString * str = @"折扣价:￥";
+        NSString * priceStr = [[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"DiscountPrice"];
+        cell1.priceLab.text = [str stringByAppendingFormat:@"%@",priceStr];
+        cell1.dishView.price = [priceStr doubleValue];
+        NSString * str11 = [[self.dataArr objectAtIndex:indexPath.row] valueForKey:@"prices"];
+        cell1.historypriceLab.text = [NSString stringWithFormat:@"原价:￥%@",str11];
+        
+        [self.priceAndNumberDic setValue:priceStr forKey:[[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"ProID"]];
+        cell1.price = [priceStr doubleValue];
+    }
+    else
+    {
+        NSString * str = @" 原价:￥";
+        NSString * priceStr = [[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"prices"];
+        cell1.priceLab.text = [str stringByAppendingFormat:@"%@",priceStr];
+        cell1.dishView.price = [priceStr doubleValue];
+        
+        [self.priceAndNumberDic setValue:priceStr forKey:[[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"ProID"]];
+        cell1.price = [priceStr doubleValue];
+    }
+    
     cell1.dishView.index = indexPath.row;
     
     [cell1.dishView.rightButton addTarget:self action:@selector(rightButtonClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [cell1.dishView.leftButton addTarget:self action:@selector(leftButtonClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [cell1.dishView.bigButton addTarget:self action:@selector(bigButtonClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     
+    // [self.priceAndNumberDic setValue:priceStr forKey:[[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"ProID"]];
+    [self.indexDic setValue:[NSNumber numberWithInt:indexPath.row] forKey:[[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"ProID"]];
+    [self.dotNumberDic setValue:[NSNumber numberWithInt:dotNumber] forKey:[[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"ProID"]];
+    cell1.dishView.rightButton.tag = [[[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"ProID"] intValue];
+    cell1.dishView.leftButton.tag = [[[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"ProID"] intValue];
+    cell1.dishView.bigButton.tag = [[[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"ProID"] intValue];
+    
+    
+    
     NSString * pathURL = ALL_URL;
     NSURL * url = [NSURL URLWithString:[pathURL stringByAppendingFormat:@"%@",[[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"ProductImg"]]];
     [cell1.leftImageView setImageWithURL:url placeholderImage:[UIImage imageNamed:ALL_NO_IMAGE]];
+    cell1.titleLab.font = [UIFont systemFontOfSize:12];
+    cell1.titleLab.numberOfLines = 2;
+    cell1.titleLab.frame = CGRectMake(70, 15, 140, 35);
+    cell1.leftImageView.layer.borderColor = [UIColor grayColor].CGColor;
+    cell1.leftImageView.layer.borderWidth = 1;
+    cell1.leftImageView.layer.cornerRadius = 5;
     return cell1;
 }
 
 #pragma mark - 点菜触发事件
 -(void)leftButtonClickEvent:(UIButton *)aButton
 {
-    DishesDetailListCell * cell = (DishesDetailListCell *)[[[aButton superview] superview] superview];
-    NSDictionary * obj = [self.myProArr objectAtIndex:cell.dishView.index];
-    if (cell.dishView.dotNumber == 0)
+    // DishesDetailListCell * cell = (DishesDetailListCell *)[[[aButton superview] superview] superview];
+    //    [[self.priceAndNumberDic valueForKey:[NSString stringWithFormat:@"%d",aButton.tag]] doubleValue]
+    //    [[self.indexDic valueForKey:[NSString stringWithFormat:@"%d",aButton.tag]] intValue]
+    NSDictionary * obj = [self.myProArr objectAtIndex:[[self.indexDic valueForKey:[NSString stringWithFormat:@"%d",aButton.tag]] intValue]];
+    int dot1 = [[self.tempDotNumberDic valueForKey:[NSString stringWithFormat:@"%d",aButton.tag]] intValue];
+    dot1 --;
+    if (dot1 == 0)
     {
         [DataBase deleteProID:[[obj valueForKey:@"ProID"] intValue]];
     }
     else
     {
-        [DataBase UpdateDotNumber:[[obj valueForKey:@"ProID"] intValue] currDotNumber:cell.dishView.dotNumber];
+        [DataBase UpdateDotNumber:[[obj valueForKey:@"ProID"] intValue] currDotNumber:dot1];
     }
     
-    [self.tempDotNumberDic setValue:[NSString stringWithFormat:@"%d",cell.dishView.dotNumber] forKey:[obj valueForKey:@"ProID"]];
+    [self.tempDotNumberDic setValue:[NSString stringWithFormat:@"%d",dot1] forKey:[obj valueForKey:@"ProID"]];
 }
 -(void)rightButtonClickEvent:(UIButton *)aButton
 {
-    DishesDetailListCell * cell = (DishesDetailListCell *)[[[aButton superview] superview] superview];
-    NSDictionary * obj = [self.myProArr objectAtIndex:cell.dishView.index];
-    [DataBase UpdateDotNumber:[[obj valueForKey:@"ProID"] intValue] currDotNumber:cell.dishView.dotNumber];
-    
-    [self.tempDotNumberDic setValue:[NSString stringWithFormat:@"%d",cell.dishView.dotNumber] forKey:[obj valueForKey:@"ProID"]];
+    int dot1 = [[self.tempDotNumberDic valueForKey:[NSString stringWithFormat:@"%d",aButton.tag]] intValue];
+    dot1 --;
+    // DishesDetailListCell * cell = (DishesDetailListCell *)[[[aButton superview] superview] superview];
+    NSDictionary * obj = [self.myProArr objectAtIndex:[[self.indexDic valueForKey:[NSString stringWithFormat:@"%d",aButton.tag]] intValue]];
+    [DataBase UpdateDotNumber:[[obj valueForKey:@"ProID"] intValue] currDotNumber:dot1];
+    [self.tempDotNumberDic setValue:[NSString stringWithFormat:@"%d",dot1] forKey:[obj valueForKey:@"ProID"]];
 }
 -(void)bigButtonClickEvent:(UIButton *)aButton
 {
-    DishesDetailListCell * cell = (DishesDetailListCell *)[[[aButton superview] superview] superview];
-    NSDictionary * obj = [self.myProArr objectAtIndex:cell.dishView.index];
-    [DataBase insertProID:[[obj valueForKey:@"ProID"] intValue] menuid:[[obj valueForKey:@"Menuid"] intValue] proName:[obj valueForKey:@"ProName"] price:[[obj valueForKey:@"prices"] doubleValue] image:[obj valueForKey:@"ProductImg"] andNumber:1];
+    //int dot1 = [[self.tempDotNumberDic valueForKey:[NSString stringWithFormat:@"%d",aButton.tag]] intValue];
     
-    [self.tempDotNumberDic setValue:[NSString stringWithFormat:@"%d",cell.dishView.dotNumber] forKey:[obj valueForKey:@"ProID"]];
+    // DishesDetailListCell * cell = (DishesDetailListCell *)[[[aButton superview] superview] superview];
+    NSDictionary * obj = [self.myProArr objectAtIndex:[[self.indexDic valueForKey:[NSString stringWithFormat:@"%d",aButton.tag]] intValue]];
+    double  price1 = 0.0;
+    if ([[obj valueForKey:@"DiscountPrice"] doubleValue] == 0.0)
+    {
+        price1 = [[obj valueForKey:@"prices"] doubleValue];
+    }
+    else
+    {
+        price1 = [[obj valueForKey:@"DiscountPrice"] doubleValue];
+    }
+    
+    [DataBase insertProID:[[obj valueForKey:@"ProID"] intValue] menuid:[[obj valueForKey:@"Menuid"] intValue] proName:[obj valueForKey:@"ProName"] price:price1 image:[obj valueForKey:@"ProductImg"] andNumber:1];
+    [self.tempDotNumberDic setValue:[NSNumber numberWithInt:1] forKey:[obj valueForKey:@"ProID"]];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-   
+    
     if (tableView.tag == 100)
     {
-         selectRow = indexPath.row;
+        selectRow = indexPath.row;
         [self.myClassArr enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
             if (idx == indexPath.row)
             {
@@ -298,7 +447,7 @@
             }
             [self.classTableView reloadData];
         }];
-
+        
         if (self.myProArr.count > 0)
         {
             [self.myProArr removeAllObjects];
@@ -309,7 +458,28 @@
 }
 -(IBAction)backClick:(id)sender
 {
-    [self dismissViewControllerAnimated:YES completion:^{
+//    [[NSUserDefaults standardUserDefaults] setValue:@"1" forKey:@"ios7"];
+//    UIWindow * window1 = [UIApplication sharedApplication].delegate.window;
+//    if (IPhone5)
+//    {
+//        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"ios7"] isEqualToString:@"1"])
+//        {
+//            window1.bounds = CGRectMake(0, 0, 320, 568);
+//        }
+//    }
+//    else
+//    {
+//        window1.bounds = CGRectMake(0, 0, 320, 480);
+//    }
+//    
+//    [self dismissViewControllerAnimated:YES completion:^{
+//        [self.id_arr enumerateObjectsUsingBlock:^(NSString * obj, NSUInteger idx, BOOL *stop) {
+//            [DataBase deleteProID:[obj intValue]];
+//        }];
+//    }];
+    [UIView animateWithDuration:0.3 animations:^{
+        self.view.frame = CGRectMake(0, self.view.frame.size.height+100, 320, self.view.frame.size.height);
+    } completion:^(BOOL finished) {
         [self.id_arr enumerateObjectsUsingBlock:^(NSString * obj, NSUInteger idx, BOOL *stop) {
             [DataBase deleteProID:[obj intValue]];
         }];
@@ -318,7 +488,23 @@
 
 -(IBAction)yesClick:(id)sender
 {
-    [self dismissViewControllerAnimated:YES completion:^{
+ //   [[NSUserDefaults standardUserDefaults] setValue:@"1" forKey:@"ios7"];
+//    UIWindow * window1 = [UIApplication sharedApplication].delegate.window;
+//    if (IPhone5)
+//    {
+//        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"ios7"] isEqualToString:@"1"])
+//        {
+//            window1.bounds = CGRectMake(0, 0, 320, 568);
+//        }
+//    }
+//    else
+//    {
+//        window1.bounds = CGRectMake(0, 0, 320, 480);
+//    }
+    
+    [UIView animateWithDuration:0.3 animations:^{
+        self.view.frame = CGRectMake(0, self.view.frame.size.height+100, 320, self.view.frame.size.height);
+    } completion:^(BOOL finished) {
         dispatch_async(dispatch_get_main_queue(), ^{
             if (self.orderDetail != nil)
             {
@@ -329,7 +515,20 @@
                 [self.myViewController performSelector:@selector(refeTable)];
             }
         });
+
     }];
+//    [self dismissViewControllerAnimated:YES completion:^{
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            if (self.orderDetail != nil)
+//            {
+//                [self.orderDetail performSelector:@selector(refreshAddDishesTableview)];
+//            }
+//            if (self.myViewController != nil)
+//            {
+//                [self.myViewController performSelector:@selector(refeTable)];
+//            }
+//        });
+//    }];
 }
 
 

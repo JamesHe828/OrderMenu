@@ -8,6 +8,7 @@
 
 #import "AboutViewController.h"
 #import <QuartzCore/QuartzCore.h>
+#import "AppDelegate.h"
 @interface AboutViewController ()
 
 @end
@@ -55,7 +56,6 @@
     lab.textColor=[UIColor grayColor];
     [self.view addSubview:lab];
     UILabel *lab1=[[UILabel alloc] initWithFrame:CGRectMake(90, 236, 70, 70)];
-    lab1.text=@"V1.0";
     lab1.backgroundColor=[UIColor clearColor];
     lab1.textColor=[UIColor grayColor];
     [self.view addSubview:lab1];
@@ -85,7 +85,7 @@
     lab4.textColor=[UIColor grayColor];
     [self.view addSubview:lab4];
     UILabel *lab44=[[UILabel alloc] initWithFrame:CGRectMake(110, 310, 200, 70)];
-    lab44.text=@"0371-88888818/5";
+    lab44.text=@"0371-88888818/5/3";
     lab44.backgroundColor=[UIColor clearColor];
     lab44.textColor=[UIColor grayColor];
     [self.view addSubview:lab44];
@@ -106,8 +106,14 @@
     
     [recognizer setDirection:(UISwipeGestureRecognizerDirectionLeft)];
     [[self view] addGestureRecognizer:recognizer];
-    
-    
+    //版本
+    NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+//    NSString *name = [infoDictionary objectForKey:@"CFBundleDisplayName"];
+    NSString *version = [infoDictionary objectForKey:@"CFBundleShortVersionString"];
+//    NSString *build = [infoDictionary objectForKey:@"CFBundleVersion"];
+//    NSString *label = [NSString stringWithFormat:@"%@ v%@ (build %@)", name, version, build];
+    lab1.text=[NSString stringWithFormat:@"V%@",version];
+    NSLog(@"%@",lab1.text);
 }
 //手势
 -(void)handleSwipeFrom:(UISwipeGestureRecognizer *)recognizer
@@ -133,6 +139,9 @@
 //    transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
 //    transition.type = kCATransitionMoveIn;
 //    [self.navigationController.view.layer addAnimation:transition forKey:nil];
+//    [[NSNotificationCenter defaultCenter] postNotificationName:@"showBotomBar" object:nil];
+    AppDelegate *app=(AppDelegate *)[[UIApplication sharedApplication] delegate];
+    [app showBotomBar];
     [self.navigationController popViewControllerAnimated:YES];
 }
 

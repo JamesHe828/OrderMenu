@@ -64,6 +64,16 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    self.navigationController.navigationBar.hidden=YES;
+    UIView *aView=[[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
+    aView.backgroundColor=[UIColor colorWithRed:252.0/255.0 green:33.0/255.0 blue:47.0/255.0 alpha:1.0];
+    [self.view addSubview:aView];
+    UILabel *titleLab=[[UILabel alloc] initWithFrame:CGRectMake(80, 0, 160, 44)];
+    titleLab.backgroundColor=[UIColor clearColor];
+    titleLab.textColor=[UIColor whiteColor];
+    titleLab.text=@"我的订单";
+    titleLab.textAlignment=NSTextAlignmentCenter;
+    [aView addSubview:titleLab];
     self.tellArr = [DataBase selectTellNumber];
     self.datasourseArr = [NSMutableArray arrayWithCapacity:0];
     self.resultArr = [NSMutableArray arrayWithCapacity:0];
@@ -132,7 +142,12 @@
 
 -(IBAction)backClick:(id)sender
 {
-    [self.navigationController popViewControllerAnimated:YES];
+    CATransition* transition = [CATransition animation];
+    transition.duration = 0.5;
+    transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    transition.type = kCATransitionMoveIn;
+    [self.navigationController.view.layer addAnimation:transition forKey:nil];
+    [self.navigationController popViewControllerAnimated:NO];
     
 }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -290,6 +305,7 @@
     {
       resultId = [[self.resultArr objectAtIndex:indexPath.row] valueForKey:@"restid"];
     }
+    orderDetail.hidesBottomBarWhenPushed=YES;
     orderDetail.resultID = resultId;
     orderDetail.segmentIndex = self.selectedSegmentIndex;
     orderDetail.restDic = [self.resultArr objectAtIndex:indexPath.row];

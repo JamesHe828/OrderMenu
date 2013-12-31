@@ -7,13 +7,20 @@
 //
 
 #import <UIKit/UIKit.h>
-
-@interface ShakeViewController : UIViewController<UIAccelerometerDelegate> 
+#import <AVFoundation/AVFoundation.h>
+#import <QuartzCore/QuartzCore.h>
+@interface ShakeViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,AVAudioPlayerDelegate>
 {
-    UIAccelerationValue    myAccelerometer[3];
-    
-    //是否响应摇一摇的标志
-    BOOL  _canShake;
-    
+    UITableView   *aTableView;
+    NSMutableArray *ary;
+    int           p;
+    AVAudioPlayer *player;
+    UIImageView   *upImage;
+    UIImageView   *downImage;
+    SystemSoundID soundID;
+    UIView        *aView;
+
 }
+@property(nonatomic,retain)UITableView   *aTableView;
+@property(nonatomic,retain)NSMutableArray       *ary;
 @end

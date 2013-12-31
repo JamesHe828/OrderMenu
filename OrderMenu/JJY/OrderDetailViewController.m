@@ -23,6 +23,7 @@
 @property (nonatomic,strong)IBOutlet UILabel * bottomLab;
 @property (nonatomic,strong)IBOutlet UIButton * sumbitBtn;
 @property (nonatomic,strong) NSMutableArray * tempArray;
+@property (nonatomic,strong) IBOutlet UIButton * Btn_sumbit;
 -(IBAction)backClick:(id)sender;
 -(void)getData;
 -(void)getSaveData;
@@ -47,6 +48,7 @@
 @synthesize resultID;
 @synthesize numberStrs;
 @synthesize tempArray;
+@synthesize Btn_sumbit;
 
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -239,11 +241,20 @@
 {
     [super viewDidLoad];
     
+    if ([[[NSUserDefaults standardUserDefaults] valueForKey:REST_STATUS] isEqualToString:@"0"])
+    {
+        self.Btn_sumbit.alpha = 0.0;
+    }
+    else
+    {
+        self.Btn_sumbit.alpha = 1.0;
+    }
+
+    
     self.proTableView.layer.borderColor = [UIColor grayColor].CGColor;
     self.proTableView.layer.borderWidth = 1;
     self.tempArray = [NSMutableArray arrayWithArray:0];
     
-    NSLog(@"self.resDic = %@",self.restDic);
     
     self.proTableView.bounces = NO;
     
@@ -256,7 +267,6 @@
     else
     {
         [self getSaveData];
-        
     }
 }
 -(void)getSaveData
@@ -318,7 +328,7 @@
 {
     if (self.segmentIndex == 1)
     {
-        return self.dataArr.count+1+self.tempArray.count;
+        return self.dataArr.count+0+self.tempArray.count;
     }
     return self.dataArr.count;
 }
@@ -520,13 +530,14 @@
 }
 -(IBAction)backClick:(id)sender
 {
+    AppDelegate *app=(AppDelegate *)[UIApplication sharedApplication].delegate;
+    [app showBotomBar];
     [self.navigationController popViewControllerAnimated:YES];
     [DataBase clearOrderMenu];
 }
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
-    
 }
 
 @end

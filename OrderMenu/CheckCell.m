@@ -24,9 +24,10 @@
         self.bgImageView = imageView;
         [self addSubview:imageView];
         
-        UILabel * lab1 = [[UILabel alloc] initWithFrame:CGRectMake(20, 10, 120, 25)];
+        UILabel * lab1 = [[UILabel alloc] initWithFrame:CGRectMake(20, 5, 120, 35)];
         self.labName = lab1;
-        lab1.font = [UIFont systemFontOfSize:15];
+        lab1.font = [UIFont systemFontOfSize:12];
+        lab1.numberOfLines = 2;
         lab1.backgroundColor = [UIColor clearColor];
         [imageView addSubview:lab1];
         

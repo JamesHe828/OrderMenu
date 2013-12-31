@@ -16,6 +16,9 @@
 @synthesize abtn=_abtn;
 @synthesize bbtn=_bbtn;
 @synthesize renjunLab=_renjunLab;
+@synthesize dazheLab=_dazheLab;
+@synthesize huodongLab=_huodongLab,waimaiLab=_waimaiLab,jiamengLab=_jiamengLab,liansuoLab=_liansuoLab;
+@synthesize aimage;
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];

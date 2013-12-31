@@ -20,6 +20,8 @@
 @property (nonatomic,strong) DishesSelectedButton * dishesButton;
 @property (nonatomic,strong) DishClickView * dishView;
 @property (nonatomic,assign)id<DishesDetailListCellDelegate>delegate;
+@property (nonatomic,strong) UILabel * historypriceLab;
+@property (nonatomic,assign) double price;
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier andDotNumber:(int)aDotNumber;
 @end
 

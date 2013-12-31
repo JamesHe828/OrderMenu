@@ -8,14 +8,20 @@
 
 #import <UIKit/UIKit.h>
 #import "DDMenuController.h"
+#import "WXApi.h"
+
 @class ViewController;
-
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
-
+@class LeveyTabBarController;
+@interface AppDelegate : UIResponder <UIApplicationDelegate,WXApiDelegate,UINavigationControllerDelegate>
+{
+    UINavigationController *nav_set,*nav_third,*nav_collect,*nav_orderList,*nav_map;
+}
 @property (strong, nonatomic) UIWindow *window;
 
 @property (strong, nonatomic) ViewController *viewController;
 @property (nonatomic,strong)DDMenuController *ddmenuControler;
 @property (nonatomic,retain)UINavigationController *AllNav;
-
+@property (nonatomic, retain)LeveyTabBarController *leveyTabBarController;
+-(void)hideBotmoBar;
+-(void)showBotomBar;
 @end

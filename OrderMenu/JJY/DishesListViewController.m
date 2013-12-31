@@ -15,7 +15,8 @@
 #import "JSONKit.h"
 #import "DataBase.h"
 #import "MenuCheckViewController.h"
-
+#import "EateryViewController.h"
+#import "DetailViewController.h"
 @interface DishesListViewController ()<UIAlertViewDelegate>
 {
     BOOL isFirst;
@@ -29,6 +30,9 @@
 @property (nonatomic,strong) NSMutableArray * dataArr;
 @property (nonatomic,strong) NSMutableDictionary * tempClassDic;
 @property (nonatomic,strong) NSMutableDictionary * tempDotNumberDic;
+@property (nonatomic,strong) NSMutableDictionary * priceAndNumberDic;
+@property (nonatomic,strong) NSMutableDictionary * indexDic;
+@property (nonatomic,strong) NSMutableDictionary * dotNumberDic;
 -(IBAction)backClick:(id)sender;
 -(IBAction)audoClickEvent:(id)sender;
 -(void)getClassData;
@@ -50,6 +54,9 @@
 @synthesize dataArr;
 @synthesize tempClassDic;
 @synthesize tempDotNumberDic;
+@synthesize priceAndNumberDic;
+@synthesize indexDic;
+@synthesize dotNumberDic;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -63,6 +70,10 @@
 {
     //添加底部
     self.dataArr = [DataBase selectAllProduct];
+    self.priceAndNumberDic = [NSMutableDictionary dictionaryWithCapacity:0];
+    self.indexDic = [NSMutableDictionary dictionaryWithCapacity:0];
+    self.dotNumberDic = [NSMutableDictionary dictionaryWithCapacity:0];
+    
     PriceView * pcView;
     if (pcView == nil)
     {
@@ -104,7 +115,7 @@
     {
         heigh = 417;
     }
-
+    
     if ([PriceView ShareView].sumnumber > 0)
     {
         [PriceView AnimateCome];
@@ -112,14 +123,24 @@
         [UIView setAnimationDuration:0.3];
         self.classTableView.frame = CGRectMake(self.classTableView.frame.origin.x,self.classTableView.frame.origin.y,self.classTableView.frame.size.width,heigh-40);
         self.productTableView.frame = CGRectMake(self.productTableView.frame.origin.x,self.productTableView.frame.origin.y,self.productTableView.frame.size.width,heigh-40);
-        [UIView commitAnimations]; 
+        [UIView commitAnimations];
     }
     else
     {
         [UIView beginAnimations:nil context:nil];
         [UIView setAnimationDuration:0.3];
-        self.classTableView.frame = CGRectMake(self.classTableView.frame.origin.x,self.classTableView.frame.origin.y,self.classTableView.frame.size.width,heigh);
-        self.productTableView.frame = CGRectMake(self.productTableView.frame.origin.x,self.productTableView.frame.origin.y,self.productTableView.frame.size.width,heigh);
+        if ([NSString IOS_7])
+        {
+            NSLog(@"self.frame = %f",self.classTableView.frame.origin.y-20);
+            self.classTableView.frame = CGRectMake(self.classTableView.frame.origin.x,44,self.classTableView.frame.size.width,heigh);
+            self.productTableView.frame = CGRectMake(self.productTableView.frame.origin.x,self.productTableView.frame.origin.y,self.productTableView.frame.size.width,heigh);
+        }
+        else
+        {
+            self.classTableView.frame = CGRectMake(self.classTableView.frame.origin.x,self.classTableView.frame.origin.y,self.classTableView.frame.size.width,heigh);
+            self.productTableView.frame = CGRectMake(self.productTableView.frame.origin.x,self.productTableView.frame.origin.y,self.productTableView.frame.size.width,heigh);
+        }
+        
         [UIView commitAnimations];
         [PriceView AnimateCancle];
     }
@@ -127,7 +148,7 @@
 }
 
 -(IBAction)backClick:(id)sender
-{
+{    
     PriceView * pcView = [PriceView ShareView];
     [pcView ChangeLabTextSumPrice:0 sumDishes:0];
     [PriceView AnimateCancle];
@@ -137,6 +158,14 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    
+    if ([NSString IOS_7])
+    {
+        self.automaticallyAdjustsScrollViewInsets = NO;
+    }
+
+    
     
     isFirst = YES;
     self.tempClassDic = [NSMutableDictionary dictionaryWithCapacity:0];
@@ -203,7 +232,13 @@
 {
     if (buttonIndex == 0)
     {
-        [self.navigationController popToRootViewControllerAnimated:YES];
+        for (UIViewController * viewController in self.navigationController.viewControllers)
+        {
+            if ([viewController isKindOfClass:[EateryViewController class]])
+            {
+                [self.navigationController popToViewController:viewController animated:YES];
+            }
+        }
     }
 }
 -(void)getProductData:(NSString *)aClassid
@@ -217,6 +252,7 @@
     [request setCompletionBlock:^{
         [MyActivceView stopAnimatedInView:self.view];
         self.myProArr = [NSMutableArray arrayWithArray:[NSString ConverfromData:reciveData1 name:PRODUCT_NAME]];
+        NSLog(@"self.myProArr = %@",self.myProArr);
         if (isFirst)
         {
             isFirst = NO;
@@ -324,42 +360,91 @@
     cell1.selectionStyle=UITableViewCellSelectionStyleNone;
     cell1.selectedBackgroundView = [[UIView alloc] initWithFrame:cell1.frame];
     cell1.titleLab.text = [[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"ProName"];
-    NSString * str = @"￥";
-    NSString * priceStr = [[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"prices"];
-    cell1.priceLab.text = [str stringByAppendingFormat:@"%@",priceStr];
-    cell1.dishView.price = [priceStr doubleValue];
+    cell1.titleLab.font = [UIFont systemFontOfSize:14];
+    cell1.titleLab.numberOfLines = 2;
+    cell1.titleLab.frame = CGRectMake(70, 15, 140, 35);
+    
+    NSString * disprice = [NSString stringWithFormat:@"%@",[[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"DiscountPrice"]];
+    NSLog(@"disprice = %@",disprice);
+    if (disprice.length>0)
+    {
+        NSString * str = @"折扣价:￥";
+        NSString * priceStr = [[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"DiscountPrice"];
+        cell1.priceLab.text = [str stringByAppendingFormat:@"%@",priceStr];
+        cell1.dishView.price = [priceStr doubleValue];
+        NSString * str11 = [[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"prices"];
+        cell1.historypriceLab.text = [NSString stringWithFormat:@"原价:￥%@",str11];
+        
+        [self.priceAndNumberDic setValue:priceStr forKey:[[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"ProID"]];
+        cell1.price = [priceStr doubleValue];
+        
+    }
+    else
+    {
+        NSString * str = @" 原价:￥";
+        NSString * priceStr = [[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"prices"];
+        cell1.priceLab.text = [str stringByAppendingFormat:@"%@",priceStr];
+        cell1.dishView.price = [priceStr doubleValue];
+        
+        [self.priceAndNumberDic setValue:priceStr forKey:[[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"ProID"]];
+        cell1.price = [priceStr doubleValue];
+        
+    }
+    
+    [self.indexDic setValue:[NSNumber numberWithInt:indexPath.row] forKey:[[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"ProID"]];
+    [self.dotNumberDic setValue:[NSNumber numberWithInt:dotNumber] forKey:[[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"ProID"]];
+    
+    
     cell1.dishView.index = indexPath.row;
     
     [cell1.dishView.rightButton addTarget:self action:@selector(rightButtonClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [cell1.dishView.leftButton addTarget:self action:@selector(leftButtonClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [cell1.dishView.bigButton addTarget:self action:@selector(bigButtonClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     
+    cell1.dishView.rightButton.tag = [[[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"ProID"] intValue];
+    cell1.dishView.leftButton.tag = [[[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"ProID"] intValue];
+    cell1.dishView.bigButton.tag = [[[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"ProID"] intValue];
+    
     NSString * pathURL = ALL_URL;
     NSURL * url = [NSURL URLWithString:[pathURL stringByAppendingFormat:@"%@",[[self.myProArr objectAtIndex:indexPath.row] valueForKey:@"ProductImg"]]];
     [cell1.leftImageView setImageWithURL:url placeholderImage:[UIImage imageNamed:ALL_NO_IMAGE]];
+    cell1.leftImageView.layer.borderColor = [UIColor grayColor].CGColor;
+    cell1.leftImageView.layer.borderWidth = 1;
+    cell1.leftImageView.layer.cornerRadius = 5;
     return cell1;
 }
 #pragma mark - 点菜触发事件
 -(void)leftButtonClickEvent:(UIButton *)aButton
 {
-    DishesDetailListCell * cell = (DishesDetailListCell *)[[[aButton superview] superview] superview];
-    if ([PriceView ShareView].sumnumber == 0)
+    // DishesDetailListCell * cell = (DishesDetailListCell *)[[[aButton superview] superview] superview];
+    int dot1 = [[self.tempDotNumberDic valueForKey:[NSString stringWithFormat:@"%d",aButton.tag]] intValue];
+    dot1 --;
+    if (dot1 == 0)
     {
         [UIView beginAnimations:nil context:nil];
         [UIView setAnimationDuration:0.3];
-        self.classTableView.frame = CGRectMake(self.classTableView.frame.origin.x,self.classTableView.frame.origin.y,self.classTableView.frame.size.width,self.classTableView.frame.size.height-40);
-        self.productTableView.frame = CGRectMake(self.productTableView.frame.origin.x,self.productTableView.frame.origin.y,self.productTableView.frame.size.width,self.productTableView.frame.size.height-40);
+        if (IPhone5)
+        {
+            self.classTableView.frame = CGRectMake(self.classTableView.frame.origin.x,self.classTableView.frame.origin.y,self.classTableView.frame.size.width,524-40);
+            self.productTableView.frame = CGRectMake(self.productTableView.frame.origin.x,self.productTableView.frame.origin.y,self.productTableView.frame.size.width,524-40);
+        }
+        else
+        {
+            self.classTableView.frame = CGRectMake(self.classTableView.frame.origin.x,self.classTableView.frame.origin.y,self.classTableView.frame.size.width,437-40);
+            self.productTableView.frame = CGRectMake(self.productTableView.frame.origin.x,self.productTableView.frame.origin.y,self.productTableView.frame.size.width,437-40);
+        }
+        
         [UIView commitAnimations];
         
         [PriceView AnimateCome];
-        [[PriceView ShareView] ChangeLabTextSumPrice:cell.dishView.price sumDishes:1];
+        [[PriceView ShareView] ChangeLabTextSumPrice:[[self.priceAndNumberDic valueForKey:[NSString stringWithFormat:@"%d",aButton.tag]] doubleValue] sumDishes:1];
     }
     else
     {
         double priceSum = [PriceView ShareView].sumprice;
         int numberSum = [PriceView ShareView].sumnumber;
         
-        [[PriceView ShareView] ChangeLabTextSumPrice:priceSum-cell.dishView.price sumDishes:numberSum-1];
+        [[PriceView ShareView] ChangeLabTextSumPrice:priceSum-[[self.priceAndNumberDic valueForKey:[NSString stringWithFormat:@"%d",aButton.tag]] doubleValue] sumDishes:numberSum-1];
         if (numberSum-1 == 0)
         {
             [UIView beginAnimations:nil context:nil];
@@ -371,22 +456,23 @@
         }
     }
     
-    NSDictionary * obj = [self.myProArr objectAtIndex:cell.dishView.index];
-    if (cell.dishView.dotNumber == 0)
+    NSDictionary * obj = [self.myProArr objectAtIndex:[[self.indexDic valueForKey:[NSString stringWithFormat:@"%d",aButton.tag]] intValue]];
+    //int dotNumber1 = [[self.dotNumberDic valueForKey:[NSString stringWithFormat:@"%d",aButton.tag]] intValue];
+    if (dot1 == 0)
     {
         [DataBase deleteProID:[[obj valueForKey:@"ProID"] intValue]];
     }
     else
     {
-        [DataBase UpdateDotNumber:[[obj valueForKey:@"ProID"] intValue] currDotNumber:cell.dishView.dotNumber];
+        [DataBase UpdateDotNumber:[[obj valueForKey:@"ProID"] intValue] currDotNumber:dot1];
     }
     
-    [self.tempDotNumberDic setValue:[NSString stringWithFormat:@"%d",cell.dishView.dotNumber] forKey:[obj valueForKey:@"ProID"]];
+    [self.tempDotNumberDic setValue:[NSString stringWithFormat:@"%d",dot1] forKey:[obj valueForKey:@"ProID"]];
 }
 -(void)rightButtonClickEvent:(UIButton *)aButton
 {
     
-    DishesDetailListCell * cell = (DishesDetailListCell *)[[[aButton superview] superview] superview];
+    // DishesDetailListCell * cell = (DishesDetailListCell *)[[[aButton superview] superview] superview];
     UIImageView * clickImgView = (UIImageView *)[[aButton superview] superview];
     //加入购物车动画效果
     CALayer *transitionLayer = [[CALayer alloc] init];
@@ -419,8 +505,9 @@
     group.autoreverses= NO;
     [transitionLayer addAnimation:group forKey:@"opacity"];
     
-    
-    if ([PriceView ShareView].sumnumber == 0)
+    int dot1 = [[self.tempDotNumberDic valueForKey:[NSString stringWithFormat:@"%d",aButton.tag]] intValue];
+    dot1 ++;
+    if (dot1 == 0)
     {
         [UIView beginAnimations:nil context:nil];
         [UIView setAnimationDuration:0.3];
@@ -428,24 +515,24 @@
         self.productTableView.frame = CGRectMake(self.productTableView.frame.origin.x,self.productTableView.frame.origin.y,self.productTableView.frame.size.width,self.productTableView.frame.size.height-40);
         [UIView commitAnimations];
         [PriceView AnimateCome];
-        [[PriceView ShareView] ChangeLabTextSumPrice:cell.dishView.price sumDishes:1];
+        [[PriceView ShareView] ChangeLabTextSumPrice:[[self.priceAndNumberDic valueForKey:[NSString stringWithFormat:@"%d",aButton.tag]] doubleValue] sumDishes:1];
     }
     else
     {
         double priceSum = [PriceView ShareView].sumprice;
         int numberSum = [PriceView ShareView].sumnumber;
-        [[PriceView ShareView] ChangeLabTextSumPrice:priceSum+cell.dishView.price sumDishes:numberSum+1];
+        [[PriceView ShareView] ChangeLabTextSumPrice:priceSum+[[self.priceAndNumberDic valueForKey:[NSString stringWithFormat:@"%d",aButton.tag]] doubleValue] sumDishes:numberSum+1];
     }
     
-    NSDictionary * obj = [self.myProArr objectAtIndex:cell.dishView.index];
-    [DataBase UpdateDotNumber:[[obj valueForKey:@"ProID"] intValue] currDotNumber:cell.dishView.dotNumber];
+    NSDictionary * obj = [self.myProArr objectAtIndex:[[self.indexDic valueForKey:[NSString stringWithFormat:@"%d",aButton.tag]] intValue]];
+    [DataBase UpdateDotNumber:[[obj valueForKey:@"ProID"] intValue] currDotNumber:dot1];
     
-    [self.tempDotNumberDic setValue:[NSString stringWithFormat:@"%d",cell.dishView.dotNumber] forKey:[obj valueForKey:@"ProID"]];
+    [self.tempDotNumberDic setValue:[NSString stringWithFormat:@"%d",dot1] forKey:[obj valueForKey:@"ProID"]];
 }
 -(void)bigButtonClickEvent:(UIButton *)aButton
 {
     
-    DishesDetailListCell * cell = (DishesDetailListCell *)[[[aButton superview] superview] superview];
+    //DishesDetailListCell * cell = (DishesDetailListCell *)[[[aButton superview] superview] superview];
     
     UIImageView * clickImgView = (UIImageView *)[[aButton superview] superview];
     //加入购物车动画效果
@@ -479,6 +566,7 @@
     group.autoreverses= NO;
     [transitionLayer addAnimation:group forKey:@"opacity"];
     
+    
     if ([PriceView ShareView].sumnumber == 0)
     {
         [UIView beginAnimations:nil context:nil];
@@ -488,17 +576,30 @@
         [UIView commitAnimations];
         
         [PriceView AnimateCome];
-        [[PriceView ShareView] ChangeLabTextSumPrice:cell.dishView.price sumDishes:1];
+        //cell.dishView.price
+        double tempPrice = [[self.priceAndNumberDic valueForKey:[NSString stringWithFormat:@"%d",aButton.tag]] doubleValue];
+        [[PriceView ShareView] ChangeLabTextSumPrice:tempPrice sumDishes:1];
     }
     else
     {
         double priceSum = [PriceView ShareView].sumprice;
         int numberSum = [PriceView ShareView].sumnumber;
-        [[PriceView ShareView] ChangeLabTextSumPrice:priceSum+cell.dishView.price sumDishes:numberSum+1];
+        double tempPrice = [[self.priceAndNumberDic valueForKey:[NSString stringWithFormat:@"%d",aButton.tag]] doubleValue];
+        [[PriceView ShareView] ChangeLabTextSumPrice:priceSum+tempPrice sumDishes:numberSum+1];
     }
-    NSDictionary * obj = [self.myProArr objectAtIndex:cell.dishView.index];
-    [DataBase insertProID:[[obj valueForKey:@"ProID"] intValue] menuid:[[obj valueForKey:@"Menuid"] intValue] proName:[obj valueForKey:@"ProName"] price:[[obj valueForKey:@"prices"] doubleValue] image:[obj valueForKey:@"ProductImg"] andNumber:1];
-    [self.tempDotNumberDic setValue:[NSString stringWithFormat:@"%d",cell.dishView.dotNumber] forKey:[obj valueForKey:@"ProID"]];
+    NSDictionary * obj = [self.myProArr objectAtIndex:[[self.indexDic valueForKey:[NSString stringWithFormat:@"%d",aButton.tag]] intValue]];
+    double  price1 = 0.0;
+    if ([[obj valueForKey:@"DiscountPrice"] doubleValue] == 0.0)
+    {
+        price1 = [[obj valueForKey:@"prices"] doubleValue];
+    }
+    else
+    {
+        price1 = [[obj valueForKey:@"DiscountPrice"] doubleValue];
+    }
+    
+    [DataBase insertProID:[[obj valueForKey:@"ProID"] intValue] menuid:[[obj valueForKey:@"Menuid"] intValue] proName:[obj valueForKey:@"ProName"] price:price1 image:[obj valueForKey:@"ProductImg"] andNumber:1];
+    [self.tempDotNumberDic setValue:[NSString stringWithFormat:@"%d",1] forKey:[obj valueForKey:@"ProID"]];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath

@@ -11,18 +11,21 @@
 #import "NSString+Additions.h"
 #import "ASIFormDataRequest.h"
 #import "SBJSON.h"
-#import "ShareContentViewController.h"
 #import "WeiBoLoginViewController.h"
+#import "AppDelegate.h"
 #define SinaRequest_string @"https://api.weibo.com/oauth2/authorize?client_id=3564417983&redirect_uri=http://www.tiankong360.com&display=mobile"
 
 #define TencentRequest_string @""
 @interface ShareViewController ()
-
+{
+  WeiBoLoginViewController * login;
+}
 @end
 
 @implementation ShareViewController
 @synthesize aTextView;
 @synthesize shareImage;
+@synthesize delegate = _delegate;
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -35,6 +38,11 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+   
+
+    
+    
     self.view.backgroundColor=[UIColor colorWithRed:225.0/255.0 green:226.0/255.0 blue:228.0/255.0 alpha:1.0];
     UIImageView *aImageView=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
     aImageView.image=[UIImage imageNamed:@"好友推荐导航"];
@@ -116,6 +124,13 @@
     [recognizer setDirection:(UISwipeGestureRecognizerDirectionLeft)];
     [[self view] addGestureRecognizer:recognizer];
 
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dismissShareVC) name:@"dismissShareVC" object:nil];
+    
+    
+    
+   
+    
+    
     
 }
 //手势
@@ -158,12 +173,25 @@
     [tencentBtn setImage:[UIImage imageNamed:@"腾讯微博1@2x.png"] forState:UIControlStateNormal];
     [tencentBtn addTarget:self action:@selector(tencentClick) forControlEvents:UIControlEventTouchUpInside];
     [backGroundView addSubview:tencentBtn];
+    UIButton *weixinBtn=[UIButton buttonWithType:UIButtonTypeCustom];
+    weixinBtn.frame=CGRectMake(140, 10, 40, 40);
+    [weixinBtn setImage:[UIImage imageNamed:@"weixin.png"] forState:UIControlStateNormal];
+    [weixinBtn addTarget:self action:@selector(weixinClick) forControlEvents:UIControlEventTouchUpInside];
+    [backGroundView addSubview:weixinBtn];
+    
+    UIButton *friendBtn=[UIButton buttonWithType:UIButtonTypeCustom];
+    friendBtn.frame=CGRectMake(200, 10, 40, 40);
+    [friendBtn setImage:[UIImage imageNamed:@"friend.png"] forState:UIControlStateNormal];
+    [friendBtn addTarget:self action:@selector(friendClick) forControlEvents:UIControlEventTouchUpInside];
+    [backGroundView addSubview:friendBtn];
     // 创建一个手势识别器
     UITapGestureRecognizer *oneFingerOneTaps =[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(oneFingerOneTaps)];
     [oneFingerOneTaps setNumberOfTapsRequired:1];
     [oneFingerOneTaps setNumberOfTouchesRequired:1];
     [background addGestureRecognizer:oneFingerOneTaps];
 //    [backGroundView addGestureRecognizer:oneFingerOneTaps];
+    
+
     
 }
 #pragma MARK -textview delegate
@@ -212,20 +240,98 @@
 }
 -(void)tencentClick
 {
+    if (login)
+    {
+        login = Nil;
+    }
     NSString * strPath =  [NSString stringWithFormat:@"https://open.t.qq.com/cgi-bin/oauth2/authorize?client_id=%@&response_type=code&redirect_uri=%@",APP_KEY,APP_REQUEST_URL];
-    WeiBoLoginViewController * login;
     if (IPhone5)
     {
         login = [[WeiBoLoginViewController alloc] initWithNibName:@"WeiBoLoginViewController" bundle:nil];
     }
     else
     {
-      login = [[WeiBoLoginViewController alloc] initWithNibName:@"WeiBoLoginViewController4" bundle:nil];
+        login = [[WeiBoLoginViewController alloc] initWithNibName:@"WeiBoLoginViewController4" bundle:nil];
     }
     login.urlStr = strPath;
-    [self presentViewController:login animated:YES completion:^{
-        ;
+    login.view.frame = CGRectMake(0, login.view.frame.size.height+100, 320, login.view.frame.size.height);
+    [self.view addSubview:login.view];
+    
+    [UIView animateWithDuration:0.3 animations:^{
+        login.view.frame = CGRectMake(0, -20, 320, login.view.frame.size.height);
+    } completion:^(BOOL finished) {
     }];
+}
+
+-(void)weixinClick
+{
+    _scene = WXSceneSession;
+    [self sendAppExtendContent];
+    [_delegate changeScene:WXSceneSession];
+}
+- (void)sendAppExtendContent
+{
+    if ([WXApi isWXAppInstalled] && [WXApi isWXAppSupportApi])
+    {
+        WXMediaMessage *message = [WXMediaMessage message];
+        message.title = @"点美点";
+        message.description = @"去那个好呢，东城，西城，城南，城北？哥们，要吃饭啊？@DMD #点美点# ，随意选就餐环境、菜品、预定座位、在线点餐，点美点，美一点，我的美餐！http://www.tiankong360.com";
+        [message setThumbImage:[UIImage imageNamed:@"Default@2x.png"]];
+        
+        WXAppExtendObject *ext =[WXAppExtendObject object];
+        ext.url=@"https://itunes.apple.com/us/app/dian-mei-dian/id678946071?ls=1&mt=8";
+        message.mediaObject=ext;
+        
+        SendMessageToWXReq* req = [[SendMessageToWXReq alloc] init];
+        req.bText = NO;
+        req.message = message;
+        req.scene = _scene;
+        
+        [WXApi sendReq:req];
+    }
+    else
+    {
+        UIAlertView *alView = [[UIAlertView alloc]initWithTitle:@"" message:@"你的iPhone上还没有安装微信,无法使用此功能，使用微信可以方便的把你喜欢的作品分享给好友。" delegate:nil cancelButtonTitle:@"取消" otherButtonTitles:nil, nil];
+        [alView show];
+        
+    }
+}
+-(void)friendClick
+{
+    _scene=WXSceneTimeline;
+    [self sendAppExtendContent_friend];
+    [_delegate changeScene:WXSceneTimeline];
+}
+- (void)sendAppExtendContent_friend
+{
+    if ([WXApi isWXAppInstalled] && [WXApi isWXAppSupportApi])
+    {
+        WXMediaMessage *message = [WXMediaMessage message];
+        message.title = @"点美点";
+        message.description = @"去那个好呢，东城，西城，城南，城北？哥们，要吃饭啊？@DMD #点美点# ，随意选就餐环境、菜品、预定座位、在线点餐，点美点，美一点，我的美餐！http://www.tiankong360.com";
+        [message setThumbImage:[UIImage imageNamed:@"Default@2x.png"]];
+        
+        WXAppExtendObject *ext =[WXAppExtendObject object];
+        ext.url=@"https://itunes.apple.com/us/app/dian-mei-dian/id678946071?ls=1&mt=8";
+        message.mediaObject=ext;
+        
+        SendMessageToWXReq* req = [[SendMessageToWXReq alloc] init];
+        req.bText = NO;
+        req.message = message;
+        req.scene = _scene;
+        
+        [WXApi sendReq:req];
+    }
+    else
+    {
+        UIAlertView *alView = [[UIAlertView alloc]initWithTitle:@"" message:@"你的iPhone上还没有安装微信,无法使用此功能，使用微信可以方便的把你喜欢的作品分享给好友。" delegate:nil cancelButtonTitle:@"取消" otherButtonTitles:nil, nil];
+        [alView show];
+        
+    }
+}
+-(void) changeScene:(NSInteger)scene
+{
+    _scene = scene;
 }
 -(void)dimissClick
 {
@@ -317,11 +423,26 @@
 }
 -(void)sharecontentVC
 {
-    ShareContentViewController *shareVC=[[ShareContentViewController alloc] init];
+    shareVC=[[ShareContentViewController alloc] init];
     shareVC.str=@"去那个好呢，东城，西城，城南，城北？哥们，要吃饭啊？@DMD #点美点# ，随意选就餐环境、菜品、预定座位、在线点餐，点美点，美一点，我的美餐！http://www.tiankong360.com";
-    shareVC.picStr=@"http://interface.hcgjzs.com/images/index.png";
-    [self presentModalViewController:shareVC animated:YES];
+    shareVC.picStr=[NSString stringWithFormat:@"http://%@/images/index.png",Domain_Name];
+//    [self presentModalViewController:shareVC animated:YES];
+    shareVC.view.frame=CGRectMake(0, [UIScreen mainScreen].bounds.size.height, 320, [UIScreen mainScreen].bounds.size.height);
+    [self.view addSubview:shareVC.view];
+    [UIView animateWithDuration:.3 animations:^{
+        shareVC.view.frame=CGRectMake(0, 0, 320, [UIScreen mainScreen].bounds.size.height);
+    } completion:^(BOOL finished) {
+        
+    }];
     [self oneFingerOneTaps];
+}
+-(void)dismissShareVC
+{
+    [UIView animateWithDuration:.3 animations:^{
+        shareVC.view.frame=CGRectMake(0, [UIScreen mainScreen].bounds.size.height, 320, [UIScreen mainScreen].bounds.size.height);
+    } completion:^(BOOL finished) {
+        [shareVC.view removeFromSuperview];
+    }];
 }
 -(void)backClick
 {
@@ -330,6 +451,9 @@
 //    transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
 //    transition.type = kCATransitionMoveIn;
 //    [self.navigationController.view.layer addAnimation:transition forKey:nil];
+//        [[NSNotificationCenter defaultCenter] postNotificationName:@"showBotomBar" object:nil];
+    AppDelegate *app=(AppDelegate *)[[UIApplication sharedApplication] delegate];
+    [app showBotomBar];
     [self.navigationController popViewControllerAnimated:YES];
 }
 

@@ -24,23 +24,29 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        // Custom initialization
+    
     }
     return self;
 }
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    UIImageView *aImageView=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
-    aImageView.image=[UIImage imageNamed:@"我的收藏导航"];
-    [self.view addSubview:aImageView];
-    UIButton *aBtn=[UIButton buttonWithType:UIButtonTypeCustom];
-    aBtn.showsTouchWhenHighlighted=YES;
-    aBtn.frame=CGRectMake(0, 0, 44, 44);
-    [self.view addSubview:aBtn];
-    [aBtn addTarget:self action:@selector(backClick) forControlEvents:UIControlEventTouchUpInside];
-    aTableView=[[UITableView alloc] initWithFrame:CGRectMake(0,44, 320, [UIScreen mainScreen].bounds.size.height -44-20) style:UITableViewStylePlain];
+    self.navigationController.navigationBar.hidden=YES;
+    UIView *aView=[[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
+    aView.backgroundColor=[UIColor colorWithRed:252.0/255.0 green:33.0/255.0 blue:47.0/255.0 alpha:1.0];
+    [self.view addSubview:aView];
+    UILabel *titleLab=[[UILabel alloc] initWithFrame:CGRectMake(80, 0, 160, 44)];
+    titleLab.backgroundColor=[UIColor clearColor];
+    titleLab.textColor=[UIColor whiteColor];
+    titleLab.text=@"我的收藏";
+    titleLab.textAlignment=NSTextAlignmentCenter;
+    [aView addSubview:titleLab];
+//    UIButton *aBtn=[UIButton buttonWithType:UIButtonTypeCustom];
+//    aBtn.showsTouchWhenHighlighted=YES;
+//    aBtn.frame=CGRectMake(0, 0, 44, 44);
+//    [self.view addSubview:aBtn];
+//    [aBtn addTarget:self action:@selector(backClick) forControlEvents:UIControlEventTouchUpInside];
+    aTableView=[[UITableView alloc] initWithFrame:CGRectMake(0,44, 320, [UIScreen mainScreen].bounds.size.height -44-20-50) style:UITableViewStylePlain];
     aTableView.delegate=self;
     aTableView.dataSource=self;
     //[aTableView setSeparatorColor:[UIColor whiteColor]];
@@ -114,13 +120,15 @@
     //    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     cell.lab.font = [UIFont fontWithName:@"Arial" size:17.0f];
-    cell.lab.textColor=[UIColor colorWithRed:251.0/255.0 green:33.0/255.0 blue:47.0/255.0 alpha:1.0];
+    //cell.lab.textColor=[UIColor colorWithRed:251.0/255.0 green:33.0/255.0 blue:47.0/255.0 alpha:1.0];
     cell.lab2.textColor=[UIColor grayColor];
     cell.renjunLab.textColor=[UIColor grayColor];
     cell.timeLab.textColor=[UIColor grayColor];
     //numberStr=cell.timeLab.text;
     cell.lab.text=[[[userDefaults objectForKey:@"collectAry"] objectAtIndex:indexPath.row] valueForKey:@"restname"];
-    [cell.imag setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://interface.hcgjzs.com%@",[[[userDefaults objectForKey:@"collectAry"] objectAtIndex:indexPath.row] valueForKey:@"restimg"]]] placeholderImage:[UIImage imageNamed:@"加载中"]];
+    [cell.imag setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@%@",Domain_Name,[[[userDefaults objectForKey:@"collectAry"] objectAtIndex:indexPath.row] valueForKey:@"restimg"]]] placeholderImage:[UIImage imageNamed:@"加载中"]];
+    cell.imag.layer.borderColor=[[UIColor grayColor] CGColor];
+    cell.imag.layer.borderWidth=1;
     cell.lab2.text=[[[userDefaults objectForKey:@"collectAry"] objectAtIndex:indexPath.row] valueForKey:@"restaddress"];
     cell.timeLab.text=[[[userDefaults objectForKey:@"collectAry"] objectAtIndex:indexPath.row] valueForKey:@"restphone"];
     //cell.renjunLab.text=[NSString stringWithFormat:@"人均￥%@",[[ary objectAtIndex:indexPath.row] valueForKey:@"restaverage"]];
@@ -169,11 +177,11 @@
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    [DataBase clearOrderMenu];
-    p=indexPath.row;
     DetailViewController *detailVC=[[DetailViewController alloc] init];
+    detailVC.hidesBottomBarWhenPushed=YES;
+    detailVC.hideStr=@"show";
     detailVC.resInfoArr =[[NSMutableArray arrayWithArray:[userDefaults objectForKey:@"collectAry"]] objectAtIndex:indexPath.row];
-    detailVC.pID=[[[NSMutableArray arrayWithArray:[userDefaults objectForKey:@"collectAry"]] objectAtIndex:p]valueForKey:@"restid"];;
+    detailVC.pID=[[[NSMutableArray arrayWithArray:[userDefaults objectForKey:@"collectAry"]] objectAtIndex:indexPath.row]valueForKey:@"restid"];
     [self.navigationController pushViewController:detailVC animated:YES];
     //点击 蓝色慢慢消失
     [tableView deselectRowAtIndexPath:[tableView indexPathForSelectedRow] animated:YES];
@@ -183,12 +191,12 @@
 }
 -(void)backClick
 {
-//    CATransition* transition = [CATransition animation];
-//    transition.duration = 0.5;
-//    transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-//    transition.type = kCATransitionMoveIn;
-//    [self.navigationController.view.layer addAnimation:transition forKey:nil];
-    [self.navigationController popViewControllerAnimated:YES];
+    CATransition* transition = [CATransition animation];
+    transition.duration = 0.5;
+    transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    transition.type = kCATransitionMoveIn;
+    [self.navigationController.view.layer addAnimation:transition forKey:nil];
+    [self.navigationController popViewControllerAnimated:NO];
 }
 - (void)didReceiveMemoryWarning
 {

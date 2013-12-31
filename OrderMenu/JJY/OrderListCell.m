@@ -53,11 +53,11 @@
         self.orderTimeLab = timelab;
         [self addSubview:timelab];
         
-        UIImageView * imageAdress = [[UIImageView alloc] initWithFrame:CGRectMake(70, 44, 8, 8)];
+        UIImageView * imageAdress = [[UIImageView alloc] initWithFrame:CGRectMake(70, 48, 14, 14)];
         imageAdress.image = [UIImage imageNamed:@"位置.png"];
         [self addSubview:imageAdress];
         
-        UILabel * adressLab = [[UILabel alloc] initWithFrame:CGRectMake(78, 41, 240, 30)];
+        UILabel * adressLab = [[UILabel alloc] initWithFrame:CGRectMake(82, 41, 240, 30)];
         adressLab.numberOfLines = 2;
         self.resultAdressLab = adressLab;
         adressLab.textColor = [UIColor grayColor];

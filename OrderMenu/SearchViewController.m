@@ -13,6 +13,9 @@
 #import "SearchResultViewController.h"
 #import "MyActivceView.h"
 #import "TKHttpRequest.h"
+#import "iflyMSC/IFlyUserWords.h"
+#import "AppDelegate.h"
+#define IPHONE_IOS7 [[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0
 @interface SearchViewController ()
 
 @end
@@ -33,8 +36,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    
+    self.navigationController.navigationBar.hidden=YES;
     UIImageView *aImageView=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
     aImageView.image=[UIImage imageNamed:@"搜索"];
     [self.view addSubview:aImageView];
@@ -44,16 +46,26 @@
     [self.view addSubview:aBtn];
     [aBtn addTarget:self action:@selector(backClick) forControlEvents:UIControlEventTouchUpInside];
     //搜索栏
-    aSearchBar=[[UISearchBar alloc] initWithFrame:CGRectMake(0, 44, 320, 41)];
+    aSearchBar=[[UISearchBar alloc] initWithFrame:CGRectMake(0, 44, 320-42, 41)];
     aSearchBar.delegate=self;
     aSearchBar.placeholder=@"请输入您想去的餐馆名";
     [self.view addSubview:aSearchBar];
-    UIView *segment=[aSearchBar.subviews objectAtIndex:0];
-    [segment removeFromSuperview];
+    aSearchBar.barStyle=UIBarStyleDefault;
+    if (IPHONE_IOS7)
+    {
+        
+    }
+    else
+    {
+        UIView *segment=[aSearchBar.subviews objectAtIndex:0];
+        [segment removeFromSuperview];
+        
+    }
     aSearchBar.backgroundColor=[UIColor whiteColor];
-    aSearchBar.tintColor=[UIColor colorWithRed:251.0/255.0 green:33.0/255.0 blue:47.0/255.0 alpha:1.0];
+    aSearchBar.tintColor=[UIColor colorWithRed:252.0/255.0 green:33.0/255.0 blue:47.0/255.0 alpha:1.0];
+    //aSearchBar.tintColor=[UIColor colorWithRed:207.0/255.0 green:207.0/255.0 blue:212.0/255.0 alpha:1.0];
     
-    
+    //[aSearchBar becomeFirstResponder];
     //表
     resultTableView=[[UITableView alloc] initWithFrame:CGRectMake(0, 44+41, 320, [UIScreen mainScreen].bounds.size.height-44-41) style:UITableViewStylePlain];
     resultTableView.delegate=self;
@@ -66,6 +78,48 @@
     
     self.ary=[NSMutableArray arrayWithCapacity:0];
     self.searcharry=[[NSArray alloc] init];
+    //手势
+    UISwipeGestureRecognizer *recognizer;
+    
+    recognizer = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(handleSwipeFrom:)];
+    
+    [recognizer setDirection:(UISwipeGestureRecognizerDirectionRight)];
+    [[self view] addGestureRecognizer:recognizer];
+    
+//    recognizer = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(handleSwipeFrom:)];
+//    
+//    [recognizer setDirection:(UISwipeGestureRecognizerDirectionLeft)];
+//    [[self view] addGestureRecognizer:recognizer];
+    //语音云
+    NSString *initString = [[NSString alloc] initWithFormat:@"appid=%@",APPID ];
+    _iFlyRecognizerView = [[IFlyRecognizerView alloc] initWithOrigin:CGPointMake(15, 60) initParam:initString];
+    _iFlyRecognizerView.delegate = self;
+    [self onLogin:nil];
+    
+    _uploader = [[IFlyDataUploader alloc] initWithDelegate:nil pwd:nil params:nil delegate:self];
+    UIButton *voiceBtn=[UIButton buttonWithType:UIButtonTypeCustom];
+    //voiceBtn.showsTouchWhenHighlighted=YES;
+    [voiceBtn setBackgroundImage:[UIImage imageNamed:@"语音"] forState:UIControlStateNormal];
+    voiceBtn.frame=CGRectMake(320-42, 46, 35, 35);
+    [self.view addSubview:voiceBtn];
+    [voiceBtn addTarget:self action:@selector(voiceBtn_Click) forControlEvents:UIControlEventTouchUpInside];
+}
+//手势
+-(void)handleSwipeFrom:(UISwipeGestureRecognizer *)recognizer
+{
+    if(recognizer.direction==UISwipeGestureRecognizerDirectionLeft) {
+        
+        //NSLog(@"swipe left");
+        //执行程序
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"SwitchGesture" object:nil];
+    }
+    
+    if(recognizer.direction==UISwipeGestureRecognizerDirectionRight) {
+        
+        //        NSLog(@"swipe right");
+        //执行程序
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"SwitchGesture" object:nil];
+    }
     
 }
 -(void)viewWillAppear:(BOOL)animated
@@ -201,13 +255,20 @@
 - (BOOL)searchBarShouldBeginEditing:(UISearchBar *)searchBar
 {
     NSLog(@"searchBarShouldBeginEditing");
-        searchBar.showsCancelButton=YES;
-    for( id cc in [searchBar subviews]){
-        if([cc isKindOfClass:[UIButton class]]){
-            UIButton *btn = (UIButton *)cc;
-            [btn setTitle:@"取消"  forState:UIControlStateNormal];
+    //searchBar.showsCancelButton=YES;
+    if (IPHONE_IOS7)
+    {
+
+    }
+    else{
+        for( id cc in [searchBar subviews]){
+            if([cc isKindOfClass:[UIButton class]]){
+                UIButton *btn = (UIButton *)cc;
+                [btn setTitle:@"取消"  forState:UIControlStateNormal];
+            }
         }
     }
+
     //
     //    resultTableView=[[UITableView alloc] initWithFrame:CGRectMake(0, [UIScreen mainScreen].bounds.size.height, 320,[UIScreen mainScreen].bounds.size.height-41-44) style:UITableViewStylePlain];
     ////    resultTableView.delegate=self;
@@ -262,7 +323,8 @@
     [[NSUserDefaults standardUserDefaults] setObject:self.ary forKey:@"historyAry"];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
-- (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar{
+- (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar
+{
     [searchBar resignFirstResponder];
     searchBar.showsCancelButton=NO;
 }
@@ -293,16 +355,17 @@
 }
 -(void)searchRequest
 {
-    ASIHTTPRequest *request=[TKHttpRequest RequestTKUrl: @"http://interface.hcgjzs.com/OM_Interface/Restaurant.asmx"];
+    ASIHTTPRequest *request=[TKHttpRequest RequestTKUrl:[NSString stringWithFormat:@"http://%@/OM_Interface/Restaurant.asmx?op=ListForSearch",Domain_Name]];
     NSString *postStr=[NSString stringWithFormat:@"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
                        <soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\
                        <soap:Body>\
                        <ListForSearch xmlns=\"http://tempuri.org/\">\
                        <key>%@</key>\
+                       <RestaurantID>%@</RestaurantID>\
                        </ListForSearch>\
                        </soap:Body>\
-                       </soap:Envelope>",self.seatchStr];
-    [request addRequestHeader:@"Host" value:@"interface.hcgjzs.com"];
+                       </soap:Envelope>",self.seatchStr,@""];
+    [request addRequestHeader:@"Host" value:Domain_Name];
     [request addRequestHeader:@"Content-Type" value:@"text/xml; charset=utf-8"];
     [request addRequestHeader:@"Content-Length" value:[NSString stringWithFormat:@"%d",postStr.length]];
     [request addRequestHeader:@"SOAPAction" value:@"http://tempuri.org/ListForSearch"];
@@ -328,6 +391,7 @@
     [MyActivceView stopAnimatedInView:self.view];
     searchReslutVC=[[SearchResultViewController alloc] init];
     searchReslutVC.ary=[NSString ConverfromData:request.responseData name:@"ListForSearch"];
+    NSLog(@"-==-=- %@",searchReslutVC.ary);
     [self.navigationController pushViewController:searchReslutVC animated:YES];
 }
 - (void)requestFailed:(ASIHTTPRequest *)request
@@ -336,6 +400,10 @@
 }
 -(void)backClick
 {
+//    [aSearchBar resignFirstResponder];
+//    [[NSNotificationCenter defaultCenter] postNotificationName:@"SwitchGesture" object:nil];
+    AppDelegate *app=(AppDelegate *)[[UIApplication sharedApplication] delegate];
+    [app showBotomBar];
     [self.navigationController popViewControllerAnimated:YES];
 }
 //网络判断
@@ -364,6 +432,96 @@
         return true;
     }
 }
+#pragma mark ---voice ---
+-(void)voiceBtn_Click
+{
+    [aSearchBar resignFirstResponder];
+    [_iFlyRecognizerView setParameter:@"grammarID" value:_grammarID];
+    
+    // 参数设置
+    [_iFlyRecognizerView setParameter:@"domain" value:_ent];
+    [_iFlyRecognizerView setParameter:@"sample_rate" value:@"16000"];
+    [_iFlyRecognizerView setParameter:@"vad_eos" value:@"1800"];
+    [_iFlyRecognizerView setParameter:@"vad_bos" value:@"6000"];
+    [_iFlyRecognizerView start];
+}
+-(void) onLogin:(id) sender
+{
+    if (![IFlySpeechUser isLogin]) {
+        
+        //        _alertView = [[UIAlertView alloc] initWithTitle:nil message:@"正在登录" delegate:self cancelButtonTitle:nil otherButtonTitles:nil, nil];
+        //        [_alertView show];
+        
+        // 需要先登录
+        IFlySpeechUser *loginUser = [[IFlySpeechUser alloc] initWithDelegate:self];
+        
+        // user 和 pwd 都传入nil时表示是匿名登录
+        NSString *loginString = [[NSString alloc] initWithFormat:@"appid=%@",APPID];
+        [loginUser login:nil pwd:nil param:loginString];
+        // [loginString release];
+    }
+    else {
+        //        _alertView = [[UIAlertView alloc] initWithTitle:@"已登录" message:nil delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+        //        [_alertView show];
+    }
+}
+//
+- (void) onUpload:(id)sender
+{
+    //    _alertView = [[UIAlertView alloc] initWithTitle:nil message:@"正在上传" delegate:self cancelButtonTitle:nil otherButtonTitles:nil, nil];
+    //    [_alertView show];
+    
+    IFlyUserWords *iFlyUserWords = [[IFlyUserWords alloc] initWithJson:USERWORDS];
+    [_uploader uploadData:NAME params:PARAMS data:[iFlyUserWords toString]];
+}
+- (void) onEnd:(IFlySpeechUser *)iFlySpeechUser error:(IFlySpeechError *)error
+{
+    [_alertView dismissWithClickedButtonIndex:0 animated:YES];
+    if (![error errorCode]) {
+        //        _alertView = [[UIAlertView alloc] initWithTitle:@"登录成功" message:nil delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+        //        [_alertView show];
+        [self onUpload:nil];
+    }
+    else {
+        //        _alertView = [[UIAlertView alloc] initWithTitle:@"登录失败" message:[error errorDesc] delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+        //        [_alertView show];
+        
+    }
+}
+//
+- (void) onEnd:(IFlyDataUploader*) uploader grammerID:(NSString *)grammerID error:(IFlySpeechError *)error
+{
+    [_alertView dismissWithClickedButtonIndex:0 animated:YES];
+    
+    
+    NSLog(@"%d",[error errorCode]);
+    
+    if (![error errorCode]) {
+        //        _alertView = [[UIAlertView alloc] initWithTitle:@"上传成功" message:grammerID delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+        //        [_alertView show];
+    }
+    else {
+        //        _alertView = [[UIAlertView alloc] initWithTitle:@"上传失败" message:[error errorDesc] delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+        //        [_alertView show];
+    }
+}
+
+- (void) onResult:(IFlyRecognizerView *)iFlyRecognizerView theResult:(NSArray *)resultArray
+{
+    NSMutableString *result = [[NSMutableString alloc] init];
+    NSDictionary *dic = [resultArray objectAtIndex:0];
+    for (NSString *key in dic) {
+        [result appendFormat:@"%@(置信度:%@)\n",key,[dic objectForKey:key]];
+        NSLog(@"%@",key);
+        aSearchBar.text= [key substringWithRange:NSMakeRange(0, key.length-1)];
+        [aSearchBar becomeFirstResponder];
+    }
+}
+- (void)onEnd:(IFlyRecognizerView *)iFlyRecognizerView theError:(IFlySpeechError *) error
+{
+    NSLog(@"recognizer end");
+}
+
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];

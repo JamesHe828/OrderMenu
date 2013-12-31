@@ -22,15 +22,16 @@
 #import "UIImageView+WebCache.h"
 
 #pragma mark - 接口
-#define CLASS_URL @"http://interface.hcgjzs.com/OM_Interface/Cuisines.asmx"
+#define CLASS_URL @"http://dmd.tiankong360.com/OM_Interface/Cuisines.asmx"
 #define CLASS_NAME @"GetList"  //获取某一餐馆的菜系分类列表
-#define PRODUCT_URL @"http://interface.hcgjzs.com/OM_Interface/Product.asmx"
+//#define PRODUCT_URL @"http://interface.hcgjzs.com/OM_Interface/Product.asmx"
+#define PRODUCT_URL @"http://dmd.tiankong360.com/OM_Interface/Product.asmx?op=ProductList"
 
 #define CHANGE_ONE @"ListForNext"
 #define PRODUCT_NAME @"ProductList"  //根据分类id，获取对应id的菜列表
-#define ALL_URL @"http://interface.hcgjzs.com"
+#define ALL_URL @"http://dmd.tiankong360.com"
 #define AUDO_PRODUCT_NAME @"ListForSearch"
-#define ORDER_URL @"http://interface.hcgjzs.com/OM_Interface/Order.asmx"
+#define ORDER_URL @"http://dmd.tiankong360.com/OM_Interface/Order.asmx"
 #define ORDER_NAME @"Add"
 #define ORDER_DELETE @"Del"
 #define ORDER_GETPRODUCT @"GetProductList"
@@ -43,4 +44,8 @@
 #define APP_SECRET @"a5ceec3dd776e4046b52c4ba4e271354"
 #define APP_REQUEST_URL @"http://www.tiankong360.com"
 
+#define REST_STATUS @"rest_status"
+
+
+#define Domain_Name @"dmd.tiankong360.com"
 #endif

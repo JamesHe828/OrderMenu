@@ -13,6 +13,7 @@
 #import "SBJSON.h"
 #import "MyActivceView.h"
 #import "Reachability.h"
+#import "AppDelegate.h"
 @interface FeedbackViewController ()
 
 @end
@@ -341,7 +342,7 @@
     if ([self isconnectok])
     {
         [MyActivceView startAnimatedInView:self.view];
-        ASIHTTPRequest *request=[ASIHTTPRequest requestWithURL:[NSURL URLWithString:@"http://interface.hcgjzs.com/OM_Interface/Feedback.asmx"]];
+        ASIHTTPRequest *request=[ASIHTTPRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@/OM_Interface/Feedback.asmx",Domain_Name]]];
         NSString *postStr=[NSString stringWithFormat:@"<?xml version=\"1.0\" encoding=\"utf-8\"?>\
                            <soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\
                            <soap:Body>\
@@ -351,7 +352,7 @@
                            </Add>\
                            </soap:Body>\
                            </soap:Envelope>",aTextView.text,atextField.text];
-        [request addRequestHeader:@"Host" value:@"interface.hcgjzs.com"];
+        [request addRequestHeader:@"Host" value:Domain_Name];
         [request addRequestHeader:@"Content-Type" value:@"text/xml; charset=utf-8"];
         [request addRequestHeader:@"Content-Length" value:[NSString stringWithFormat:@"%d",postStr.length]];
         [request addRequestHeader:@"SOAPAction" value:@"http://tempuri.org/Add"];
@@ -440,6 +441,9 @@
 //    transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
 //    transition.type = kCATransitionPush;
 //    [self.navigationController.view.layer addAnimation:transition forKey:nil];
+//    [[NSNotificationCenter defaultCenter] postNotificationName:@"showBotomBar" object:nil];
+    AppDelegate *app=(AppDelegate *)[[UIApplication sharedApplication] delegate];
+    [app showBotomBar];
     [self.navigationController popViewControllerAnimated:YES];
 }
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event

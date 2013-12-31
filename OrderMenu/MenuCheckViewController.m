@@ -12,11 +12,19 @@
 #import "SumbitViewController.h"
 #import "WebService.h"
 #import "PriceView.h"
-
+#import "AppDelegate.h"
 @interface MenuCheckViewController ()
 @property (nonatomic,strong) IBOutlet UITableView * myTableView;
 @property (nonatomic,strong) IBOutlet UILabel * priceLab;
 @property (nonatomic,strong) NSMutableArray * dataArr;
+@property (nonatomic,strong) IBOutlet UIButton * Btn_sumbit;
+@property (nonatomic,strong) IBOutlet UIImageView * nav_imageView;
+
+
+@property (nonatomic,strong) NSMutableDictionary * priceAndNumberDic;
+@property (nonatomic,strong) NSMutableDictionary * indexDic;
+@property (nonatomic,strong) NSMutableDictionary * dotNumberDic;
+
 -(void)getData;
 -(IBAction)sumbitClick:(id)sender;
 -(IBAction)saveClick:(id)sender;
@@ -29,6 +37,9 @@
 @synthesize myTableView;
 @synthesize resInfoArr;
 @synthesize priceLab;
+@synthesize Btn_sumbit;
+@synthesize priceAndNumberDic,indexDic,dotNumberDic;
+@synthesize nav_imageView;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -41,14 +52,33 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
+    if ([[[NSUserDefaults standardUserDefaults] valueForKey:REST_STATUS] isEqualToString:@"0"])
+    {
+        self.Btn_sumbit.alpha = 0.0;
+    }
+    else
+    {
+        self.Btn_sumbit.alpha = 1.0;
+    }
     
     self.dataArr = [NSMutableArray arrayWithCapacity:0];
+    
+    if (![NSString IOS_7])
+    {
+        self.nav_imageView.frame = CGRectMake(0, 0, 320, 44);
+    }
+    
+    self.priceAndNumberDic = [NSMutableDictionary dictionaryWithCapacity:0];
+    self.indexDic = [NSMutableDictionary dictionaryWithCapacity:0];
+    self.dotNumberDic = [NSMutableDictionary dictionaryWithCapacity:0];
+    
     [self getData];
 }
 #pragma mark - 回到首页
 -(IBAction)backIndex:(id)sender
 {
+    AppDelegate *app=(AppDelegate *)[UIApplication sharedApplication].delegate;
+    [app showBotomBar];
     [self.navigationController popToRootViewControllerAnimated:YES];
 }
 
@@ -74,7 +104,7 @@
     if (self.dataArr.count>0)
     {
         [self.dataArr removeAllObjects];
-        self.dataArr = (NSMutableArray *)[DataBase selectAllProduct]; 
+        self.dataArr = (NSMutableArray *)[DataBase selectAllProduct];
     }
     else
     {
@@ -123,36 +153,50 @@
     cell1.ClickView.frame = CGRectMake(210, 3, 90, 30);
     [cell1.ClickView.rightButton addTarget:self action:@selector(rightButtonClickEvent:) forControlEvents:UIControlEventTouchUpInside];
     [cell1.ClickView.leftButton addTarget:self action:@selector(leftButtonClickEvent:) forControlEvents:UIControlEventTouchUpInside];
+    
+    [self.priceAndNumberDic setValue:priceStr forKey:[[self.dataArr objectAtIndex:indexPath.row] valueForKey:@"ProID"]];
+    [self.indexDic setValue:[NSNumber numberWithInt:indexPath.row] forKey:[[self.dataArr objectAtIndex:indexPath.row] valueForKey:@"ProID"]];
+    [self.dotNumberDic setValue:[NSNumber numberWithInt:number] forKey:[[self.dataArr objectAtIndex:indexPath.row] valueForKey:@"ProID"]];
+    cell1.ClickView.rightButton.tag = [[[self.dataArr objectAtIndex:indexPath.row] valueForKey:@"ProID"] intValue];
+    cell1.ClickView.leftButton.tag = [[[self.dataArr objectAtIndex:indexPath.row] valueForKey:@"ProID"] intValue];
+    cell1.ClickView.bigButton.tag = [[[self.dataArr objectAtIndex:indexPath.row] valueForKey:@"ProID"] intValue];
+    
     return cell1;
 }
 
 #pragma mark - 点菜触发事件
 -(void)leftButtonClickEvent:(UIButton *)aButton
 {
-    CheckCell * cell = (CheckCell *)[[[aButton superview] superview] superview];
+    // CheckCell * cell = (CheckCell *)[[[aButton superview] superview] superview];
+    int dot1 = [[self.dotNumberDic valueForKey:[NSString stringWithFormat:@"%d",aButton.tag]] intValue];
+    dot1 --;
+    [self.dotNumberDic setValue:[NSNumber numberWithInt:dot1] forKey:[NSString stringWithFormat:@"%d",aButton.tag]];
     double priceSum = [PriceView ShareView].sumprice;
     int numberSum = [PriceView ShareView].sumnumber;
-    [[PriceView ShareView] ChangeLabTextSumPrice:priceSum-[[[self.dataArr objectAtIndex:cell.ClickView.index] valueForKey:@"prices"] doubleValue] sumDishes:numberSum-1];
-    NSDictionary * obj = [self.dataArr objectAtIndex:cell.ClickView.index];
-    if (cell.ClickView.dotNumber == 0)
+    [[PriceView ShareView] ChangeLabTextSumPrice:priceSum-[[[self.dataArr objectAtIndex:[[self.indexDic valueForKey:[NSString stringWithFormat:@"%d",aButton.tag]] intValue]] valueForKey:@"prices"] doubleValue] sumDishes:numberSum-1];
+    NSDictionary * obj = [self.dataArr objectAtIndex:[[self.indexDic valueForKey:[NSString stringWithFormat:@"%d",aButton.tag]] intValue]];
+    if (dot1 == 0)
     {
         [DataBase deleteProID:[[obj valueForKey:@"ProID"] intValue]];
         [self getData];
     }
     else
     {
-        [DataBase UpdateDotNumber:[[obj valueForKey:@"ProID"] intValue] currDotNumber:cell.ClickView.dotNumber];
+        [DataBase UpdateDotNumber:[[obj valueForKey:@"ProID"] intValue] currDotNumber:dot1];
         [self refePriceView];
     }
 }
 -(void)rightButtonClickEvent:(UIButton *)aButton
 {
-    CheckCell * cell = (CheckCell *)[[[aButton superview] superview] superview];
+    // CheckCell * cell = (CheckCell *)[[[aButton superview] superview] superview];
+    int dot1 = [[self.dotNumberDic valueForKey:[NSString stringWithFormat:@"%d",aButton.tag]] intValue];
+    dot1++;
+    [self.dotNumberDic setValue:[NSNumber numberWithInt:dot1] forKey:[NSString stringWithFormat:@"%d",aButton.tag]];
     double priceSum = [PriceView ShareView].sumprice;
     int numberSum = [PriceView ShareView].sumnumber;
-    [[PriceView ShareView] ChangeLabTextSumPrice:priceSum+[[[self.dataArr objectAtIndex:cell.ClickView.index] valueForKey:@"prices"] doubleValue] sumDishes:numberSum+1];
-    NSDictionary * obj = [self.dataArr objectAtIndex:cell.ClickView.index];
-    [DataBase UpdateDotNumber:[[obj valueForKey:@"ProID"] intValue] currDotNumber:cell.ClickView.dotNumber];
+    [[PriceView ShareView] ChangeLabTextSumPrice:priceSum+[[[self.dataArr objectAtIndex:[[self.indexDic valueForKey:[NSString stringWithFormat:@"%d",aButton.tag]] intValue]] valueForKey:@"prices"] doubleValue] sumDishes:numberSum+1];
+    NSDictionary * obj = [self.dataArr objectAtIndex:[[self.indexDic valueForKey:[NSString stringWithFormat:@"%d",aButton.tag]] intValue]];
+    [DataBase UpdateDotNumber:[[obj valueForKey:@"ProID"] intValue] currDotNumber:dot1];
     [self refePriceView];
 }
 

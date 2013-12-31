@@ -17,6 +17,8 @@
     IBOutlet UIButton      *_abtn;
     IBOutlet UIButton      *_bbtn;
     IBOutlet UILabel       *_renjunLab;
+    IBOutlet UILabel       *_dazheLab,*_huodongLab,*_waimaiLab,*_jiamengLab,*_liansuoLab;
+    IBOutlet UIImageView   *aimage;
 }
 @property(nonatomic,retain)IBOutlet UILabel       *lab;
 @property(nonatomic,retain)IBOutlet UILabel       *lab2;
@@ -25,4 +27,6 @@
 @property(nonatomic,retain)IBOutlet UIImageView   *imag;
 @property(nonatomic,retain)IBOutlet UIButton      *abtn;
 @property(nonatomic,retain)IBOutlet UIButton      *bbtn;
+@property(nonatomic,retain)IBOutlet UILabel       *dazheLab,*huodongLab,*waimaiLab,*jiamengLab,*liansuoLab;
+@property(nonatomic,retain)IBOutlet UIImageView   *aimage;
 @end

@@ -7,7 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
-@interface DetailViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,UIWebViewDelegate>
+#import "ShareContentViewController.h"
+#import "WXApi.h"
+#import "WXApiObject.h"
+@protocol sendMsgToWeChatViewDelegate <NSObject>
+- (void) sendAppExtendContent;
+- (void) changeScene:(NSInteger)scene;
+@end
+@interface DetailViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,UIWebViewDelegate,WXApiDelegate,sendMsgToWeChatViewDelegate>
 {
      UITableView   *aTableView;
      UILabel       *numLab;
@@ -29,8 +36,11 @@
      UILabel       *Lab11;
      UILabel       *Lab22;
      UILabel       *Lab33;
+    ShareContentViewController *shareVC;
+    enum WXScene _scene;
+    NSString       *hideStr;
 }
-
+@property(nonatomic,retain)NSString      *hideStr;
 @property(nonatomic,retain)UITableView   *aTableView;
 @property(nonatomic,retain)UILabel       *numLab;
 @property(nonatomic,retain)NSArray       *detailAry,*recommendAry;
@@ -44,4 +54,8 @@
 
 @property (nonatomic,strong)NSMutableArray * resInfoArr;
 @property(nonatomic,retain)UILabel       *Lab11,*Lab22,*Lab33;
+@property (nonatomic, assign) id<sendMsgToWeChatViewDelegate> delegate;
+
+@property (nonatomic,assign) BOOL isFromMap;
+
 @end

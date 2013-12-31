@@ -351,7 +351,7 @@
     {
         p=8;
     }
-    self.refreshFooterView.frame = CGRectMake(0,p*66, self.frame.size.width, self.frame.size.height);
+    self.refreshFooterView.frame = CGRectMake(0,p*83, self.frame.size.width, self.frame.size.height);
 }
 #pragma mark -
 #pragma mark ScrollView Methods

@@ -10,6 +10,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import "ASIFormDataRequest.h"
 #import "JSONKit.h"
+#import "AppDelegate.h"
 
 @interface WeiBoLoginViewController ()
 {
@@ -23,6 +24,7 @@
 @property (nonatomic,strong) IBOutlet UIImageView * lineImageView;
 @property (nonatomic,strong) IBOutlet UILabel * lab_title;
 @property (nonatomic,strong) NSMutableArray * dataArr;
+@property (nonatomic,strong) IBOutlet UIImageView * nav_image;
 -(IBAction)backClick:(id)sender;
 -(IBAction)sendClick:(id)sender;
 -(void)changeUI;
@@ -38,20 +40,94 @@
 @synthesize resustName;
 @synthesize lineImageView;
 @synthesize lab_title;
+@synthesize nav_image;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-       
+        
     }
     return self;
 }
+
+//-(void)viewWillAppear:(BOOL)animated
+//{
+//    if ([NSString IOS_7])
+//    {
+//        UIWindow * window1 = [UIApplication sharedApplication].delegate.window;
+//        window1.frame = [[UIScreen mainScreen] applicationFrame];
+//        window1.clipsToBounds =YES;
+//        
+//        if (IPhone5)
+//        {
+//            window1.frame =  CGRectMake(0,20,320,568);
+//            window1.bounds = CGRectMake(0, 0, 320, 568);
+//            if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"ios7Login"] isEqualToString:@"1"])
+//            {
+//                window1.bounds = CGRectMake(0, -20, 320, 568);
+//            }
+//        }
+//        else
+//        {
+//            window1.frame =  CGRectMake(0,30,320,460);
+//            window1.bounds = CGRectMake(0, 0, 320, 480);
+//            if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"ios7Login"] isEqualToString:@"1"])
+//            {
+//                window1.bounds = CGRectMake(0, -20, 320, 480);
+//            }
+//        }
+//        
+//        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+//        self.nav_image.frame = CGRectMake(0, 20, 320, 44);
+//    }
+//}
+//
+//-(void)viewWillDisappear:(BOOL)animated
+//{
+//    if ([NSString IOS_7])
+//    {
+//        UIWindow * window1 = [UIApplication sharedApplication].delegate.window;
+//        window1.frame = [[UIScreen mainScreen] applicationFrame];
+//        // window1.frame =  CGRectMake(0,20,320,window1.frame.size.height);
+//        window1.bounds = CGRectMake(0,-20,320, window1.frame.size.height);
+//        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+////        if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7) {
+////            [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+////            AppDelegate * delegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+////            delegate.window.clipsToBounds =YES;
+////            
+////            NSLog(@"=====%f=======",delegate.window.frame.size.height);
+////            if (IPhone5)
+////            {
+////                delegate.window.bounds = CGRectMake(0, 0, 320, 548);
+////                delegate.window.frame =  CGRectMake(0,20,320,548);
+////            }
+////            else
+////            {
+////                delegate.window.bounds = CGRectMake(0, 0, 320, 460);
+////                delegate.window.frame =  CGRectMake(0,20,320,460);
+////            }
+////        }
+//    }
+//    
+////    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7) {
+////        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+////        AppDelegate * delegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+////        delegate.window.clipsToBounds =YES;
+////        
+////        delegate.window.bounds = CGRectMake(0, 0, delegate.window.frame.size.width, delegate.window.frame.size.height);
+////        delegate.window.frame =  CGRectMake(0,20,delegate.window.frame.size.width,delegate.window.frame.size.height);
+////    }
+//}
 
 - (void)viewDidLoad
 {
     
     [super viewDidLoad];
+    
+    self.view.backgroundColor = [UIColor whiteColor];
+    
     NSString * token = [[NSUserDefaults standardUserDefaults] valueForKey:@"T_access_token"];
     if (token.length>0)
     {
@@ -62,15 +138,39 @@
         self.sendBtn.alpha = 0.0;
         self.lab_title.alpha = 1.0;
         self.lineImageView.alpha = 0.0;
+        NSLog(@"urlStr = %@",self.urlStr);
         self.request = [NSURLRequest requestWithURL:[NSURL URLWithString:self.urlStr]];
         [self.myWebView loadRequest:request];
     }
 }
 -(IBAction)backClick:(id)sender
 {
-    [self dismissViewControllerAnimated:YES completion:^{
+    
+    [UIView animateWithDuration:0.3 animations:^{
+        self.view.frame = CGRectMake(0, self.view.frame.size.height+100, 320, self.view.frame.size.height);
+        
+    } completion:^(BOOL finished) {
         ;
     }];
+
+    
+//    [[NSUserDefaults standardUserDefaults] setValue:@"1" forKey:@"ios7Login"];
+//    UIWindow * window1 = [UIApplication sharedApplication].delegate.window;
+//    if (IPhone5)
+//    {
+//        if ([[[NSUserDefaults standardUserDefaults] valueForKey:@"ios7Login"] isEqualToString:@"1"])
+//        {
+//            window1.bounds = CGRectMake(0, 0, 320, 568);
+//        }
+//    }
+//    else
+//    {
+//        window1.bounds = CGRectMake(0, 0, 320, 480);
+//    }
+//    
+//    [self dismissViewControllerAnimated:YES completion:^{
+//        ;
+//    }];
 }
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
 {
@@ -117,7 +217,7 @@
 
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
 {
- 
+    
 }
 -(void)changeUI
 {
@@ -131,7 +231,7 @@
     }
     else
     {
-      nView=[[UIView alloc] initWithFrame:CGRectMake(20, 20, 280, 165)];
+        nView=[[UIView alloc] initWithFrame:CGRectMake(20, 20, 280, 165)];
     }
     
     nView.backgroundColor=[UIColor colorWithRed:255.0/255.0 green:255.0/255.0 blue:255.0/255.0 alpha:1.0];
@@ -154,11 +254,11 @@
     allTextView.font=[UIFont systemFontOfSize:16.0f];
     if (self.resustName.length>0)
     {
-         allTextView.text = [NSString stringWithFormat:@"我现在在%@吃饭，在用点美点进行点餐，用起来不错，推荐给大家。@DMD #点美点# ，随意选就餐环境、菜品、预定座位、在线点餐，尽在指尖，点即动美食定！http://www.tiankong360.com",self.resustName];
+        allTextView.text = [NSString stringWithFormat:@"我现在在%@吃饭，在用点美点进行点餐，用起来不错，推荐给大家。@DMD #点美点# ，随意选就餐环境、菜品、预定座位、在线点餐，尽在指尖，点即动美食定！http://www.tiankong360.com",self.resustName];
     }
     else
     {
-       allTextView.text = @"去那个好呢，东城，西城，城南，城北？哥们，要吃饭啊？@DMD #点美点# ，随意选就餐环境、菜品、预定座位、在线点餐，点美点，美一点，我的美餐！http://www.tiankong360.com";
+        allTextView.text = @"去那个好呢，东城，西城，城南，城北？哥们，要吃饭啊？@DMD #点美点# ，随意选就餐环境、菜品、预定座位、在线点餐，点美点，美一点，我的美餐！http://www.tiankong360.com";
     }
     [nView addSubview:allTextView];
     [self.view addSubview:allView];
@@ -168,7 +268,7 @@
         allView.frame = CGRectMake(0, 43, 320, self.view.frame.size.height);
         self.sendBtn.alpha = 1.0;
         self.lineImageView.alpha =  1.0;
-         self.lab_title.text=@"好友推荐";
+        self.lab_title.text=@"好友推荐";
     } completion:^(BOOL finished) {
     }];
 }
@@ -196,9 +296,9 @@
         [MyAlert ShowAlertMessage:@"分享成功" title:@""];
     }
     else
-   {
-       [MyAlert ShowAlertMessage:@"分享失败" title:@""];
-   }
+    {
+        [MyAlert ShowAlertMessage:@"分享失败" title:@""];
+    }
 }
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
